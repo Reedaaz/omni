@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Omnexor Dashboard</title>
+  <title>Panel de Control Omnexor</title>
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,13 +42,13 @@
   class="min-h-screen bg-[#f8fafc] text-gray-800 antialiased"
   x-data="{
     sidebarOpen: true,
-    activeNav: 'dashboard',
+    activeNav: 'panel',
     navItems: [
-      { id: 'dashboard',  label: 'Dashboard',  icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-      { id: 'analytics',  label: 'Analytics',  icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-      { id: 'projects',   label: 'Projects',   icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z' },
-      { id: 'team',       label: 'Team',       icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
-      { id: 'settings',   label: 'Settings',   icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+      { id: 'panel',      label: 'Panel',        icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+      { id: 'analiticas', label: 'Analíticas',   icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+      { id: 'proyectos',  label: 'Proyectos',    icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z' },
+      { id: 'equipo',     label: 'Equipo',       icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+      { id: 'ajustes',    label: 'Ajustes',      icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
     ]
   }"
 >
@@ -152,7 +152,7 @@
       <button
         @click="sidebarOpen = !sidebarOpen"
         class="absolute top-1/2 -right-3 -translate-y-1/2 w-6 h-6 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:text-indigo-600 hover:border-indigo-300 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10"
-        :title="sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'"
+        :title="sidebarOpen ? 'Contraer barra lateral' : 'Expandir barra lateral'"
       >
         <svg
           class="w-3.5 h-3.5 transition-transform duration-300"
@@ -185,7 +185,7 @@
         </button>
 
         <!-- Page title (driven by active nav) -->
-        <h1 class="text-base font-semibold text-gray-900 capitalize" x-text="activeNav"></h1>
+        <h1 class="text-base font-semibold text-gray-900 capitalize" x-text="activeNav.charAt(0).toUpperCase() + activeNav.slice(1)"></h1>
 
         <!-- Right-side actions -->
         <div class="flex items-center gap-3">
@@ -215,10 +215,10 @@
           <!-- Example placeholder content -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
             <template x-for="(card, i) in [
-              { label: 'Total Revenue',   value: '$48,295',  change: '+12.5%', up: true  },
-              { label: 'Active Projects', value: '24',       change: '+3',     up: true  },
-              { label: 'Team Members',    value: '138',      change: '-2',     up: false },
-              { label: 'Uptime',          value: '99.98%',   change: '+0.02%', up: true  },
+              { label: 'Ingresos Totales',    value: '$48,295',  change: '+12.5%', up: true  },
+              { label: 'Proyectos Activos',   value: '24',       change: '+3',     up: true  },
+              { label: 'Miembros del Equipo', value: '138',      change: '-2',     up: false },
+              { label: 'Disponibilidad',      value: '99.98%',   change: '+0.02%', up: true  },
             ]" :key="i">
               <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide" x-text="card.label"></p>
@@ -226,7 +226,7 @@
                 <p
                   class="mt-1 text-xs font-medium"
                   :class="card.up ? 'text-emerald-600' : 'text-red-500'"
-                  x-text="card.change + ' from last month'"
+                  x-text="card.change + ' respecto al mes anterior'"
                 ></p>
               </div>
             </template>
@@ -234,10 +234,10 @@
 
           <!-- Content placeholder -->
           <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-            <h2 class="text-sm font-semibold text-gray-700 mb-4">Content Area</h2>
+            <h2 class="text-sm font-semibold text-gray-700 mb-4">Área de Contenido</h2>
             <p class="text-sm text-gray-500">
-              This is the main content region. Replace this placeholder with page-specific components
-              for each section of the Omnexor Dashboard.
+              Esta es la región de contenido principal. Reemplaza este marcador de posición con componentes
+              específicos de cada sección del Panel de Control Omnexor.
             </p>
           </div>
 
