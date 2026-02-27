@@ -61,6 +61,51 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
+    /* ── Premium Kanban Card ── */
+    .kanban-card-premium {
+      position: relative;
+      background: rgba(12, 12, 25, 0.9);
+      border: 1px solid rgba(59,130,246,0.18);
+      border-radius: 0.875rem;
+      padding: 1rem;
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+    }
+    .kanban-card-premium:hover {
+      border-color: rgba(59,130,246,0.35);
+      box-shadow: 0 4px 24px rgba(59,130,246,0.12);
+    }
+    /* Glow trail overlay */
+    .card-glow-trail {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      background: radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.25) 0%, transparent 70%);
+    }
+    .card-glow-trail.active {
+      opacity: 1;
+      animation: glow-pulse 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes glow-pulse {
+      from { opacity: 0.4; }
+      to   { opacity: 1; }
+    }
+    /* Card moving state */
+    .card-moving {
+      transform: scale(1.04);
+      border-color: rgba(59,130,246,0.6) !important;
+      box-shadow: 0 0 30px rgba(59,130,246,0.35), 0 8px 32px rgba(59,130,246,0.2) !important;
+      z-index: 10;
+    }
+    /* Card arrived in new column */
+    .card-arrived {
+      border-color: rgba(245,158,11,0.35);
+      box-shadow: 0 0 20px rgba(245,158,11,0.15);
+    }
+
     /* ── Bento Box Dashboard ── */
     .bento-card {
       position: relative;
@@ -905,73 +950,342 @@
               </div>
             </div>
 
-            <!-- ── Tab: Clientes Potenciales ── -->
-            <div x-show="activeNav === 'clientes-potenciales' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Clientes Potenciales')" class="tab-content">
+            <!-- ── Tab: Clientes Potenciales (Cinematic Kanban) ── -->
+            <div
+              x-show="activeNav === 'clientes-potenciales' || (activeTab === 'Clientes Potenciales' && activeNav !== 'conversaciones' && activeNav !== 'calendarios')"
+              class="tab-content"
+              x-data="clientesPotencialesBoard()"
+              x-init="$watch('activeTab', val => { if (val === 'Clientes Potenciales') { onTabVisible(); scheduleAnim(); } })"
+              x-effect="activeTab === 'Clientes Potenciales' && !animDone ? scheduleAnim() : null"
+            >
+              <!-- Header -->
               <div class="flex items-center justify-between mb-6">
                 <div>
                   <h1 class="text-lg font-bold text-white">Clientes Potenciales</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Pipeline de ventas — gestiona tus leads por etapa</p>
                 </div>
-                <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  Nuevo Lead
-                </button>
-              </div>
-
-              <!-- Kanban board -->
-              <div class="overflow-x-auto pb-2">
-                <div class="flex gap-3 min-w-max">
-                  <template x-for="col in kanbanCols" :key="col.id">
-                    <div class="kanban-col flex flex-col">
-                      <!-- Column header -->
-                      <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
-                        <div class="flex items-center gap-2">
-                          <div class="w-2 h-2 rounded-full" :style="'background:' + col.color + '; box-shadow: 0 0 6px ' + col.color"></div>
-                          <span class="text-xs font-semibold text-slate-300" x-text="col.title"></span>
-                          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="col.leads.length"></span>
-                        </div>
-                        <button class="topbar-btn w-6 h-6">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      </div>
-                      <!-- Cards -->
-                      <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
-                        <template x-for="lead in col.leads" :key="lead.id">
-                          <div class="kanban-card">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                              <div class="flex items-center gap-2 min-w-0">
-                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" :style="'background: linear-gradient(135deg, #3b82f6, #8b5cf6)'">
-                                  <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
-                                </div>
-                                <div class="min-w-0">
-                                  <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
-                                  <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
-                                </div>
-                              </div>
-                              <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
-                            </div>
-                            <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
-                              <span class="text-emerald-400 font-semibold" x-text="'$' + lead.valor.toLocaleString()"></span>
-                              <span x-text="lead.fecha"></span>
-                            </div>
-                          </div>
-                        </template>
-                        <!-- Empty state -->
-                        <div x-show="col.leads.length === 0" class="flex flex-col items-center justify-center py-8 text-slate-700">
-                          <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          <p class="text-[10px]">Sin leads</p>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
+                <div class="flex items-center gap-3">
+                  <!-- Automation status badge -->
+                  <div
+                    class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-semibold transition-all duration-500"
+                    :class="animating
+                      ? 'bg-blue-500/20 border-blue-500/40 text-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                      : 'bg-white/5 border-white/10 text-slate-500'"
+                  >
+                    <svg class="w-3 h-3" :class="animating ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span x-text="animating ? 'Automatizando...' : 'Automatización activa'"></span>
+                  </div>
+                  <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nuevo Lead
+                  </button>
                 </div>
               </div>
+
+              <!-- Kanban board — 5 columns -->
+              <div class="overflow-x-auto pb-2">
+                <div class="flex gap-3" style="min-width: max-content;">
+
+                  <!-- ── Column: Nuevo Lead ── -->
+                  <div class="kanban-col flex flex-col">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-blue-500" style="box-shadow: 0 0 6px #3b82f6"></div>
+                        <span class="text-xs font-semibold text-slate-300">Nuevo Lead</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="nuevoLeadCount"></span>
+                      </div>
+                      <button class="topbar-btn w-6 h-6">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                      </button>
+                    </div>
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+
+                      <!-- ★ Juan Pérez — animated card ★ -->
+                      <div
+                        id="card-juan"
+                        class="kanban-card-premium"
+                        :class="{
+                          'card-moving': animating,
+                          'card-hidden': juanInContactado
+                        }"
+                        x-show="!juanInContactado"
+                        x-transition:leave="transition ease-in duration-300"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                      >
+                        <!-- Glow overlay while animating -->
+                        <div class="card-glow-trail" :class="animating ? 'active' : ''"></div>
+
+                        <!-- Top: avatar + source icons -->
+                        <div class="flex items-start justify-between mb-3">
+                          <div class="flex items-center gap-2.5">
+                            <div class="relative">
+                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-lg">JP</div>
+                              <!-- Active status ring -->
+                              <div class="absolute -inset-0.5 rounded-full border-2 border-blue-500/60 animate-pulse"></div>
+                            </div>
+                            <div>
+                              <p class="text-xs font-bold text-white">Juan Pérez</p>
+                              <div class="flex items-center gap-1 mt-0.5">
+                                <div class="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_4px_rgba(59,130,246,0.8)]"></div>
+                                <span class="text-[10px] text-blue-400 font-medium">Activo</span>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Source icons: WhatsApp + Instagram -->
+                          <div class="flex items-center gap-1.5">
+                            <!-- WhatsApp -->
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center" title="WhatsApp">
+                              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                              </svg>
+                            </div>
+                            <!-- Instagram -->
+                            <div class="w-6 h-6 rounded-lg bg-pink-500/15 border border-pink-500/25 flex items-center justify-center" title="Instagram">
+                              <svg class="w-3.5 h-3.5 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Company & details -->
+                        <div class="mb-3">
+                          <p class="text-[10px] text-slate-500">Empresa</p>
+                          <p class="text-[11px] text-slate-300 font-medium">Pérez Consulting S.L.</p>
+                        </div>
+
+                        <!-- Value + date row -->
+                        <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                          <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-bold text-emerald-400">€1.500</span>
+                            <span class="text-[9px] text-slate-600">/mes</span>
+                          </div>
+                          <span class="text-[10px] text-slate-600">27 feb</span>
+                        </div>
+                      </div>
+                      <!-- /Juan Pérez card -->
+
+                      <!-- Other leads in Nuevo Lead -->
+                      <template x-for="lead in nuevoLeadOtros" :key="lead.id">
+                        <div class="kanban-card">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                              </div>
+                            </div>
+                            <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                            <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- ── Column: Lead Calificado ── -->
+                  <div class="kanban-col flex flex-col">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500" style="box-shadow: 0 0 6px #10b981"></div>
+                        <span class="text-xs font-semibold text-slate-300">Lead Calificado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">2</span>
+                      </div>
+                      <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                    </div>
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+                      <template x-for="lead in calificadoLeads" :key="lead.id">
+                        <div class="kanban-card">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #10b981, #3b82f6)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                              </div>
+                            </div>
+                            <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                            <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- ── Column: Lead NO Calificado ── -->
+                  <div class="kanban-col flex flex-col">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-red-500" style="box-shadow: 0 0 6px #ef4444"></div>
+                        <span class="text-xs font-semibold text-slate-300">Lead NO Calificado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">1</span>
+                      </div>
+                      <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                    </div>
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+                      <template x-for="lead in noCalificadoLeads" :key="lead.id">
+                        <div class="kanban-card opacity-60">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #ef4444, #f59e0b)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-400 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                              </div>
+                            </div>
+                            <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 font-semibold" x-text="lead.fuente"></span>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-600 mt-2 pt-2 border-t border-white/5">
+                            <span x-text="'€' + lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- ── Column: Contactado ── -->
+                  <div class="kanban-col flex flex-col">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-amber-500" style="box-shadow: 0 0 6px #f59e0b"></div>
+                        <span class="text-xs font-semibold text-slate-300">Contactado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="contactadoCount"></span>
+                      </div>
+                      <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                    </div>
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+
+                      <!-- Juan Pérez appears here after animation -->
+                      <div
+                        x-show="juanInContactado"
+                        x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        class="kanban-card-premium"
+                        :class="juanInContactado ? 'card-arrived' : ''"
+                      >
+                        <div class="card-glow-trail" :class="juanInContactado && animating ? 'active' : ''"></div>
+                        <div class="flex items-start justify-between mb-3">
+                          <div class="flex items-center gap-2.5">
+                            <div class="relative">
+                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-lg">JP</div>
+                              <div class="absolute -inset-0.5 rounded-full border-2 border-amber-500/60 animate-pulse"></div>
+                            </div>
+                            <div>
+                              <p class="text-xs font-bold text-white">Juan Pérez</p>
+                              <div class="flex items-center gap-1 mt-0.5">
+                                <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_4px_rgba(245,158,11,0.8)]"></div>
+                                <span class="text-[10px] text-amber-400 font-medium">Contactado</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+                              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </div>
+                            <div class="w-6 h-6 rounded-lg bg-pink-500/15 border border-pink-500/25 flex items-center justify-center">
+                              <svg class="w-3.5 h-3.5 text-pink-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <p class="text-[10px] text-slate-500">Empresa</p>
+                          <p class="text-[11px] text-slate-300 font-medium">Pérez Consulting S.L.</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                          <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-bold text-emerald-400">€1.500</span>
+                            <span class="text-[9px] text-slate-600">/mes</span>
+                          </div>
+                          <span class="text-[10px] text-slate-600">27 feb</span>
+                        </div>
+                      </div>
+
+                      <!-- Other contactado leads -->
+                      <template x-for="lead in contactadoLeads" :key="lead.id">
+                        <div class="kanban-card">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #f59e0b, #ef4444)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                              </div>
+                            </div>
+                            <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                            <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Empty state when no leads and Juan not here yet -->
+                      <div x-show="contactadoLeads.length === 0 && !juanInContactado" class="flex flex-col items-center justify-center py-8 text-slate-700">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <p class="text-[10px]">Sin leads</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ── Column: Reunión Agendada ── -->
+                  <div class="kanban-col flex flex-col">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-violet-500" style="box-shadow: 0 0 6px #8b5cf6"></div>
+                        <span class="text-xs font-semibold text-slate-300">Reunión Agendada</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">1</span>
+                      </div>
+                      <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                    </div>
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+                      <template x-for="lead in reunionLeads" :key="lead.id">
+                        <div class="kanban-card">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                              </div>
+                            </div>
+                            <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                            <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                </div><!-- /flex -->
+              </div><!-- /overflow-x-auto -->
             </div>
 
           </div><!-- /glass-panel -->
@@ -1252,6 +1566,89 @@
         onMouseLeave(el) {
           el.style.setProperty('--mouse-x', '50%');
           el.style.setProperty('--mouse-y', '50%');
+        },
+      };
+    }
+
+    /* ── Clientes Potenciales Cinematic Kanban ── */
+    function clientesPotencialesBoard() {
+      return {
+        /* Animation state */
+        animating: false,
+        animDone: false,
+        juanInContactado: false,
+        animTimer: null,
+
+        /* Column data */
+        nuevoLeadOtros: [
+          { id: 2, nombre: 'Laura Ríos',      empresa: 'Grupo Ríos',      valor: 3200,  fuente: 'Referido', fecha: '25 feb' },
+          { id: 3, nombre: 'Andrés Castillo',  empresa: '',                valor: 900,   fuente: 'LinkedIn', fecha: '26 feb' },
+        ],
+        calificadoLeads: [
+          { id: 4, nombre: 'Sofía Herrera',    empresa: 'Innovatek',       valor: 4500,  fuente: 'Email',    fecha: '20 feb' },
+          { id: 5, nombre: 'Miguel Torres',    empresa: 'Distribuidora T', valor: 12000, fuente: 'Evento',   fecha: '22 feb' },
+        ],
+        noCalificadoLeads: [
+          { id: 6, nombre: 'Pedro Gómez',      empresa: 'Gómez & Hijos',   valor: 200,   fuente: 'Web',      fecha: '18 feb' },
+        ],
+        contactadoLeads: [
+          { id: 7, nombre: 'Diana Morales',    empresa: 'DM Consulting',   valor: 2800,  fuente: 'LinkedIn', fecha: '17 feb' },
+        ],
+        reunionLeads: [
+          { id: 8, nombre: 'Patricia Vega',    empresa: 'Vega & Asoc.',    valor: 5000,  fuente: 'Web',      fecha: '18 feb' },
+        ],
+
+        /* Computed counts */
+        get nuevoLeadCount() {
+          return this.nuevoLeadOtros.length + (this.juanInContactado ? 0 : 1);
+        },
+        get contactadoCount() {
+          return this.contactadoLeads.length + (this.juanInContactado ? 1 : 0);
+        },
+
+        /* Source badge helper (mirrors omnexorApp) */
+        sourceBadge(fuente) {
+          const map = {
+            'Web':      'bg-blue-500/15 text-blue-400',
+            'Referido': 'bg-emerald-500/15 text-emerald-400',
+            'LinkedIn': 'bg-violet-500/15 text-violet-400',
+            'Email':    'bg-amber-500/15 text-amber-400',
+            'Evento':   'bg-pink-500/15 text-pink-400',
+            'Otro':     'bg-slate-500/15 text-slate-400',
+          };
+          return map[fuente] || 'bg-slate-500/15 text-slate-400';
+        },
+
+        onTabVisible() {
+          // Reset on first mount
+          this.animDone = false;
+          this.juanInContactado = false;
+          this.animating = false;
+        },
+
+        scheduleAnim() {
+          if (this.animDone || this.animTimer) return;
+          this.animTimer = setTimeout(() => {
+            this.triggerMoveAnimation();
+          }, 3000);
+        },
+
+        triggerMoveAnimation() {
+          if (this.animDone) return;
+          // Phase 1: show glow + scale on card
+          this.animating = true;
+
+          // Phase 2: after 800ms, remove from Nuevo Lead
+          setTimeout(() => {
+            this.juanInContactado = true;
+          }, 800);
+
+          // Phase 3: after card arrives, stop animating state
+          setTimeout(() => {
+            this.animating = false;
+            this.animDone = true;
+            this.animTimer = null;
+          }, 1600);
         },
       };
     }
