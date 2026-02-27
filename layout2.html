@@ -271,9 +271,48 @@
       border-radius: 99px;
     }
 
-    /* ── Tab content fade ── */
+    /* ── Tab content — liquid slide transitions ── */
     .tab-content {
-      animation: fade-in 0.4s ease both;
+      /* Base: no animation by default; transitions handled by x-transition */
+    }
+
+    /* Enter: slide in from right */
+    @keyframes tab-enter {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    /* Leave: slide out to left */
+    @keyframes tab-leave {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-28px); }
+    }
+    .tab-enter-active {
+      animation: tab-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .tab-leave-active {
+      animation: tab-leave 0.35s ease-in both;
+      position: absolute;
+      width: 100%;
+    }
+
+    /* ── Inner progress bar (inside glass panel) ── */
+    .inner-progress-track {
+      height: 2px;
+      background: rgba(59,130,246,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .inner-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transform-origin: left;
+      animation: inner-progress 6s linear forwards;
+    }
+    @keyframes inner-progress {
+      from { width: 0%; }
+      to   { width: 100%; }
     }
 
     /* ── Sidebar nav item (light) ── */
@@ -585,8 +624,25 @@
         <div class="border-beam-wrapper animate-pulse-glow max-w-7xl mx-auto">
           <div class="glass-panel rounded-[1.25rem] p-5 min-h-[calc(100vh-7rem)]">
 
+            <!-- ── Inner progress bar ── -->
+            <div class="inner-progress-track">
+              <div
+                class="inner-progress-fill"
+                :key="progressKey"
+                :style="'animation-duration: 6s'"
+              ></div>
+            </div>
+
+            <!-- Tab sections wrapper (relative for absolute leave animation) -->
+            <div class="relative overflow-hidden">
+
             <!-- ── Tab: Inicio (Dashboard) ── -->
-            <div x-show="activeNav === 'inicio'" class="tab-content">
+            <div
+              x-show="activeNav === 'inicio'"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
+              class="tab-content"
+            >
 
               <!-- Header row -->
               <div class="flex items-center justify-between mb-6">
@@ -670,6 +726,8 @@
             <!-- ── Tab: Dashboard (Bento Box) — visible when activeTab === 'Dashboard' ── -->
             <div
               x-show="activeTab === 'Dashboard' && activeNav !== 'dashboard'"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
               class="tab-content"
               x-data="bentoDashboard()"
               x-init="initBento()"
@@ -734,7 +792,12 @@
             </div>
 
             <!-- ── Tab: Dashboard (nav) ── -->
-            <div x-show="activeNav === 'dashboard'" class="tab-content">
+            <div
+              x-show="activeNav === 'dashboard'"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
+              class="tab-content"
+            >
               <div class="flex items-center justify-between mb-6">
                 <div>
                   <h1 class="text-lg font-bold text-slate-900">Dashboard</h1>
@@ -783,9 +846,11 @@
             <!-- ── Tab: Conversaciones (Live Chat) ── -->
             <div
               x-show="activeNav === 'conversaciones' || activeTab === 'Conversaciones'"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
               class="tab-content"
               x-data="conversacionesChat()"
-              x-init="$watch('activeTab', val => { if (val === 'Conversaciones') startLiveDemo(); })"
+              x-init="$watch('activeTab', val => { if (val === 'Conversaciones') { setTimeout(() => startLiveDemo(), 600); } })"
             >
               <!-- Header -->
               <div class="flex items-center justify-between mb-5">
@@ -1001,7 +1066,12 @@
             </div>
 
             <!-- ── Tab: Calendarios ── -->
-            <div x-show="activeNav === 'calendarios' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Calendarios')" class="tab-content">
+            <div
+              x-show="activeNav === 'calendarios' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Calendarios')"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
+              class="tab-content"
+            >
               <div class="flex items-center justify-between mb-6">
                 <div>
                   <h1 class="text-lg font-bold text-slate-900">Calendarios</h1>
@@ -1071,7 +1141,12 @@
             </div>
 
             <!-- ── Tab: Contactos ── -->
-            <div x-show="activeNav === 'contactos'" class="tab-content">
+            <div
+              x-show="activeNav === 'contactos'"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
+              class="tab-content"
+            >
               <div class="flex items-center justify-between mb-6">
                 <div>
                   <h1 class="text-lg font-bold text-slate-900">Contactos</h1>
@@ -1100,10 +1175,11 @@
             <!-- ── Tab: Clientes Potenciales (Cinematic Kanban) ── -->
             <div
               x-show="activeNav === 'clientes-potenciales' || (activeTab === 'Clientes Potenciales' && activeNav !== 'conversaciones' && activeNav !== 'calendarios')"
+              x-transition:enter="tab-enter-active"
+              x-transition:leave="tab-leave-active"
               class="tab-content"
               x-data="clientesPotencialesBoard()"
-              x-init="$watch('activeTab', val => { if (val === 'Clientes Potenciales') { onTabVisible(); scheduleAnim(); } })"
-              x-effect="activeTab === 'Clientes Potenciales' && !animDone ? scheduleAnim() : null"
+              x-init="$watch('activeTab', val => { if (val === 'Clientes Potenciales') { onTabVisible(); setTimeout(() => scheduleAnim(), 600); } })"
             >
               <!-- Header -->
               <div class="flex items-center justify-between mb-6">
@@ -1434,6 +1510,8 @@
                 </div><!-- /flex -->
               </div><!-- /overflow-x-auto -->
             </div>
+
+            </div><!-- /relative overflow-hidden wrapper -->
 
           </div><!-- /glass-panel -->
         </div><!-- /border-beam-wrapper -->
