@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnexor — Panel Cinematic</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            omnexor: '#3b82f6',
+          },
+          keyframes: {
+            'border-beam': {
+              '0%':   { backgroundPosition: '0% 50%' },
+              '50%':  { backgroundPosition: '100% 50%' },
+              '100%': { backgroundPosition: '0% 50%' },
+            },
+            'progress-bar': {
+              '0%':   { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            'fade-in': {
+              '0%':   { opacity: '0', transform: 'translateY(6px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'pulse-glow': {
+              '0%, 100%': { boxShadow: '0 0 20px 2px rgba(59,130,246,0.15)' },
+              '50%':       { boxShadow: '0 0 40px 8px rgba(59,130,246,0.35)' },
+            },
+            'spin-slow': {
+              '0%':   { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' },
+            },
+          },
+          animation: {
+            'border-beam':  'border-beam 6s ease infinite',
+            'progress-bar': 'progress-bar 10s linear forwards',
+            'fade-in':      'fade-in 0.4s ease both',
+            'pulse-glow':   'pulse-glow 3s ease-in-out infinite',
+            'spin-slow':    'spin-slow 12s linear infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background-color: #030303;
+      color: #e2e8f0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 99px; }
+
+    /* ── Glassmorphism container ── */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.80);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(59,130,246,0.12);
+    }
+
+    /* ── Rotating border-beam glow ── */
+    .border-beam-wrapper {
+      position: relative;
+      border-radius: 1.25rem;
+    }
+    .border-beam-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(
+        var(--beam-angle, 0deg),
+        transparent 20%,
+        rgba(59,130,246,0.7) 40%,
+        rgba(139,92,246,0.5) 60%,
+        transparent 80%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      animation: beam-rotate 6s linear infinite;
+    }
+    @keyframes beam-rotate {
+      0%   { --beam-angle: 0deg; }
+      100% { --beam-angle: 360deg; }
+    }
+    @property --beam-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    /* ── Progress bar ── */
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+      background-size: 200% 100%;
+      animation: progress-bar 10s linear forwards, border-beam 3s ease infinite;
+      border-radius: 99px;
+    }
+
+    /* ── Tab content fade ── */
+    .tab-content {
+      animation: fade-in 0.4s ease both;
+    }
+
+    /* ── Sidebar nav item ── */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.625rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: rgba(148,163,184,0.85);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover {
+      background: rgba(59,130,246,0.08);
+      color: #e2e8f0;
+    }
+    .nav-item.active {
+      background: rgba(59,130,246,0.15);
+      color: #3b82f6;
+      border-color: rgba(59,130,246,0.25);
+    }
+    .nav-item.active svg {
+      filter: drop-shadow(0 0 4px rgba(59,130,246,0.6));
+    }
+
+    /* ── Stat card ── */
+    .stat-card {
+      background: rgba(15,15,25,0.7);
+      border: 1px solid rgba(59,130,246,0.1);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+      border-color: rgba(59,130,246,0.3);
+      box-shadow: 0 0 20px rgba(59,130,246,0.1);
+    }
+
+    /* ── Kanban column ── */
+    .kanban-col {
+      background: rgba(10,10,20,0.6);
+      border: 1px solid rgba(59,130,246,0.1);
+      border-radius: 1rem;
+      min-width: 260px;
+      max-width: 260px;
+    }
+    .kanban-card {
+      background: rgba(15,15,30,0.8);
+      border: 1px solid rgba(59,130,246,0.08);
+      border-radius: 0.75rem;
+      padding: 0.875rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: grab;
+    }
+    .kanban-card:hover {
+      border-color: rgba(59,130,246,0.25);
+      box-shadow: 0 4px 20px rgba(59,130,246,0.08);
+    }
+
+    /* ── Calendar grid ── */
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cal-day:hover { background: rgba(59,130,246,0.15); }
+    .cal-day.today {
+      background: rgba(59,130,246,0.25);
+      color: #3b82f6;
+      font-weight: 700;
+    }
+    .cal-day.has-event::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #3b82f6;
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .cal-day { position: relative; }
+
+    /* ── Conversation item ── */
+    .conv-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+    .conv-item:hover {
+      background: rgba(59,130,246,0.07);
+      border-color: rgba(59,130,246,0.12);
+    }
+    .conv-item.active-conv {
+      background: rgba(59,130,246,0.12);
+      border-color: rgba(59,130,246,0.2);
+    }
+
+    /* ── Glow dot ── */
+    .glow-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #3b82f6;
+      box-shadow: 0 0 6px 2px rgba(59,130,246,0.6);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* ── Top bar icon btn ── */
+    .topbar-btn {
+      width: 2rem; height: 2rem;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 0.5rem;
+      color: rgba(148,163,184,0.7);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .topbar-btn:hover {
+      background: rgba(59,130,246,0.1);
+      color: #3b82f6;
+    }
+  </style>
+</head>
+
+<body
+  class="min-h-screen antialiased"
+  x-data="omnexorApp()"
+  x-init="init()"
+>
+
+  <!-- ══════════════════════════════════════════
+       PROGRESS BAR (top of viewport)
+  ══════════════════════════════════════════ -->
+  <div class="fixed top-0 left-0 right-0 z-50 h-[2px] bg-white/5">
+    <div
+      class="progress-fill"
+      :key="progressKey"
+      :style="'animation-duration: 10s'"
+    ></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       AMBIENT BACKGROUND ORBS
+  ══════════════════════════════════════════ -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full"
+         style="background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);"></div>
+    <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full"
+         style="background: radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%);"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
+         style="background: radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 60%);"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN LAYOUT
+  ══════════════════════════════════════════ -->
+  <div class="flex h-screen overflow-hidden pt-[2px]">
+
+    <!-- ════════════════════════════
+         SIDEBAR
+    ════════════════════════════ -->
+    <aside class="flex flex-col flex-shrink-0 w-56 glass-panel border-r border-white/5 z-10">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-4 h-14 border-b border-white/5 flex-shrink-0">
+        <!-- Animated logo mark -->
+        <div class="relative flex-shrink-0 w-7 h-7">
+          <div class="absolute inset-0 rounded-lg bg-blue-500/20 animate-pulse-glow"></div>
+          <div class="relative w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <span class="text-sm font-bold text-white tracking-wide">Omnexor</span>
+          <div class="flex items-center gap-1 mt-0.5">
+            <div class="glow-dot" style="width:5px;height:5px;"></div>
+            <span class="text-[10px] text-blue-400/80 font-medium">En línea</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+        <p class="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-600">Principal</p>
+
+        <template x-for="item in navItems" :key="item.id">
+          <div
+            class="nav-item"
+            :class="{ 'active': activeNav === item.id }"
+            @click="activeNav = item.id"
+          >
+            <svg class="flex-shrink-0 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+            </svg>
+            <span x-text="item.label"></span>
+            <!-- Active indicator dot -->
+            <div x-show="activeNav === item.id" class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_2px_rgba(59,130,246,0.6)]"></div>
+          </div>
+        </template>
+      </nav>
+
+      <!-- User profile -->
+      <div class="flex-shrink-0 border-t border-white/5 p-3">
+        <div class="flex items-center gap-2.5">
+          <div class="relative flex-shrink-0">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+              <span class="text-xs font-bold text-white">JD</span>
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-white truncate">Jane Doe</p>
+            <p class="text-[10px] text-slate-500 truncate">jane@omnexor.io</p>
+          </div>
+          <button class="ml-auto topbar-btn flex-shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+    <!-- ════════════════════════════ /SIDEBAR ════════════════════════════ -->
+
+    <!-- ════════════════════════════
+         MAIN AREA
+    ════════════════════════════ -->
+    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+
+      <!-- ── TOP BAR ── -->
+      <header class="flex-shrink-0 flex items-center justify-between h-14 px-5 glass-panel border-b border-white/5 z-10">
+
+        <!-- Left: breadcrumb / page title -->
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] text-slate-600 font-medium">Omnexor</span>
+          <svg class="w-3 h-3 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          <span class="text-xs font-semibold text-slate-300" x-text="navItems.find(n => n.id === activeNav)?.label || ''"></span>
+        </div>
+
+        <!-- Center: Tab pills (auto-cycling) -->
+        <div class="hidden md:flex items-center gap-1 bg-white/5 rounded-xl p-1">
+          <template x-for="tab in cycleTabs" :key="tab">
+            <button
+              @click="activeTab = tab; resetCycle()"
+              class="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
+              :class="activeTab === tab
+                ? 'bg-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
+                : 'text-slate-500 hover:text-slate-300'"
+              x-text="tab"
+            ></button>
+          </template>
+        </div>
+
+        <!-- Right: icon actions -->
+        <div class="flex items-center gap-1">
+          <!-- Search -->
+          <button class="topbar-btn" title="Buscar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+          <!-- Notifications -->
+          <button class="topbar-btn relative" title="Notificaciones">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_4px_rgba(59,130,246,0.8)]"></span>
+          </button>
+          <!-- Grid view -->
+          <button class="topbar-btn" title="Vista de cuadrícula">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </button>
+          <!-- Divider -->
+          <div class="w-px h-5 bg-white/10 mx-1"></div>
+          <!-- Avatar -->
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+            <span class="text-[10px] font-bold text-white">JD</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── CONTENT AREA ── -->
+      <main class="flex-1 overflow-y-auto p-5">
+
+        <!-- ════════════════════════════
+             GLASSMORPHISM DASHBOARD CONTAINER
+        ════════════════════════════ -->
+        <div class="border-beam-wrapper animate-pulse-glow max-w-7xl mx-auto">
+          <div class="glass-panel rounded-[1.25rem] p-5 min-h-[calc(100vh-7rem)]">
+
+            <!-- ── Tab: Inicio (Dashboard) ── -->
+            <div x-show="activeNav === 'inicio'" class="tab-content">
+
+              <!-- Header row -->
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Bienvenido de vuelta, Jane</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Aquí tienes un resumen de tu actividad reciente</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                  <div class="glow-dot" style="width:6px;height:6px;"></div>
+                  <span>Actualizado ahora</span>
+                </div>
+              </div>
+
+              <!-- Stat cards -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <template x-for="(card, i) in statCards" :key="i">
+                  <div class="stat-card">
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" :style="'background:' + card.iconBg">
+                        <svg class="w-4 h-4" :style="'color:' + card.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                          <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
+                        </svg>
+                      </div>
+                      <span
+                        class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                        :class="card.up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'"
+                        x-text="card.change"
+                      ></span>
+                    </div>
+                    <p class="text-xl font-bold text-white" x-text="card.value"></p>
+                    <p class="text-[11px] text-slate-500 mt-0.5" x-text="card.label"></p>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Activity + Quick actions -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Activity feed -->
+                <div class="lg:col-span-2 stat-card">
+                  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Actividad Reciente</h3>
+                  <div class="space-y-3">
+                    <template x-for="(act, i) in recentActivity" :key="i">
+                      <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5" :style="'background:' + act.bg">
+                          <svg class="w-3.5 h-3.5" :style="'color:' + act.color" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" :d="act.icon" />
+                          </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs text-slate-300" x-text="act.text"></p>
+                          <p class="text-[10px] text-slate-600 mt-0.5" x-text="act.time"></p>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="stat-card">
+                  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Acciones Rápidas</h3>
+                  <div class="space-y-2">
+                    <template x-for="(qa, i) in quickActions" :key="i">
+                      <button
+                        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-150 border border-transparent hover:border-blue-500/20"
+                        @click="activeNav = qa.nav"
+                      >
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                          <path stroke-linecap="round" stroke-linejoin="round" :d="qa.icon" />
+                        </svg>
+                        <span x-text="qa.label"></span>
+                        <svg class="w-3 h-3 ml-auto opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Tab: Dashboard ── -->
+            <div x-show="activeNav === 'dashboard'" class="tab-content">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Dashboard</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Métricas y análisis en tiempo real</p>
+                </div>
+              </div>
+
+              <!-- KPI row -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <template x-for="(card, i) in statCards" :key="i">
+                  <div class="stat-card">
+                    <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2" x-text="card.label"></p>
+                    <p class="text-2xl font-bold text-white" x-text="card.value"></p>
+                    <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                      <div class="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full" :style="'width:' + card.pct + '%'"></div>
+                    </div>
+                    <p class="text-[10px] mt-1" :class="card.up ? 'text-emerald-400' : 'text-red-400'" x-text="card.change + ' vs mes anterior'"></p>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Chart placeholder -->
+              <div class="stat-card">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Rendimiento Mensual</h3>
+                  <div class="flex gap-2">
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400">Ingresos</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400">Leads</span>
+                  </div>
+                </div>
+                <!-- SVG bar chart -->
+                <div class="flex items-end gap-2 h-32 px-2">
+                  <template x-for="(bar, i) in chartBars" :key="i">
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        class="w-full rounded-t-sm transition-all duration-500"
+                        :style="'height:' + bar.h + '%; background: linear-gradient(to top, rgba(59,130,246,0.6), rgba(139,92,246,0.4))'"
+                      ></div>
+                      <span class="text-[9px] text-slate-600" x-text="bar.label"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Tab: Conversaciones ── -->
+            <div x-show="activeNav === 'conversaciones' || activeTab === 'Conversaciones'" class="tab-content">
+              <div x-show="activeNav === 'conversaciones' || (activeNav !== 'conversaciones' && activeTab === 'Conversaciones')">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 class="text-lg font-bold text-white">Conversaciones</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestiona tus mensajes y chats activos</p>
+                  </div>
+                  <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nueva conversación
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <!-- Conversation list -->
+                  <div class="stat-card space-y-1">
+                    <div class="flex items-center gap-2 mb-3">
+                      <div class="flex-1 flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" placeholder="Buscar..." class="bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none flex-1" />
+                      </div>
+                    </div>
+                    <template x-for="(conv, i) in conversations" :key="i">
+                      <div class="conv-item" :class="{ 'active-conv': i === 0 }">
+                        <div class="relative flex-shrink-0">
+                          <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" :style="'background:' + conv.color">
+                            <span x-text="conv.initials"></span>
+                          </div>
+                          <div x-show="conv.online" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold text-slate-200 truncate" x-text="conv.name"></p>
+                            <span class="text-[10px] text-slate-600 flex-shrink-0 ml-1" x-text="conv.time"></span>
+                          </div>
+                          <p class="text-[11px] text-slate-500 truncate mt-0.5" x-text="conv.last"></p>
+                        </div>
+                        <div x-show="conv.unread > 0" class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                          <span class="text-[9px] font-bold text-white" x-text="conv.unread"></span>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+
+                  <!-- Chat window -->
+                  <div class="lg:col-span-2 stat-card flex flex-col" style="min-height: 400px;">
+                    <div class="flex items-center gap-3 pb-3 border-b border-white/5 mb-3">
+                      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white">CM</div>
+                      <div>
+                        <p class="text-xs font-semibold text-white">Carlos Mendoza</p>
+                        <p class="text-[10px] text-emerald-400">En línea</p>
+                      </div>
+                      <div class="ml-auto flex gap-1">
+                        <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg></button>
+                        <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
+                      </div>
+                    </div>
+                    <div class="flex-1 space-y-3 overflow-y-auto pr-1">
+                      <template x-for="(msg, i) in chatMessages" :key="i">
+                        <div class="flex" :class="msg.mine ? 'justify-end' : 'justify-start'">
+                          <div
+                            class="max-w-[70%] px-3 py-2 rounded-xl text-xs"
+                            :class="msg.mine
+                              ? 'bg-blue-500/25 text-blue-100 rounded-br-sm border border-blue-500/20'
+                              : 'bg-white/5 text-slate-300 rounded-bl-sm border border-white/8'"
+                          >
+                            <p x-text="msg.text"></p>
+                            <p class="text-[9px] mt-1 opacity-50" x-text="msg.time"></p>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                    <div class="mt-3 flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/8">
+                      <input type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none" />
+                      <button class="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 hover:bg-blue-500/30 transition-all">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Tab: Calendarios ── -->
+            <div x-show="activeNav === 'calendarios' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Calendarios')" class="tab-content">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Calendarios</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Gestiona tus eventos y reuniones</p>
+                </div>
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nuevo evento
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Calendar grid -->
+                <div class="lg:col-span-2 stat-card">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-white">Febrero 2026</h3>
+                    <div class="flex gap-1">
+                      <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
+                      <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></button>
+                    </div>
+                  </div>
+                  <!-- Day headers -->
+                  <div class="grid grid-cols-7 gap-1 mb-2">
+                    <template x-for="d in ['Lu','Ma','Mi','Ju','Vi','Sá','Do']" :key="d">
+                      <div class="text-center text-[10px] font-semibold text-slate-600 py-1" x-text="d"></div>
+                    </template>
+                  </div>
+                  <!-- Days -->
+                  <div class="grid grid-cols-7 gap-1">
+                    <template x-for="(day, i) in calDays" :key="i">
+                      <div
+                        class="cal-day text-slate-400"
+                        :class="{
+                          'text-slate-700': !day.current,
+                          'today': day.today,
+                          'has-event': day.event
+                        }"
+                        x-text="day.n"
+                      ></div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Upcoming events -->
+                <div class="stat-card">
+                  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Próximos Eventos</h3>
+                  <div class="space-y-3">
+                    <template x-for="(ev, i) in upcomingEvents" :key="i">
+                      <div class="flex gap-3 p-2.5 rounded-lg bg-white/3 border border-white/5 hover:border-blue-500/20 transition-all">
+                        <div class="flex-shrink-0 w-1 rounded-full self-stretch" :style="'background:' + ev.color"></div>
+                        <div class="min-w-0">
+                          <p class="text-xs font-semibold text-slate-200 truncate" x-text="ev.title"></p>
+                          <p class="text-[10px] text-slate-500 mt-0.5" x-text="ev.time"></p>
+                          <div class="flex items-center gap-1 mt-1.5">
+                            <template x-for="(att, j) in ev.attendees" :key="j">
+                              <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white -ml-1 first:ml-0 border border-[#0a0a0f]" :style="'background:' + att.color" x-text="att.initials"></div>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Tab: Contactos ── -->
+            <div x-show="activeNav === 'contactos'" class="tab-content">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Contactos</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Directorio de contactos y clientes</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="(c, i) in contacts" :key="i">
+                  <div class="stat-card flex items-center gap-3 cursor-pointer hover:border-blue-500/25 transition-all">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0" :style="'background:' + c.color">
+                      <span x-text="c.initials"></span>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-white truncate" x-text="c.name"></p>
+                      <p class="text-[11px] text-slate-500 truncate" x-text="c.company"></p>
+                      <p class="text-[10px] text-blue-400/70 truncate mt-0.5" x-text="c.email"></p>
+                    </div>
+                    <div class="ml-auto flex-shrink-0">
+                      <span class="text-[10px] px-2 py-0.5 rounded-full" :class="c.active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-500/15 text-slate-500'" x-text="c.active ? 'Activo' : 'Inactivo'"></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- ── Tab: Clientes Potenciales ── -->
+            <div x-show="activeNav === 'clientes-potenciales' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Clientes Potenciales')" class="tab-content">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Clientes Potenciales</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Pipeline de ventas — gestiona tus leads por etapa</p>
+                </div>
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nuevo Lead
+                </button>
+              </div>
+
+              <!-- Kanban board -->
+              <div class="overflow-x-auto pb-2">
+                <div class="flex gap-3 min-w-max">
+                  <template x-for="col in kanbanCols" :key="col.id">
+                    <div class="kanban-col flex flex-col">
+                      <!-- Column header -->
+                      <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                        <div class="flex items-center gap-2">
+                          <div class="w-2 h-2 rounded-full" :style="'background:' + col.color + '; box-shadow: 0 0 6px ' + col.color"></div>
+                          <span class="text-xs font-semibold text-slate-300" x-text="col.title"></span>
+                          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="col.leads.length"></span>
+                        </div>
+                        <button class="topbar-btn w-6 h-6">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                      <!-- Cards -->
+                      <div class="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-22rem)]">
+                        <template x-for="lead in col.leads" :key="lead.id">
+                          <div class="kanban-card">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                              <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" :style="'background: linear-gradient(135deg, #3b82f6, #8b5cf6)'">
+                                  <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                                </div>
+                                <div class="min-w-0">
+                                  <p class="text-[11px] font-semibold text-slate-200 truncate" x-text="lead.nombre"></p>
+                                  <p class="text-[10px] text-slate-600 truncate" x-text="lead.empresa || '—'"></p>
+                                </div>
+                              </div>
+                              <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                              <span class="text-emerald-400 font-semibold" x-text="'$' + lead.valor.toLocaleString()"></span>
+                              <span x-text="lead.fecha"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <!-- Empty state -->
+                        <div x-show="col.leads.length === 0" class="flex flex-col items-center justify-center py-8 text-slate-700">
+                          <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <p class="text-[10px]">Sin leads</p>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /glass-panel -->
+        </div><!-- /border-beam-wrapper -->
+
+        <!-- ── Auto-cycle indicator (bottom) ── -->
+        <div class="max-w-7xl mx-auto mt-3 flex items-center justify-center gap-3">
+          <template x-for="tab in cycleTabs" :key="tab">
+            <div class="flex items-center gap-1.5">
+              <div
+                class="h-1 rounded-full transition-all duration-300"
+                :class="activeTab === tab ? 'w-6 bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' : 'w-1.5 bg-white/15'"
+              ></div>
+              <span
+                class="text-[10px] font-medium transition-colors duration-300"
+                :class="activeTab === tab ? 'text-blue-400' : 'text-slate-700'"
+                x-text="tab"
+              ></span>
+            </div>
+          </template>
+        </div>
+
+      </main>
+    </div>
+    <!-- ════════════════════════════ /MAIN AREA ════════════════════════════ -->
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ALPINE.JS APP LOGIC
+  ══════════════════════════════════════════ -->
+  <script>
+    function omnexorApp() {
+      return {
+        /* ── State ── */
+        activeNav: 'inicio',
+        activeTab: 'Conversaciones',
+        cycleTabs: ['Conversaciones', 'Calendarios', 'Clientes Potenciales'],
+        cycleIndex: 0,
+        cycleTimer: null,
+        progressKey: 0,
+
+        /* ── Nav items ── */
+        navItems: [
+          { id: 'inicio',              label: 'Inicio',               icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+          { id: 'dashboard',           label: 'Dashboard',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+          { id: 'conversaciones',      label: 'Conversaciones',       icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+          { id: 'calendarios',         label: 'Calendarios',          icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+          { id: 'contactos',           label: 'Contactos',            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+          { id: 'clientes-potenciales',label: 'Clientes Potenciales', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+        ],
+
+        /* ── Stat cards ── */
+        statCards: [
+          { label: 'Ingresos Totales',    value: '$48,295',  change: '+12.5%', up: true,  pct: 72, icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', iconBg: 'rgba(16,185,129,0.15)', iconColor: '#10b981' },
+          { label: 'Proyectos Activos',   value: '24',       change: '+3',     up: true,  pct: 55, icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z', iconBg: 'rgba(59,130,246,0.15)', iconColor: '#3b82f6' },
+          { label: 'Miembros del Equipo', value: '138',      change: '-2',     up: false, pct: 88, icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', iconBg: 'rgba(139,92,246,0.15)', iconColor: '#8b5cf6' },
+          { label: 'Disponibilidad',      value: '99.98%',   change: '+0.02%', up: true,  pct: 99, icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', iconBg: 'rgba(245,158,11,0.15)', iconColor: '#f59e0b' },
+        ],
+
+        /* ── Recent activity ── */
+        recentActivity: [
+          { text: 'Carlos Mendoza envió un nuevo mensaje', time: 'Hace 2 minutos', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', bg: 'rgba(59,130,246,0.15)', color: '#3b82f6' },
+          { text: 'Reunión con Innovatek agendada para mañana', time: 'Hace 15 minutos', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', bg: 'rgba(16,185,129,0.15)', color: '#10b981' },
+          { text: 'Nuevo lead: Sofía Herrera — $75,000', time: 'Hace 1 hora', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
+          { text: 'Proyecto "Rediseño Web" marcado como completado', time: 'Hace 3 horas', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'rgba(139,92,246,0.15)', color: '#8b5cf6' },
+          { text: 'Factura #1042 enviada a Grupo Ríos', time: 'Ayer, 18:30', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', bg: 'rgba(239,68,68,0.15)', color: '#ef4444' },
+        ],
+
+        /* ── Quick actions ── */
+        quickActions: [
+          { label: 'Ver conversaciones',       nav: 'conversaciones',      icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+          { label: 'Abrir calendario',         nav: 'calendarios',         icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+          { label: 'Gestionar leads',          nav: 'clientes-potenciales',icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+          { label: 'Ver contactos',            nav: 'contactos',           icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+        ],
+
+        /* ── Chart bars ── */
+        chartBars: [
+          { h: 45, label: 'Ago' }, { h: 62, label: 'Sep' }, { h: 38, label: 'Oct' },
+          { h: 75, label: 'Nov' }, { h: 55, label: 'Dic' }, { h: 88, label: 'Ene' },
+          { h: 70, label: 'Feb' },
+        ],
+
+        /* ── Conversations ── */
+        conversations: [
+          { name: 'Carlos Mendoza',  initials: 'CM', color: 'linear-gradient(135deg,#3b82f6,#8b5cf6)', online: true,  time: '2m',  last: '¿Podemos agendar una llamada?', unread: 2 },
+          { name: 'Laura Ríos',      initials: 'LR', color: 'linear-gradient(135deg,#10b981,#3b82f6)', online: true,  time: '15m', last: 'Revisé la propuesta, me parece bien', unread: 0 },
+          { name: 'Sofía Herrera',   initials: 'SH', color: 'linear-gradient(135deg,#f59e0b,#ef4444)', online: false, time: '1h',  last: 'Gracias por la información', unread: 1 },
+          { name: 'Miguel Torres',   initials: 'MT', color: 'linear-gradient(135deg,#8b5cf6,#ec4899)', online: false, time: '3h',  last: 'Confirmo la reunión del viernes', unread: 0 },
+          { name: 'Diana Morales',   initials: 'DM', color: 'linear-gradient(135deg,#06b6d4,#3b82f6)', online: true,  time: 'Ayer', last: 'Adjunto el contrato firmado', unread: 0 },
+        ],
+
+        /* ── Chat messages ── */
+        chatMessages: [
+          { text: 'Hola, ¿cómo estás? Quería hablar sobre la propuesta que enviaste.', time: '10:24', mine: false },
+          { text: '¡Hola Carlos! Todo bien, gracias. Claro, con gusto te explico los detalles.', time: '10:26', mine: true },
+          { text: 'Me interesa mucho el plan Enterprise. ¿Podemos agendar una llamada esta semana?', time: '10:28', mine: false },
+          { text: 'Por supuesto. Tengo disponibilidad el jueves a las 3pm o el viernes a las 11am. ¿Cuál te viene mejor?', time: '10:30', mine: true },
+          { text: '¿Podemos agendar una llamada?', time: '10:32', mine: false },
+        ],
+
+        /* ── Calendar ── */
+        calDays: (() => {
+          const days = [];
+          // Prev month tail (Jan)
+          for (let i = 26; i <= 31; i++) days.push({ n: i, current: false, today: false, event: false });
+          // Feb 2026 (starts Sunday → index 0 in 0=Sun grid, but we use Mon-first so offset=6? Feb 1 2026 = Sunday)
+          // For Mon-first: Sunday = col 7 → offset 6
+          for (let i = 1; i <= 28; i++) {
+            days.push({ n: i, current: true, today: i === 27, event: [3,7,12,15,20,24,27].includes(i) });
+          }
+          // Next month head (Mar)
+          for (let i = 1; days.length < 42; i++) days.push({ n: i, current: false, today: false, event: false });
+          return days;
+        })(),
+
+        /* ── Upcoming events ── */
+        upcomingEvents: [
+          { title: 'Llamada con Carlos Mendoza', time: 'Hoy, 15:00 — 15:30', color: '#3b82f6', attendees: [{ initials: 'CM', color: '#3b82f6' }, { initials: 'JD', color: '#8b5cf6' }] },
+          { title: 'Revisión de propuesta Innovatek', time: 'Mañana, 11:00 — 12:00', color: '#10b981', attendees: [{ initials: 'SH', color: '#10b981' }, { initials: 'MT', color: '#f59e0b' }, { initials: 'JD', color: '#8b5cf6' }] },
+          { title: 'Demo producto — Grupo Ríos', time: 'Vie 6 Mar, 10:00 — 11:30', color: '#f59e0b', attendees: [{ initials: 'LR', color: '#f59e0b' }, { initials: 'JD', color: '#8b5cf6' }] },
+          { title: 'Reunión de equipo semanal', time: 'Lun 9 Mar, 09:00 — 09:45', color: '#8b5cf6', attendees: [{ initials: 'JD', color: '#8b5cf6' }, { initials: 'DM', color: '#06b6d4' }, { initials: 'MT', color: '#f59e0b' }] },
+        ],
+
+        /* ── Contacts ── */
+        contacts: [
+          { name: 'Carlos Mendoza',  initials: 'CM', company: 'TechSol MX',      email: 'c.mendoza@techsol.mx',   color: 'linear-gradient(135deg,#3b82f6,#8b5cf6)', active: true  },
+          { name: 'Laura Ríos',      initials: 'LR', company: 'Grupo Ríos',      email: 'laura@gruporios.com',    color: 'linear-gradient(135deg,#10b981,#3b82f6)', active: true  },
+          { name: 'Sofía Herrera',   initials: 'SH', company: 'Innovatek',       email: 's.herrera@innovatek.io', color: 'linear-gradient(135deg,#f59e0b,#ef4444)', active: true  },
+          { name: 'Miguel Torres',   initials: 'MT', company: 'Distribuidora T', email: 'm.torres@dist-t.com',    color: 'linear-gradient(135deg,#8b5cf6,#ec4899)', active: false },
+          { name: 'Diana Morales',   initials: 'DM', company: 'DM Consulting',   email: 'diana@dmconsulting.mx',  color: 'linear-gradient(135deg,#06b6d4,#3b82f6)', active: true  },
+          { name: 'Roberto Salinas', initials: 'RS', company: 'Salinas Corp',    email: 'r.salinas@salinascorp.mx',color:'linear-gradient(135deg,#ef4444,#f59e0b)', active: true  },
+        ],
+
+        /* ── Kanban columns ── */
+        kanbanCols: [
+          {
+            id: 'nuevo', title: 'Nuevo Lead', color: '#3b82f6',
+            leads: [
+              { id: 1, nombre: 'Carlos Mendoza',  empresa: 'TechSol MX',      valor: 45000,  fuente: 'Web',      fecha: '24 feb' },
+              { id: 2, nombre: 'Laura Ríos',       empresa: 'Grupo Ríos',      valor: 120000, fuente: 'Referido', fecha: '25 feb' },
+              { id: 3, nombre: 'Andrés Castillo',  empresa: '',                valor: 18000,  fuente: 'LinkedIn', fecha: '26 feb' },
+            ],
+          },
+          {
+            id: 'calificado', title: 'Lead Calificado', color: '#10b981',
+            leads: [
+              { id: 4, nombre: 'Sofía Herrera',    empresa: 'Innovatek',       valor: 75000,  fuente: 'Email',    fecha: '20 feb' },
+              { id: 5, nombre: 'Miguel Torres',    empresa: 'Distribuidora T', valor: 200000, fuente: 'Evento',   fecha: '22 feb' },
+            ],
+          },
+          {
+            id: 'contactado', title: 'Contactado', color: '#f59e0b',
+            leads: [
+              { id: 6, nombre: 'Roberto Salinas',  empresa: 'Salinas Corp',    valor: 95000,  fuente: 'Referido', fecha: '15 feb' },
+              { id: 7, nombre: 'Diana Morales',    empresa: 'DM Consulting',   valor: 60000,  fuente: 'LinkedIn', fecha: '17 feb' },
+            ],
+          },
+          {
+            id: 'reunion', title: 'Reunión Agendada', color: '#8b5cf6',
+            leads: [
+              { id: 8, nombre: 'Patricia Vega',    empresa: 'Vega & Asoc.',    valor: 5000,   fuente: 'Web',      fecha: '18 feb' },
+            ],
+          },
+          {
+            id: 'cerrado', title: 'Cerrado / Ganado', color: '#06b6d4',
+            leads: [],
+          },
+        ],
+
+        /* ── Helpers ── */
+        sourceBadge(fuente) {
+          const map = {
+            'Web':      'bg-blue-500/15 text-blue-400',
+            'Referido': 'bg-emerald-500/15 text-emerald-400',
+            'LinkedIn': 'bg-violet-500/15 text-violet-400',
+            'Email':    'bg-amber-500/15 text-amber-400',
+            'Evento':   'bg-pink-500/15 text-pink-400',
+            'Otro':     'bg-slate-500/15 text-slate-400',
+          };
+          return map[fuente] || 'bg-slate-500/15 text-slate-400';
+        },
+
+        /* ── Init ── */
+        init() {
+          this.startCycle();
+        },
+
+        startCycle() {
+          if (this.cycleTimer) clearInterval(this.cycleTimer);
+          this.cycleTimer = setInterval(() => {
+            this.cycleIndex = (this.cycleIndex + 1) % this.cycleTabs.length;
+            this.activeTab = this.cycleTabs[this.cycleIndex];
+            this.progressKey++; // force progress bar restart
+          }, 10000);
+        },
+
+        resetCycle() {
+          this.progressKey++;
+          this.startCycle();
+        },
+      };
+    }
+  </script>
+
+</body>
+</html>
