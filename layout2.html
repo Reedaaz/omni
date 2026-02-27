@@ -61,6 +61,24 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
+    /* ── Chat bubble slide-up animation ── */
+    @keyframes bubble-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .chat-bubble-in {
+      animation: bubble-in 0.35s ease both;
+    }
+
+    /* ── Typing indicator dots ── */
+    @keyframes typing-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30%            { transform: translateY(-4px); opacity: 1; }
+    }
+    .typing-dot {
+      animation: typing-bounce 1.2s ease-in-out infinite;
+    }
+
     /* ── Premium Kanban Card ── */
     .kanban-card-premium {
       position: relative;
@@ -763,94 +781,224 @@
               </div>
             </div>
 
-            <!-- ── Tab: Conversaciones ── -->
-            <div x-show="activeNav === 'conversaciones' || activeTab === 'Conversaciones'" class="tab-content">
-              <div x-show="activeNav === 'conversaciones' || (activeNav !== 'conversaciones' && activeTab === 'Conversaciones')">
-                <div class="flex items-center justify-between mb-6">
-                  <div>
-                    <h1 class="text-lg font-bold text-white">Conversaciones</h1>
-                    <p class="text-xs text-slate-500 mt-0.5">Gestiona tus mensajes y chats activos</p>
-                  </div>
-                  <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Nueva conversación
-                  </button>
+            <!-- ── Tab: Conversaciones (Live Chat) ── -->
+            <div
+              x-show="activeNav === 'conversaciones' || activeTab === 'Conversaciones'"
+              class="tab-content"
+              x-data="conversacionesChat()"
+              x-init="$watch('activeTab', val => { if (val === 'Conversaciones') startLiveDemo(); })"
+            >
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-5">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Conversaciones</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Gestiona tus mensajes y chats activos</p>
                 </div>
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nueva conversación
+                </button>
+              </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <!-- Conversation list -->
-                  <div class="stat-card space-y-1">
-                    <div class="flex items-center gap-2 mb-3">
-                      <div class="flex-1 flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5">
-                        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <input type="text" placeholder="Buscar..." class="bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none flex-1" />
-                      </div>
-                    </div>
-                    <template x-for="(conv, i) in conversations" :key="i">
-                      <div class="conv-item" :class="{ 'active-conv': i === 0 }">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" style="height: calc(100vh - 14rem); min-height: 480px;">
+
+                <!-- ── Sidebar: Conversation list ── -->
+                <div class="stat-card flex flex-col overflow-hidden">
+                  <!-- Search -->
+                  <div class="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5 mb-3 flex-shrink-0">
+                    <svg class="w-3.5 h-3.5 text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" placeholder="Buscar conversación..." class="bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none flex-1" />
+                  </div>
+
+                  <!-- Filter tabs -->
+                  <div class="flex gap-1 mb-3 flex-shrink-0">
+                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/25">Todos</button>
+                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-300 transition-colors">No leídos</button>
+                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-300 transition-colors">Archivados</button>
+                  </div>
+
+                  <!-- Conversation items -->
+                  <div class="flex-1 overflow-y-auto space-y-0.5 -mx-1 px-1">
+                    <template x-for="(conv, i) in sidebarConvs" :key="conv.id">
+                      <div
+                        class="conv-item"
+                        :class="{ 'active-conv': selectedConv === conv.id }"
+                        @click="selectedConv = conv.id"
+                      >
                         <div class="relative flex-shrink-0">
-                          <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" :style="'background:' + conv.color">
+                          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" :style="'background:' + conv.color">
                             <span x-text="conv.initials"></span>
                           </div>
                           <div x-show="conv.online" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <div class="flex items-center justify-between">
-                            <p class="text-xs font-semibold text-slate-200 truncate" x-text="conv.name"></p>
-                            <span class="text-[10px] text-slate-600 flex-shrink-0 ml-1" x-text="conv.time"></span>
+                          <div class="flex items-center justify-between gap-1">
+                            <p class="text-xs font-semibold truncate" :class="conv.unread > 0 ? 'text-white' : 'text-slate-300'" x-text="conv.name"></p>
+                            <span class="text-[10px] text-slate-600 flex-shrink-0" x-text="conv.time"></span>
                           </div>
                           <p class="text-[11px] text-slate-500 truncate mt-0.5" x-text="conv.last"></p>
                         </div>
-                        <div x-show="conv.unread > 0" class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                        <div x-show="conv.unread > 0" class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center shadow-[0_0_6px_rgba(59,130,246,0.6)]">
                           <span class="text-[9px] font-bold text-white" x-text="conv.unread"></span>
                         </div>
                       </div>
                     </template>
                   </div>
+                </div>
 
-                  <!-- Chat window -->
-                  <div class="lg:col-span-2 stat-card flex flex-col" style="min-height: 400px;">
-                    <div class="flex items-center gap-3 pb-3 border-b border-white/5 mb-3">
-                      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white">CM</div>
-                      <div>
-                        <p class="text-xs font-semibold text-white">Carlos Mendoza</p>
-                        <p class="text-[10px] text-emerald-400">En línea</p>
-                      </div>
-                      <div class="ml-auto flex gap-1">
-                        <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg></button>
-                        <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
-                      </div>
+                <!-- ── Main: Chat window ── -->
+                <div class="lg:col-span-2 stat-card flex flex-col overflow-hidden">
+
+                  <!-- Chat header -->
+                  <div class="flex items-center gap-3 pb-3 border-b border-white/5 mb-3 flex-shrink-0">
+                    <div class="relative">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">MG</div>
+                      <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
                     </div>
-                    <div class="flex-1 space-y-3 overflow-y-auto pr-1">
-                      <template x-for="(msg, i) in chatMessages" :key="i">
-                        <div class="flex" :class="msg.mine ? 'justify-end' : 'justify-start'">
-                          <div
-                            class="max-w-[70%] px-3 py-2 rounded-xl text-xs"
-                            :class="msg.mine
-                              ? 'bg-blue-500/25 text-blue-100 rounded-br-sm border border-blue-500/20'
-                              : 'bg-white/5 text-slate-300 rounded-bl-sm border border-white/8'"
-                          >
-                            <p x-text="msg.text"></p>
-                            <p class="text-[9px] mt-1 opacity-50" x-text="msg.time"></p>
-                          </div>
-                        </div>
-                      </template>
+                    <div>
+                      <p class="text-xs font-bold text-white">María García</p>
+                      <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                        En línea
+                      </p>
                     </div>
-                    <div class="mt-3 flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/8">
-                      <input type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none" />
-                      <button class="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 hover:bg-blue-500/30 transition-all">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
+                    <div class="ml-auto flex items-center gap-1">
+                      <!-- AI badge -->
+                      <div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 mr-1">
+                        <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <span class="text-[10px] text-blue-400 font-semibold">Agente IA</span>
+                      </div>
+                      <button class="topbar-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                      </button>
+                      <button class="topbar-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
+
+                  <!-- Messages area -->
+                  <div class="flex-1 overflow-y-auto pr-1 space-y-3" id="chat-messages-area" x-ref="chatArea">
+
+                    <!-- Static seed messages -->
+                    <template x-for="(msg, i) in seedMessages" :key="'seed-' + i">
+                      <div class="flex chat-bubble-in" :class="msg.mine ? 'justify-end' : 'justify-start'">
+                        <!-- Incoming: avatar -->
+                        <div x-show="!msg.mine" class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                        <div class="max-w-[72%]">
+                          <div
+                            class="px-3 py-2 rounded-2xl text-xs leading-relaxed"
+                            :class="msg.mine
+                              ? 'bg-blue-500 text-white rounded-br-sm shadow-[0_2px_12px_rgba(59,130,246,0.35)]'
+                              : 'bg-white/8 text-slate-200 rounded-bl-sm border border-white/8'"
+                          >
+                            <p x-text="msg.text"></p>
+                          </div>
+                          <!-- Time + read receipt -->
+                          <div class="flex items-center gap-1 mt-1" :class="msg.mine ? 'justify-end' : 'justify-start'">
+                            <span class="text-[9px] text-slate-600" x-text="msg.time"></span>
+                            <template x-if="msg.mine">
+                              <!-- Double checkmark (Visto) -->
+                              <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M1 13l4 4" />
+                              </svg>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+
+                    <!-- Live: incoming message from María García -->
+                    <div
+                      x-show="showIncoming"
+                      x-transition:enter="transition ease-out duration-400"
+                      x-transition:enter-start="opacity-0 translate-y-3"
+                      x-transition:enter-end="opacity-100 translate-y-0"
+                      class="flex justify-start"
+                    >
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                      <div class="max-w-[72%]">
+                        <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-xs leading-relaxed bg-white/8 text-slate-200 border border-white/8">
+                          <p>Hola, me gustaría agendar una llamada para saber más de Omnexor.</p>
+                        </div>
+                        <div class="flex items-center gap-1 mt-1">
+                          <span class="text-[9px] text-slate-600" x-text="liveTime"></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Live: typing indicator -->
+                    <div
+                      x-show="showTyping"
+                      x-transition:enter="transition ease-out duration-300"
+                      x-transition:enter-start="opacity-0 translate-y-2"
+                      x-transition:enter-end="opacity-100 translate-y-0"
+                      x-transition:leave="transition ease-in duration-200"
+                      x-transition:leave-start="opacity-100"
+                      x-transition:leave-end="opacity-0"
+                      class="flex justify-start items-center gap-2"
+                    >
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">IA</div>
+                      <div class="flex items-center gap-2 px-3 py-2 rounded-2xl rounded-bl-sm bg-blue-500/10 border border-blue-500/20">
+                        <!-- Animated dots -->
+                        <div class="flex items-center gap-1">
+                          <div class="w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot" style="animation-delay: 0ms"></div>
+                          <div class="w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot" style="animation-delay: 200ms"></div>
+                          <div class="w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot" style="animation-delay: 400ms"></div>
+                        </div>
+                        <span class="text-[10px] text-blue-400 font-medium">Agente IA escribiendo...</span>
+                      </div>
+                    </div>
+
+                    <!-- Live: AI response -->
+                    <div
+                      x-show="showAIResponse"
+                      x-transition:enter="transition ease-out duration-500"
+                      x-transition:enter-start="opacity-0 translate-y-4 scale-98"
+                      x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                      class="flex justify-end"
+                    >
+                      <div class="max-w-[72%]">
+                        <div class="px-3 py-2 rounded-2xl rounded-br-sm text-xs leading-relaxed bg-blue-500 text-white shadow-[0_2px_16px_rgba(59,130,246,0.4)]">
+                          <p>¡Hola María! Claro que sí. ¿Te parece bien mañana a las 10:00 AM? He visto un hueco en el calendario.</p>
+                        </div>
+                        <div class="flex items-center gap-1 mt-1 justify-end">
+                          <span class="text-[9px] text-slate-600" x-text="liveTime"></span>
+                          <!-- Visto checkmark (blue) -->
+                          <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M1 13l4 4" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div><!-- /messages area -->
+
+                  <!-- Input bar -->
+                  <div class="mt-3 flex-shrink-0 flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/8">
+                    <!-- Emoji -->
+                    <button class="topbar-btn w-7 h-7 flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                    <input type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none" />
+                    <!-- Attach -->
+                    <button class="topbar-btn w-7 h-7 flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                    </button>
+                    <!-- Send -->
+                    <button class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 transition-all shadow-[0_0_10px_rgba(59,130,246,0.4)] flex-shrink-0">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                    </button>
+                  </div>
+                </div><!-- /chat window -->
+
+              </div><!-- /grid -->
             </div>
 
             <!-- ── Tab: Calendarios ── -->
@@ -1649,6 +1797,121 @@
             this.animDone = true;
             this.animTimer = null;
           }, 1600);
+        },
+      };
+    }
+
+    /* ── Conversaciones Live Chat ── */
+    function conversacionesChat() {
+      return {
+        /* State */
+        selectedConv: 'mg',
+        showIncoming: false,
+        showTyping: false,
+        showAIResponse: false,
+        demoDone: false,
+        liveTime: '',
+
+        /* Sidebar conversations */
+        sidebarConvs: [
+          {
+            id: 'mg',
+            name: 'María García',
+            initials: 'MG',
+            color: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+            online: true,
+            time: 'Ahora',
+            last: 'Hola, me gustaría agendar una llamada...',
+            unread: 1,
+          },
+          {
+            id: 'cr',
+            name: 'Carlos Ruiz',
+            initials: 'CR',
+            color: 'linear-gradient(135deg, #10b981, #3b82f6)',
+            online: true,
+            time: '5m',
+            last: 'Perfecto, nos vemos el jueves entonces.',
+            unread: 0,
+          },
+          {
+            id: 'lp',
+            name: 'Laura Pérez',
+            initials: 'LP',
+            color: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+            online: false,
+            time: '32m',
+            last: '¿Podéis enviarme la propuesta por email?',
+            unread: 2,
+          },
+          {
+            id: 'jm',
+            name: 'Javier Moreno',
+            initials: 'JM',
+            color: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+            online: false,
+            time: '2h',
+            last: 'Gracias por la demo, muy interesante.',
+            unread: 0,
+          },
+          {
+            id: 'as',
+            name: 'Ana Sánchez',
+            initials: 'AS',
+            color: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+            online: true,
+            time: 'Ayer',
+            last: 'Confirmo la reunión del viernes a las 11.',
+            unread: 0,
+          },
+        ],
+
+        /* Seed messages (pre-existing history) */
+        seedMessages: [
+          { text: 'Hola, vi vuestro anuncio en Instagram y me llamó mucho la atención.', time: '10:15', mine: false },
+          { text: '¡Hola María! Encantados de que hayas contactado. ¿En qué podemos ayudarte?', time: '10:16', mine: true },
+          { text: 'Estoy buscando una solución para automatizar mis seguimientos de clientes.', time: '10:18', mine: false },
+          { text: 'Omnexor es exactamente lo que necesitas. Tenemos flujos de automatización completos para eso.', time: '10:19', mine: true },
+        ],
+
+        /* Helpers */
+        getNow() {
+          const d = new Date();
+          return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+        },
+
+        scrollToBottom() {
+          this.$nextTick(() => {
+            const el = this.$refs.chatArea;
+            if (el) el.scrollTop = el.scrollHeight;
+          });
+        },
+
+        startLiveDemo() {
+          if (this.demoDone) return;
+          this.liveTime = this.getNow();
+
+          // Step 1: incoming message after 2s
+          setTimeout(() => {
+            this.showIncoming = true;
+            this.scrollToBottom();
+
+            // Step 2: typing indicator after 3 more seconds
+            setTimeout(() => {
+              this.showTyping = true;
+              this.scrollToBottom();
+
+              // Step 3: AI response after 2.5s of typing
+              setTimeout(() => {
+                this.showTyping = false;
+                setTimeout(() => {
+                  this.showAIResponse = true;
+                  this.demoDone = true;
+                  this.scrollToBottom();
+                }, 200);
+              }, 2500);
+            }, 3000);
+          }, 2000);
         },
       };
     }
