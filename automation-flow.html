@@ -8,363 +8,295 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; }
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      margin: 0; padding: 0;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       background: transparent;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Outer container — pointer-events disabled ── */
-    .flow-widget {
+    /* ── Widget shell ── */
+    .widget {
       position: relative;
       width: 420px;
       height: 400px;
       background: #f8fafc;
       border-radius: 1.5rem;
-      box-shadow: 0 8px 40px rgba(59,130,246,0.10), 0 2px 8px rgba(59,130,246,0.06);
       border: 1px solid rgba(59,130,246,0.10);
+      box-shadow: 0 8px 40px rgba(59,130,246,0.10), 0 2px 8px rgba(59,130,246,0.05);
       overflow: hidden;
-      pointer-events: none; /* ★ visual demo only */
+      pointer-events: none;
       user-select: none;
     }
 
-    /* ── SVG canvas (lines) ── */
-    .flow-svg {
+    /* ── SVG overlay for lines ── */
+    .lines-svg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
     }
-
-    /* ── Animated dashed line ── */
-    .flow-line {
+    .line {
       stroke: #cbd5e1;
       stroke-width: 1.5;
       stroke-dasharray: 5 4;
       fill: none;
-      transition: stroke 0.4s ease, stroke-width 0.4s ease, opacity 0.4s ease;
+      transition: stroke 0.4s ease, stroke-width 0.4s ease;
     }
-    .flow-line.active {
+    .line.lit {
       stroke: #3b82f6;
       stroke-width: 2;
-      animation: dash-flow 1s linear infinite;
+      animation: flow 1s linear infinite;
     }
-    @keyframes dash-flow {
-      to { stroke-dashoffset: -18; }
-    }
+    @keyframes flow { to { stroke-dashoffset: -18; } }
 
-    /* ── Central lead avatar ── */
-    .lead-center {
+    /* ── Central node ── */
+    .node {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -56%);
+      transform: translate(-50%, -54%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      z-index: 10;
+      gap: 8px;
+      z-index: 20;
     }
-    .lead-avatar-wrap {
+    .node-ring-wrap {
       position: relative;
       width: 72px;
       height: 72px;
     }
-    /* Pulsing ring */
-    .pulse-ring {
+    .ring {
       position: absolute;
-      inset: -6px;
       border-radius: 50%;
-      border: 2px solid rgba(59,130,246,0.3);
-      animation: ring-pulse 2.4s ease-out infinite;
+      border: 2px solid rgba(59,130,246,0.30);
+      animation: pulse-ring 2.4s ease-out infinite;
     }
-    .pulse-ring-2 {
-      position: absolute;
-      inset: -14px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(59,130,246,0.15);
-      animation: ring-pulse 2.4s ease-out infinite;
-      animation-delay: 0.8s;
+    .ring-1 { inset: -7px; }
+    .ring-2 { inset: -16px; border-color: rgba(59,130,246,0.14); animation-delay: 0.9s; }
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.88); opacity: 0; }
+      20%  { opacity: 1; }
+      100% { transform: scale(1.12); opacity: 0; }
     }
-    @keyframes ring-pulse {
-      0%   { transform: scale(0.9); opacity: 0; }
-      25%  { opacity: 1; }
-      100% { transform: scale(1.1); opacity: 0; }
-    }
-    .avatar-circle {
+    .node-circle {
       position: relative;
       z-index: 2;
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.30);
+      box-shadow: 0 4px 20px rgba(59,130,246,0.32);
     }
-    .lead-label {
-      font-size: 0.6875rem;
+    /* ONLY "LEAD" label — nothing else */
+    .node-label {
+      font-size: 11px;
       font-weight: 800;
       color: #1e293b;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
+      line-height: 1;
     }
 
-    /* ── Float animation for cards ── */
-    @keyframes float-card {
-      0%, 100% { transform: translateY(0px); }
-      50%       { transform: translateY(-5px); }
-    }
-    @keyframes float-card-sms {
-      0%, 100% { transform: translateX(-50%) translateY(0px); }
-      50%       { transform: translateX(-50%) translateY(-5px); }
-    }
+    /* ── Float animation ── */
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    @keyframes float-center { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-5px)} }
 
     /* ── Channel cards ── */
-    .channel-card {
+    .card {
       position: absolute;
-      width: 136px;
+      width: 134px;
       background: #ffffff;
       border: 1.5px solid rgba(59,130,246,0.10);
-      border-radius: 1rem;
-      padding: 0.75rem;
-      box-shadow: 0 4px 16px rgba(59,130,246,0.07), 0 1px 4px rgba(0,0,0,0.04);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(59,130,246,0.07), 0 1px 3px rgba(0,0,0,0.04);
       z-index: 10;
-      animation: float-card 4s ease-in-out infinite;
+      animation: float 4s ease-in-out infinite;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
     }
-    .channel-card.active {
+    .card.lit {
       border-color: rgba(59,130,246,0.45);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.10), 0 6px 24px rgba(59,130,246,0.15);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.09), 0 6px 24px rgba(59,130,246,0.14);
     }
-
-    /* Card positions */
-    .card-whatsapp {
-      top: 52px;
-      left: 16px;
-      animation-delay: 0s;
-    }
-    .card-email {
-      top: 52px;
-      right: 16px;
-      animation-delay: 1.3s;
-    }
+    /* Positions */
+    .card-wa  { top: 48px;  left: 14px;  animation-delay: 0s; }
+    .card-em  { top: 48px;  right: 14px; animation-delay: 1.4s; }
     .card-sms {
-      bottom: 90px;
-      left: 50%;
+      bottom: 86px; left: 50%;
       transform: translateX(-50%);
-      animation: float-card-sms 4s ease-in-out infinite;
-      animation-delay: 0.65s;
+      animation: float-center 4s ease-in-out infinite;
+      animation-delay: 0.7s;
+    }
+    .card-sms.lit { transform: translateX(-50%); }
+
+    /* Card internals */
+    .c-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 7px;
+    }
+    .c-title { font-size: 11px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+    .c-msg   { font-size: 9.5px; color: #64748b; line-height: 1.45; margin-bottom: 6px; }
+    .c-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 600;
+      padding: 2px 7px; border-radius: 99px;
     }
 
-    /* ── Card internals ── */
-    .card-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.4rem;
-    }
-    .card-title {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 0.2rem;
-    }
-    .card-msg {
-      font-size: 0.5875rem;
-      color: #64748b;
-      line-height: 1.45;
-      margin-bottom: 0.4rem;
-    }
-    .card-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      font-size: 0.5625rem;
-      font-weight: 600;
-      padding: 0.15rem 0.5rem;
-      border-radius: 99px;
-    }
-
-    /* ── Floating chart (bottom-right) ── */
+    /* ── Chart card ── */
     .chart-card {
       position: absolute;
-      bottom: 14px;
-      right: 14px;
-      width: 138px;
+      bottom: 14px; right: 14px;
+      width: 136px;
       background: #ffffff;
       border: 1px solid rgba(59,130,246,0.12);
-      border-radius: 1rem;
-      padding: 0.75rem;
+      border-radius: 14px;
+      padding: 12px;
       box-shadow: 0 4px 16px rgba(59,130,246,0.08);
       z-index: 20;
-      animation: float-card 5s ease-in-out infinite;
-      animation-delay: 2s;
+      animation: float 5s ease-in-out infinite;
+      animation-delay: 2.1s;
     }
-    .chart-card-title {
-      font-size: 0.5rem;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.5rem;
+    .chart-title {
+      font-size: 8px; font-weight: 700;
+      color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.07em; margin-bottom: 8px;
     }
-    .chart-svg {
-      width: 100%;
-      height: 38px;
-      display: block;
+    .chart-svg { width: 100%; height: 38px; display: block; }
+    .chart-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: 6px;
     }
-    .chart-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 0.4rem;
-    }
-    .chart-value {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #3b82f6;
-      letter-spacing: -0.02em;
-    }
-    .chart-trend {
-      font-size: 0.5625rem;
-      font-weight: 600;
-      color: #10b981;
-      background: rgba(16,185,129,0.1);
-      padding: 0.15rem 0.45rem;
-      border-radius: 99px;
+    .chart-val  { font-size: 16px; font-weight: 800; color: #3b82f6; letter-spacing: -0.02em; }
+    .chart-pct  {
+      font-size: 9px; font-weight: 600; color: #10b981;
+      background: rgba(16,185,129,0.10); padding: 2px 7px; border-radius: 99px;
     }
   </style>
 </head>
 
 <body>
-  <div
-    class="flow-widget"
-    x-data="automationFlow()"
-    x-init="init()"
-  >
+  <div class="widget" x-data="{ch:0}" x-init="setInterval(()=>ch=(ch+1)%3, 2000)">
 
     <!-- SVG Lines -->
-    <svg class="flow-svg" viewBox="0 0 420 400" preserveAspectRatio="none">
-      <!-- Line: center → WhatsApp (top-left) -->
-      <line x1="210" y1="185" x2="88"  y2="118"
-        class="flow-line" :class="activeChannel === 0 ? 'active' : ''" />
-      <!-- Line: center → Email (top-right) -->
-      <line x1="210" y1="185" x2="332" y2="118"
-        class="flow-line" :class="activeChannel === 1 ? 'active' : ''" />
-      <!-- Line: center → SMS (bottom-center) -->
-      <line x1="210" y1="185" x2="210" y2="295"
-        class="flow-line" :class="activeChannel === 2 ? 'active' : ''" />
+    <svg class="lines-svg" viewBox="0 0 420 400" preserveAspectRatio="none">
+      <!-- center → WhatsApp -->
+      <line x1="210" y1="182" x2="81"  y2="114" class="line" :class="ch===0?'lit':''"/>
+      <!-- center → Email -->
+      <line x1="210" y1="182" x2="339" y2="114" class="line" :class="ch===1?'lit':''"/>
+      <!-- center → SMS -->
+      <line x1="210" y1="182" x2="210" y2="294" class="line" :class="ch===2?'lit':''"/>
     </svg>
 
-    <!-- Central Lead Avatar -->
-    <div class="lead-center">
-      <div class="lead-avatar-wrap">
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring-2"></div>
-        <div class="avatar-circle">
-          <svg style="width:28px;height:28px;color:#ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    <!-- ★ Central Node — ONLY "LEAD" text ★ -->
+    <div class="node">
+      <div class="node-ring-wrap">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="node-circle">
+          <!-- Person icon -->
+          <svg width="28" height="28" fill="none" stroke="#ffffff" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
           </svg>
         </div>
       </div>
-      <span class="lead-label">Lead</span>
+      <!-- ONLY this label — no other text -->
+      <span class="node-label">Lead</span>
     </div>
 
     <!-- WhatsApp Card -->
-    <div class="channel-card card-whatsapp" :class="activeChannel === 0 ? 'active' : ''">
-      <div class="card-icon" style="background:rgba(37,211,102,0.12);">
-        <svg style="width:16px;height:16px;color:#25d366;" viewBox="0 0 24 24" fill="currentColor">
+    <div class="card card-wa" :class="ch===0?'lit':''">
+      <div class="c-icon" style="background:rgba(37,211,102,0.12)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </svg>
       </div>
-      <div class="card-title">WhatsApp</div>
-      <div class="card-msg">"¡Hola! Tu sesión está lista..."</div>
-      <div class="card-badge" style="background:rgba(37,211,102,0.1);color:#16a34a;">
-        <svg style="width:7px;height:7px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      <div class="c-title">WhatsApp</div>
+      <div class="c-msg">"¡Hola! Tu sesión está lista..."</div>
+      <div class="c-badge" style="background:rgba(37,211,102,0.10);color:#16a34a">
+        <svg width="7" height="7" fill="none" stroke="#16a34a" stroke-width="3.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
         Enviado
       </div>
     </div>
 
     <!-- Email Card -->
-    <div class="channel-card card-email" :class="activeChannel === 1 ? 'active' : ''">
-      <div class="card-icon" style="background:rgba(59,130,246,0.12);">
-        <svg style="width:16px;height:16px;color:#3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+    <div class="card card-em" :class="ch===1?'lit':''">
+      <div class="c-icon" style="background:rgba(59,130,246,0.12)">
+        <svg width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
         </svg>
       </div>
-      <div class="card-title">Email</div>
-      <div class="card-msg">Secuencia de Nurturing activa</div>
-      <div class="card-badge" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
-        <svg style="width:7px;height:7px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="c-title">Email</div>
+      <div class="c-msg">Secuencia de Nurturing activa</div>
+      <div class="c-badge" style="background:rgba(59,130,246,0.10);color:#3b82f6">
+        <svg width="7" height="7" fill="none" stroke="#3b82f6" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
         Activa
       </div>
     </div>
 
     <!-- SMS Card -->
-    <div class="channel-card card-sms" :class="activeChannel === 2 ? 'active' : ''">
-      <div class="card-icon" style="background:rgba(139,92,246,0.12);">
-        <svg style="width:16px;height:16px;color:#8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+    <div class="card card-sms" :class="ch===2?'lit':''">
+      <div class="c-icon" style="background:rgba(139,92,246,0.12)">
+        <svg width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
         </svg>
       </div>
-      <div class="card-title">SMS</div>
-      <div class="card-msg">Recordatorio enviado</div>
-      <div class="card-badge" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
-        <svg style="width:7px;height:7px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      <div class="c-title">SMS</div>
+      <div class="c-msg">Recordatorio enviado</div>
+      <div class="c-badge" style="background:rgba(139,92,246,0.10);color:#8b5cf6">
+        <svg width="7" height="7" fill="none" stroke="#8b5cf6" stroke-width="3.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
         OK
       </div>
     </div>
 
-    <!-- Floating Chart Card (bottom-right) -->
+    <!-- Chart Card -->
     <div class="chart-card">
-      <div class="chart-card-title">Escalado de Oportunidades</div>
-      <svg class="chart-svg" viewBox="0 0 118 38" preserveAspectRatio="none">
+      <div class="chart-title">Escalado de Oportunidades</div>
+      <svg class="chart-svg" viewBox="0 0 116 38" preserveAspectRatio="none">
         <defs>
           <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22"/>
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.20"/>
             <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.01"/>
           </linearGradient>
         </defs>
-        <path d="M0,36 C12,33 24,28 36,24 C48,20 60,15 72,11 C84,7 96,4 108,2 L118,1 L118,38 L0,38 Z" fill="url(#cg)"/>
-        <path d="M0,36 C12,33 24,28 36,24 C48,20 60,15 72,11 C84,7 96,4 108,2 L118,1"
-          fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="118" cy="1" r="3" fill="#3b82f6"/>
-        <circle cx="118" cy="1" r="5.5" fill="rgba(59,130,246,0.18)"/>
+        <path d="M0,36 C14,32 28,27 42,22 C56,17 70,12 84,8 C98,4 107,2 116,1 L116,38 L0,38 Z"
+          fill="url(#cg)"/>
+        <path d="M0,36 C14,32 28,27 42,22 C56,17 70,12 84,8 C98,4 107,2 116,1"
+          fill="none" stroke="#3b82f6" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="116" cy="1" r="3" fill="#3b82f6"/>
+        <circle cx="116" cy="1" r="5.5" fill="rgba(59,130,246,0.18)"/>
       </svg>
-      <div class="chart-bottom">
-        <span class="chart-value">×4.4</span>
-        <span class="chart-trend">↑ +34%</span>
+      <div class="chart-row">
+        <span class="chart-val">×4.4</span>
+        <span class="chart-pct">↑ +34%</span>
       </div>
     </div>
 
   </div>
-
-  <script>
-    function automationFlow() {
-      return {
-        activeChannel: 0,
-
-        init() {
-          setInterval(() => {
-            this.activeChannel = (this.activeChannel + 1) % 3;
-          }, 2000);
-        },
-      };
-    }
-  </script>
 </body>
 </html>
