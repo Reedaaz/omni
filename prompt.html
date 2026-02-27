@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnexor — Prompt Completo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 99px; }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+    .logo-title { font-size: 18px; font-weight: 800; color: #1e293b; }
+    .logo-sub   { font-size: 12px; color: #64748b; margin-top: 1px; }
+
+    /* Copy button */
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #3b82f6;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .copy-btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .copy-btn:active { transform: translateY(0); }
+    .copy-btn.copied { background: #10b981; }
+
+    /* ── Prompt box ── */
+    .prompt-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(59,130,246,0.06);
+    }
+    .prompt-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .toolbar-dots { display: flex; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #10b981; }
+    .toolbar-label { font-size: 11px; font-weight: 600; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    .prompt-content {
+      padding: 24px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: #334155;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    /* Markdown-like styling inside the prompt */
+    .prompt-content .h1  { font-size: 15px; font-weight: 800; color: #1e293b; display: block; margin: 20px 0 8px; }
+    .prompt-content .h2  { font-size: 13px; font-weight: 700; color: #3b82f6; display: block; margin: 16px 0 6px; }
+    .prompt-content .h3  { font-size: 12px; font-weight: 700; color: #8b5cf6; display: block; margin: 12px 0 4px; }
+    .prompt-content .kw  { color: #3b82f6; font-weight: 600; }
+    .prompt-content .val { color: #10b981; }
+    .prompt-content .str { color: #f59e0b; }
+    .prompt-content .cmt { color: #94a3b8; font-style: italic; }
+    .prompt-content .sep { display: block; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="logo-row">
+        <div class="logo-icon">
+          <svg width="18" height="18" fill="none" stroke="#ffffff" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-title">Omnexor</div>
+          <div class="logo-sub">Prompt Completo — layout2.html</div>
+        </div>
+      </div>
+      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+        Copiar Prompt
+      </button>
+    </div>
+
+    <!-- Prompt box -->
+    <div class="prompt-box">
+      <div class="prompt-toolbar">
+        <div class="toolbar-dots">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <span class="toolbar-label">prompt.txt — Omnexor Panel Cinematic</span>
+        <span></span>
+      </div>
+      <div class="prompt-content" id="promptText">Act as a Senior Frontend Developer. Build a complete, production-ready interactive dashboard demo file named layout2.html using only HTML, Tailwind CSS (CDN), and Alpine.js (CDN). No build tools, no frameworks. All text must be in Spanish.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. GLOBAL SETUP & THEME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Font: Inter (Google Fonts, weights 300–800)
+Mode: Light mode
+  - Body background: #ffffff
+  - Text: #1e293b (dark slate)
+  - Primary accent: Omnexor Blue #3b82f6
+
+Glassmorphism panels (.glass-panel):
+  - background: rgba(241,245,249,0.85)
+  - backdrop-filter: blur(24px) saturate(180%)
+  - border: 1px solid rgba(59,130,246,0.18)
+
+Cards (.stat-card):
+  - background: #ffffff
+  - border: 1px solid #e2e8f0
+  - border-radius: 1rem
+  - Soft blue box-shadow on hover: 0 4px 20px rgba(59,130,246,0.08)
+
+Kanban columns (.kanban-col):
+  - background: rgba(248,250,252,0.9)
+  - border: 1px solid rgba(59,130,246,0.12)
+
+Pointer events: Set pointer-events: none on all .nav-item and .topbar-btn elements (visual demo only).
+
+Scrollbar: 4px, blue thumb rgba(59,130,246,0.35), light gray track #f1f5f9.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. LAYOUT STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Full-screen layout (height: 100vh, overflow: hidden) with:
+  - Left sidebar: fixed width 224px, white background, border-right: 1px solid #e2e8f0
+  - Main area: flex-1, flex-column (topbar + content)
+
+SIDEBAR:
+  - Logo: animated blue-to-violet gradient icon + "Omnexor" text + pulsing green "En línea" dot
+  - Navigation: 6 items (Inicio, Dashboard, Conversaciones, Calendarios, Contactos, Clientes Potenciales)
+    with SVG icons. Active item highlighted in blue. pointer-events: none on all items.
+  - User profile: avatar (JD initials, gradient), "Jane Doe", "jane@omnexor.io", online dot
+
+TOPBAR:
+  - Left: breadcrumb "Omnexor > [Active View Label]" — updates dynamically via Alpine.js
+  - Center: Tab pills showing the 4 cycle tabs. Active tab highlighted. pointer-events: none.
+  - Right: Search, Notifications (with blue dot badge), Grid view icons — all pointer-events: none. Avatar (JD).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PROGRESS BARS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TOP PROGRESS BAR (fixed, top of viewport):
+  - Fixed 2px bar at very top (z-index: 50)
+  - Track: bg-slate-200
+  - Fill: blue-to-violet gradient, animates 0%→100% in 6 seconds
+  - Resets on every tab change via Alpine.js :key="progressKey"
+
+INNER PROGRESS BAR (inside glass panel):
+  - Additional 2px bar at top of main content container
+  - Same 6-second animation, same reset mechanism
+  - Provides visual cue of when next tab will appear
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. AUTO-CYCLING TAB SYSTEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Alpine.js omnexorApp() component on <body>:
+  - cycleTabs: ['Dashboard', 'Conversaciones', 'Calendarios', 'Clientes Potenciales']
+  - activeTab: starts at 'Dashboard'
+  - setInterval: 6000ms — cycles through tabs automatically
+  - resetCycle(): resets timer and progress bar key on manual tab click
+
+TAB TRANSITIONS (Liquid Slide):
+  - Old content: slides out to left (translateX(0 → -28px), opacity 1→0, 350ms ease-in, position: absolute)
+  - New content: slides in from right (translateX(28px → 0), opacity 0→1, 550ms cubic-bezier(0.22,1,0.36,1))
+  - Applied via Alpine.js x-transition:enter and x-transition:leave on ALL tab sections
+  - All tab sections wrapped in <div class="relative overflow-hidden"> to contain leaving element
+
+BOTTOM CYCLE INDICATOR:
+  - Row of dots + labels below main container
+  - Active tab: wide blue dot (w-6 bg-blue-500) + blue label
+  - Inactive: small gray dot (w-1.5 bg-slate-200) + gray label
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. VIEW: DASHBOARD (BENTO BOX)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visible when: activeTab === 'Dashboard' AND activeNav !== 'dashboard'
+Alpine component: bentoDashboard() with x-data and x-init
+
+Header: "Dashboard" title + "En vivo" pill badge (pulsing green dot)
+
+3-column Bento Grid (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3, gap-4)
+
+6 CARDS, each with:
+  - Colored icon with glow halo (::after pseudo-element, blurred)
+  - Spinning sync icon + pulsing live dot (per-card color)
+  - Title (bold, text-slate-900)
+  - Subtitle (text-slate-500)
+  - Bottom stat badge + chevron arrow
+  - Mouse-follow highlight effect: radial-gradient overlay driven by CSS custom properties
+    --mouse-x/--mouse-y, updated via @mousemove Alpine handler
+  - Hover glow: colored border + box-shadow matching card color
+
+Cards (all text in Spanish):
+  1. Captación de Leads     — Blue   — "142 leads hoy"
+  2. Email de Bienvenida    — Green  — "98.4% entregados"
+  3. Embudo de Ventas       — Purple — "67% conversión"
+  4. Página de Webinar      — Orange — "312 registros"
+  5. SMS de Seguimiento     — Pink   — "91% tasa apertura"
+  6. Formulario de Reserva  — Teal   — "28 citas hoy"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. VIEW: CONVERSACIONES (LIVE CHAT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visible when: activeTab === 'Conversaciones' OR activeNav === 'conversaciones'
+Alpine component: conversacionesChat() with x-data
+x-init: $watch('activeTab', val => { if (val === 'Conversaciones') { setTimeout(() => startLiveDemo(), 600); } })
+(600ms delay ensures slide-in transition completes before demo starts)
+
+LEFT SIDEBAR (conversation list):
+  - Search bar ("Buscar conversación...")
+  - Filter tabs: Todos / No leídos / Archivados
+  - 5 conversations: María García (active, 1 unread), Carlos Ruiz, Laura Pérez (2 unread),
+    Javier Moreno, Ana Sánchez
+  - Each item: avatar with online dot, name, timestamp, last message preview, unread badge
+
+RIGHT CHAT WINDOW (María García):
+  - Header: avatar + online dot + "En línea" + "Agente IA" badge + phone/video buttons
+  - 4 seed messages (pre-existing history) with slide-up animation, timestamps,
+    blue double-checkmark "Visto" icons on outgoing messages
+  - Input bar: emoji, attach, send (solid blue #3b82f6) buttons — all in Spanish
+
+LIVE DEMO SEQUENCE (triggered 600ms after tab becomes active):
+  +2s  → Incoming message slides in: "Hola, me gustaría agendar una llamada para saber más de Omnexor."
+  +5s  → Typing indicator: animated 3-dot bounce + "Agente IA escribiendo..."
+  +7.5s→ AI response (Omnexor blue bubble): "¡Hola María! Claro que sí. ¿Te parece bien mañana
+          a las 10:00 AM? He visto un hueco en el calendario." with blue "Visto" checkmark
+
+Chat area auto-scrolls to bottom at each step via $refs.chatArea.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. VIEW: CALENDARIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visible when: activeTab === 'Calendarios' OR activeNav === 'calendarios'
+
+Header: "Calendarios" + "Nuevo evento" button
+
+2/3 column: Monthly calendar grid (February 2026, Monday-first)
+  - Day headers: Lu, Ma, Mi, Ju, Vi, Sá, Do
+  - Today (day 27) highlighted in blue
+  - Event dots on days: 3, 7, 12, 15, 20, 24, 27
+  - Prev/next month navigation buttons
+
+1/3 column: "Próximos Eventos" list (4 events with colored left border, title, time, attendee avatars)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. VIEW: CLIENTES POTENCIALES (CINEMATIC KANBAN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visible when: activeTab === 'Clientes Potenciales' OR activeNav === 'clientes-potenciales'
+Alpine component: clientesPotencialesBoard() with x-data
+x-init: $watch('activeTab', val => {
+  if (val === 'Clientes Potenciales') { onTabVisible(); setTimeout(() => scheduleAnim(), 600); }
+})
+(600ms delay for transition sync)
+
+HEADER:
+  - "Clientes Potenciales" title
+  - "Automatizando..." spinning badge (blue, active during animation) / "Automatización activa" (idle)
+  - "Nuevo Lead" button
+
+5 KANBAN COLUMNS (horizontal scroll):
+  1. Nuevo Lead       (Blue)   — Juan Pérez premium card + 2 other leads
+  2. Lead Calificado  (Green)  — 2 leads
+  3. Lead NO Calificado (Red)  — 1 lead (60% opacity)
+  4. Contactado       (Amber)  — 1 lead + Juan Pérez appears here after animation
+  5. Reunión Agendada (Violet) — 1 lead
+
+JUAN PÉREZ PREMIUM CARD:
+  - White background, blue border glow
+  - 36px avatar with animated blue pulse ring + "Activo" status dot (Omnexor blue #3b82f6)
+  - WhatsApp (green) + Instagram (pink) source icons with branded SVGs
+  - Company: "Pérez Consulting S.L."
+  - Value: €1.500/mes in emerald
+  - Date: 27 feb
+
+CINEMATIC ANIMATION (3 seconds after tab becomes active):
+  Phase 1 (0–800ms): animating = true → card glows + scales up
+    (.card-moving: scale 1.04, intense blue box-shadow 0 0 30px rgba(59,130,246,0.35))
+  Phase 2 (800ms): juanInContactado = true → card disappears from "Nuevo Lead"
+    with fade/scale-out Alpine x-transition
+  Phase 3 (1600ms): Card appears in "Contactado" with slide-up + scale-in transition
+    animating = false; column badge counts update dynamically
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. ADDITIONAL NAV-TRIGGERED VIEWS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Inicio (activeNav === 'inicio'):
+  - Welcome header + 4 stat cards (Ingresos, Proyectos, Equipo, Disponibilidad)
+  - Recent Activity feed (5 items with icons)
+  - Quick Actions panel
+
+Dashboard (activeNav === 'dashboard'):
+  - KPI row (4 stat cards with progress bars)
+  - Bar chart "Rendimiento Mensual" with 7 monthly bars
+
+Contactos (activeNav === 'contactos'):
+  - 3-column grid of contact cards (6 contacts) with avatar, name, company, email, Activo/Inactivo badge
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. CSS ANIMATIONS & KEYFRAMES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/* Slide transitions */
+@keyframes tab-enter { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:translateX(0)} }
+@keyframes tab-leave { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(-28px)} }
+.tab-enter-active { animation: tab-enter 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.tab-leave-active { animation: tab-leave 0.35s ease-in both; position:absolute; width:100%; }
+
+/* Chat bubbles */
+@keyframes bubble-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.chat-bubble-in { animation: bubble-in 0.35s ease both; }
+
+/* Typing dots */
+@keyframes typing-bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-4px);opacity:1} }
+.typing-dot { animation: typing-bounce 1.2s ease-in-out infinite; }
+
+/* Kanban card glow */
+@keyframes glow-pulse { from{opacity:0.4} to{opacity:1} }
+.card-glow-trail.active { opacity:1; animation: glow-pulse 0.8s ease-in-out infinite alternate; }
+
+/* Premium card states */
+.card-moving { transform:scale(1.04); border-color:rgba(59,130,246,0.6)!important; box-shadow:0 0 30px rgba(59,130,246,0.35)!important; }
+.card-arrived { border-color:rgba(245,158,11,0.35); box-shadow:0 0 20px rgba(245,158,11,0.15); }
+
+/* Bento mouse-follow */
+.bento-card .card-highlight {
+  background: radial-gradient(400px circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(255,255,255,0.04) 0%, transparent 60%);
+}
+
+/* Inner progress bar */
+@keyframes inner-progress { from{width:0%} to{width:100%} }
+.inner-progress-fill { animation: inner-progress 6s linear forwards; }
+
+/* Live dot */
+@keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.75)} }
+
+/* Sync spinner */
+@keyframes sync-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.sync-icon { animation: sync-spin 1.4s linear infinite; }
+
+/* Rotating border beam */
+@keyframes beam-rotate { 0%{--beam-angle:0deg} 100%{--beam-angle:360deg} }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. ALPINE.JS COMPONENTS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+omnexorApp() — on <body>:
+  State: activeNav, activeTab, cycleTabs, progressKey, cycleTimer (6000ms)
+  Data: statCards[], recentActivity[], quickActions[], chartBars[],
+        conversations[], chatMessages[], calDays[], upcomingEvents[],
+        contacts[], kanbanCols[]
+  Methods: sourceBadge(fuente), init(), startCycle(), resetCycle()
+
+bentoDashboard() — Bento tab:
+  State: bentoCards[]
+  Methods: initBento(), onMouseMove(event, el), onMouseLeave(el)
+
+conversacionesChat() — Chat tab:
+  State: selectedConv, showIncoming, showTyping, showAIResponse, demoDone, liveTime
+  Data: sidebarConvs[], seedMessages[]
+  Methods: getNow(), scrollToBottom(), startLiveDemo()
+
+clientesPotencialesBoard() — Kanban tab:
+  State: animating, animDone, juanInContactado, animTimer
+  Data: nuevoLeadOtros[], calificadoLeads[], noCalificadoLeads[], contactadoLeads[], reunionLeads[]
+  Computed: nuevoLeadCount, contactadoCount
+  Methods: sourceBadge(fuente), onTabVisible(), scheduleAnim(), triggerMoveAnimation()
+</div>
+    </div>
+
+    <div class="footer">
+      Omnexor Panel Cinematic — layout2.html — Prompt completo con todas las correcciones aplicadas
+    </div>
+  </div>
+
+  <script>
+    function copyPrompt() {
+      const text = document.getElementById('promptText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = `
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+          ¡Copiado!
+        `;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            Copiar Prompt
+          `;
+        }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>
