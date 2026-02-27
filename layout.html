@@ -34,12 +34,47 @@
     body {
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       background-color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      min-height: 100%;
+    }
+
+    /* Main app shell: fixed compact dimensions */
+    .app-shell {
+      width: 900px;
+      height: 600px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      background: #ffffff;
+    }
+
+    /* Responsive: smaller screens */
+    @media (max-width: 900px) {
+      .app-shell {
+        width: 100%;
+        height: auto;
+        min-height: 0;
+      }
+    }
+
+    /* Hardware-accelerated animations */
+    [x-transition] {
+      will-change: transform, opacity;
+    }
+
+    /* Simplify shadows — use border only */
+    .shadow-sm, .shadow-md, .shadow-xl, .shadow-lg {
+      box-shadow: none !important;
     }
   </style>
 </head>
 
 <body
-  class="min-h-screen bg-[#f8fafc] text-gray-800 antialiased"
+  class="bg-[#f8fafc] text-gray-800 antialiased"
   x-data="{
     sidebarOpen: true,
     activeNav: 'panel',
@@ -55,12 +90,13 @@
 >
 
   <!-- ===== App Shell ===== -->
-  <div class="flex h-screen overflow-hidden">
+  <div class="app-shell flex overflow-hidden">
 
     <!-- ===== Sidebar ===== -->
     <aside
       :class="sidebarOpen ? 'w-64' : 'w-16'"
       class="relative flex flex-col flex-shrink-0 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-hidden"
+      style="will-change: transform, opacity;"
     >
 
       <!-- Sidebar Header / Logo -->
@@ -83,6 +119,7 @@
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             class="text-lg font-semibold text-gray-900 whitespace-nowrap"
+            style="will-change: transform, opacity;"
           >
             Omnexor
           </span>
@@ -219,7 +256,7 @@
               { label: 'Miembros del Equipo', value: '138',      change: '-2',     up: false },
               { label: 'Disponibilidad',      value: '99.98%',   change: '+0.02%', up: true  },
             ]" :key="i">
-              <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+              <div class="bg-white rounded-xl border border-[#e2e8f0] p-5">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide" x-text="card.label"></p>
                 <p class="mt-2 text-2xl font-bold text-gray-900" x-text="card.value"></p>
                 <p
@@ -230,7 +267,7 @@
               </div>
             </template>
           </div>
-          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div class="bg-white rounded-xl border border-[#e2e8f0] p-6">
             <h2 class="text-sm font-semibold text-gray-700 mb-4">Área de Contenido</h2>
             <p class="text-sm text-gray-500">
               Esta es la región de contenido principal. Reemplaza este marcador de posición con componentes
@@ -265,7 +302,7 @@
                 <div class="flex flex-col w-72 flex-shrink-0">
 
                   <!-- Column Header -->
-                  <div class="flex items-center justify-between px-4 py-3 rounded-t-xl bg-indigo-600 shadow-sm">
+                  <div class="flex items-center justify-between px-4 py-3 rounded-t-xl bg-indigo-600">
                     <div class="flex items-center gap-2">
                       <span class="text-sm font-semibold text-white" x-text="col.title"></span>
                       <span
@@ -278,14 +315,15 @@
 
                   <!-- Cards Container -->
                   <div
-                    class="flex-1 flex flex-col gap-3 p-3 bg-indigo-50/60 rounded-b-xl min-h-[20rem] max-h-[calc(100vh-18rem)] overflow-y-auto"
+                    class="flex-1 flex flex-col gap-3 p-3 bg-indigo-50/60 rounded-b-xl min-h-[12rem] max-h-[18rem] overflow-y-auto"
                     style="scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;"
                     @dragover.prevent
                     @drop="drop($event, col.id)"
                   >
-                    <template x-for="lead in col.leads" :key="lead.id">
+                    <template x-for="lead in col.leads.slice(0, 5)" :key="lead.id">
                       <div
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow duration-150 group"
+                        class="bg-white rounded-2xl border border-[#e2e8f0] p-4 cursor-grab active:cursor-grabbing group"
+                        style="will-change: transform, opacity;"
                         draggable="true"
                         @dragstart="dragStart($event, lead.id, col.id)"
                       >
@@ -373,6 +411,7 @@
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            style="will-change: transform, opacity;"
             @click.self="closeModal()"
           >
             <div
@@ -383,7 +422,8 @@
               x-transition:leave="transition ease-in duration-150"
               x-transition:leave-start="opacity-100 scale-100"
               x-transition:leave-end="opacity-0 scale-95"
-              class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+              class="bg-white rounded-2xl border border-[#e2e8f0] w-full max-w-md p-6"
+              style="will-change: transform, opacity;"
             >
               <div class="flex items-center justify-between mb-5">
                 <h2 class="text-base font-bold text-gray-900" x-text="modal.editing ? 'Editar Lead' : 'Nuevo Lead'"></h2>
@@ -437,7 +477,7 @@
 
         <!-- ── Other sections placeholder ── -->
         <div x-show="!['panel','clientes'].includes(activeNav)" class="max-w-7xl mx-auto">
-          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 text-center">
+          <div class="bg-white rounded-xl border border-[#e2e8f0] p-10 text-center">
             <p class="text-sm text-gray-400">Sección en construcción.</p>
           </div>
         </div>
