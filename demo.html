@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnexor – Plataforma de Gestión Empresarial con IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+    .demo-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      max-height: 800px;
+      height: 800px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      height: 56px;
+      min-height: 56px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 10;
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #64748b; }
+    .breadcrumb .brand { font-weight: 700; color: #4f46e5; font-size: 15px; letter-spacing: -0.3px; }
+    .breadcrumb .sep { color: #cbd5e1; }
+    .breadcrumb .current { color: #1e293b; font-weight: 500; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: #f8fafc; border: 1px solid #e2e8f0; cursor: pointer;
+      color: #64748b; transition: all 0.2s;
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    }
+
+    /* MAIN BODY */
+    .main-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: #fafafa;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 0;
+    }
+    .sidebar-logo {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 8px;
+    }
+    .sidebar-logo .logo-text {
+      font-size: 18px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px;
+    }
+    .sidebar-logo .logo-sub { font-size: 10px; color: #94a3b8; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+    .nav-items { flex: 1; padding: 0 8px; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px; margin-bottom: 2px;
+      font-size: 13px; font-weight: 500; color: #64748b;
+      cursor: pointer; transition: all 0.25s ease;
+    }
+    .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-item.active {
+      background: #eef2ff; color: #4f46e5; font-weight: 600;
+    }
+    .nav-item.active .nav-icon { color: #4f46e5; }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto; background: #4f46e5; color: white;
+      font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+    }
+    .sidebar-user {
+      padding: 12px 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info .user-name { font-size: 12px; font-weight: 600; color: #1e293b; }
+    .user-info .user-email { font-size: 10px; color: #94a3b8; }
+
+    /* CONTENT AREA */
+    .content-area { flex: 1; overflow: hidden; position: relative; background: #f8fafc; }
+
+    /* VIEW TRANSITIONS */
+    .view-panel {
+      position: absolute; inset: 0;
+      padding: 24px;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      pointer-events: none;
+    }
+    .view-panel.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: none;
+    }
+
+    /* METRIC CARDS */
+    .metric-card {
+      background: white; border-radius: 12px; padding: 18px 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .metric-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px; }
+    .metric-value { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -1px; margin: 4px 0; }
+    .metric-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #10b981; }
+    .trend-down { color: #ef4444; }
+
+    /* CHART */
+    .chart-container {
+      background: white; border-radius: 12px; padding: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .chart-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .chart-subtitle { font-size: 12px; color: #94a3b8; margin-bottom: 16px; }
+
+    /* CHAT VIEW */
+    .chat-list-item {
+      padding: 12px 14px; border-radius: 8px; cursor: pointer;
+      border-bottom: 1px solid #f1f5f9; transition: background 0.2s;
+    }
+    .chat-list-item:hover { background: #f8fafc; }
+    .chat-list-item.active { background: #eef2ff; border-left: 3px solid #4f46e5; }
+    .chat-bubble {
+      max-width: 80%; padding: 10px 14px; border-radius: 12px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .chat-bubble.user { background: #4f46e5; color: white; border-bottom-right-radius: 4px; }
+    .chat-bubble.ai { background: white; color: #1e293b; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; border-bottom-left-radius: 4px; width: fit-content; }
+    .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; animation: typingBounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+    /* KANBAN */
+    .kanban-col {
+      background: #f8fafc; border-radius: 10px; padding: 12px;
+      border: 1px solid #e2e8f0; flex: 1; min-width: 0;
+    }
+    .kanban-col-header { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .deal-card {
+      background: white; border-radius: 8px; padding: 12px;
+      border: 1px solid #e2e8f0; margin-bottom: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .deal-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+    .deal-company { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .deal-value { font-size: 13px; font-weight: 700; color: #4f46e5; margin-top: 6px; }
+    .priority-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+    .priority-high { background: #fef2f2; color: #dc2626; }
+    .priority-med { background: #fffbeb; color: #d97706; }
+    .priority-low { background: #f0fdf4; color: #16a34a; }
+
+    /* AGENTS */
+    .agent-card {
+      background: white; border-radius: 12px; padding: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .agent-status { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #10b981; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.2); } 50% { box-shadow: 0 0 0 6px rgba(16,185,129,0.1); } }
+    .resolution-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+    .resolution-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #7c3aed); border-radius: 2px; transition: width 1s ease; }
+
+    /* AUTOMATION */
+    .workflow-node {
+      border-radius: 10px; padding: 10px 16px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      white-space: nowrap;
+    }
+    .node-trigger { background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; }
+    .node-action-green { background: #f0fdf4; border: 2px solid #22c55e; color: #15803d; }
+    .node-condition { background: #fffbeb; border: 2px solid #f59e0b; color: #b45309; transform: rotate(0deg); }
+    .node-action-purple { background: #faf5ff; border: 2px solid #a855f7; color: #7e22ce; }
+    .flow-arrow {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0; color: #94a3b8;
+    }
+    .dashed-line {
+      width: 2px; height: 28px;
+      background: repeating-linear-gradient(to bottom, #94a3b8 0px, #94a3b8 4px, transparent 4px, transparent 8px);
+      animation: flowDown 1s linear infinite;
+    }
+    @keyframes flowDown {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 16px; }
+    }
+    .arrow-head { color: #94a3b8; font-size: 14px; margin-top: -4px; }
+
+    /* TASK LOG */
+    .task-log-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .task-log-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 13px;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      background: white; border-radius: 10px; padding: 10px 16px;
+      border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 20px;
+      font-size: 12px; color: #475569; font-weight: 500;
+    }
+    .stats-bar .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stats-bar .stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+    .stats-divider { color: #e2e8f0; }
+
+    /* SECTION TITLE */
+    .section-title { font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+    .section-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+
+    /* BREADCRUMB TRANSITION */
+    .breadcrumb-view { transition: opacity 0.4s ease; }
+  </style>
+</head>
+<body>
+
+<div class="demo-wrapper" id="demoWrapper">
+
+  <!-- TOP HEADER -->
+  <div class="top-header">
+    <div class="breadcrumb">
+      <span class="brand">Omnexor</span>
+      <span class="sep">›</span>
+      <span class="current" id="breadcrumbCurrent">Dashboard</span>
+    </div>
+    <div class="header-actions">
+      <!-- Grid Icon -->
+      <div class="icon-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <!-- Bell Icon -->
+      <div class="icon-btn" style="position:relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span style="position:absolute;top:6px;right:6px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid white;"></span>
+      </div>
+      <!-- Avatar -->
+      <div class="avatar">MA</div>
+    </div>
+  </div>
+
+  <!-- MAIN BODY -->
+  <div class="main-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">Omnexor</div>
+        <div class="logo-sub">Plataforma Empresarial IA</div>
+      </div>
+
+      <div class="nav-items">
+        <!-- 1. Inicio -->
+        <div class="nav-item" id="nav-inicio">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Inicio
+        </div>
+        <!-- 2. Dashboard -->
+        <div class="nav-item active" id="nav-dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Dashboard
+        </div>
+        <!-- 3. Conversaciones -->
+        <div class="nav-item" id="nav-conversaciones">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Conversaciones
+          <span class="nav-badge">5</span>
+        </div>
+        <!-- 4. Calendarios -->
+        <div class="nav-item" id="nav-calendarios">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Calendarios
+        </div>
+        <!-- 5. Contactos -->
+        <div class="nav-item" id="nav-contactos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Contactos
+        </div>
+        <!-- 6. Pagos -->
+        <div class="nav-item" id="nav-pagos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          Pagos
+        </div>
+        <!-- 7. Agentes de AI -->
+        <div class="nav-item" id="nav-agentes">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+            <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="16" x2="12" y2="18"/>
+          </svg>
+          Agentes de AI
+        </div>
+        <!-- 8. Marketing -->
+        <div class="nav-item" id="nav-marketing">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Marketing
+        </div>
+        <!-- 9. Automatización -->
+        <div class="nav-item" id="nav-automatizacion">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Automatización
+        </div>
+      </div>
+
+      <!-- USER PROFILE -->
+      <div class="sidebar-user">
+        <div class="user-avatar">MA</div>
+        <div class="user-info">
+          <div class="user-name">María Alcázar</div>
+          <div class="user-email">contacto@tuempresa.com</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div class="content-area">
+
+      <!-- ===== VIEW 1: DASHBOARD ===== -->
+      <div class="view-panel active" id="view-dashboard">
+        <div style="margin-bottom:20px;">
+          <div class="section-title">Dashboard</div>
+          <div class="section-sub">Resumen de rendimiento · Febrero 2026</div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+          <!-- Leads -->
+          <div class="metric-card">
+            <div class="metric-label">Leads Totales</div>
+            <div class="metric-value">1,284</div>
+            <div class="metric-trend trend-up">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+              +12.4% vs mes anterior
+            </div>
+          </div>
+          <!-- Conversión -->
+          <div class="metric-card">
+            <div class="metric-label">Tasa de Conversión</div>
+            <div class="metric-value">34.7%</div>
+            <div class="metric-trend trend-up">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+              +3.2% vs mes anterior
+            </div>
+          </div>
+          <!-- MRR -->
+          <div class="metric-card">
+            <div class="metric-label">MRR</div>
+            <div class="metric-value">$48,295</div>
+            <div class="metric-trend trend-up">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+              +8.7% vs mes anterior
+            </div>
+          </div>
+          <!-- NPS -->
+          <div class="metric-card">
+            <div class="metric-label">NPS Score</div>
+            <div class="metric-value">72</div>
+            <div class="metric-trend trend-down">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+              -1.5 vs mes anterior
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+          <div class="chart-title">Rendimiento Mensual</div>
+          <div class="chart-subtitle">Ingresos generados por mes · Últimos 7 meses</div>
+          <div style="display:flex;align-items:flex-end;gap:0;height:180px;position:relative;">
+            <!-- Y-axis labels -->
+            <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%;padding-bottom:24px;margin-right:10px;text-align:right;">
+              <span style="font-size:10px;color:#94a3b8;">$60k</span>
+              <span style="font-size:10px;color:#94a3b8;">$45k</span>
+              <span style="font-size:10px;color:#94a3b8;">$30k</span>
+              <span style="font-size:10px;color:#94a3b8;">$15k</span>
+              <span style="font-size:10px;color:#94a3b8;">$0</span>
+            </div>
+            <!-- SVG Chart -->
+            <svg width="100%" height="100%" viewBox="0 0 560 180" preserveAspectRatio="none" style="flex:1;">
+              <!-- Grid lines -->
+              <line x1="0" y1="0" x2="560" y2="0" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="39" x2="560" y2="39" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="78" x2="560" y2="78" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="117" x2="560" y2="117" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="156" x2="560" y2="156" stroke="#f1f5f9" stroke-width="1"/>
+
+              <!-- Bars: Ago=40%, Sep=50%, Oct=55%, Nov=65%, Dic=75%, Ene=85%, Feb=95% of 156px chart height -->
+              <!-- Ago: height=62.4, y=156-62.4=93.6 -->
+              <rect x="10" y="93.6" width="60" height="62.4" rx="6" fill="url(#barGrad)" opacity="0.7"/>
+              <!-- Sep: height=78, y=156-78=78 -->
+              <rect x="90" y="78" width="60" height="78" rx="6" fill="url(#barGrad)" opacity="0.75"/>
+              <!-- Oct: height=85.8, y=156-85.8=70.2 -->
+              <rect x="170" y="70.2" width="60" height="85.8" rx="6" fill="url(#barGrad)" opacity="0.8"/>
+              <!-- Nov: height=101.4, y=156-101.4=54.6 -->
+              <rect x="250" y="54.6" width="60" height="101.4" rx="6" fill="url(#barGrad)" opacity="0.85"/>
+              <!-- Dic: height=117, y=156-117=39 -->
+              <rect x="330" y="39" width="60" height="117" rx="6" fill="url(#barGrad)" opacity="0.9"/>
+              <!-- Ene: height=132.6, y=156-132.6=23.4 -->
+              <rect x="410" y="23.4" width="60" height="132.6" rx="6" fill="url(#barGrad)" opacity="0.95"/>
+              <!-- Feb: height=148.2, y=156-148.2=7.8 -->
+              <rect x="490" y="7.8" width="60" height="148.2" rx="6" fill="url(#barGrad)"/>
+
+              <!-- Value labels on top of bars -->
+              <text x="40" y="88" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$19.2k</text>
+              <text x="120" y="72" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$24.1k</text>
+              <text x="200" y="64" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$26.5k</text>
+              <text x="280" y="48" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$31.3k</text>
+              <text x="360" y="33" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$36.1k</text>
+              <text x="440" y="17" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">$41.8k</text>
+              <text x="520" y="2" text-anchor="middle" font-size="9" fill="#4f46e5" font-weight="700" font-family="Inter">$48.3k</text>
+
+              <!-- X-axis labels -->
+              <text x="40" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Ago</text>
+              <text x="120" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Sep</text>
+              <text x="200" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Oct</text>
+              <text x="280" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Nov</text>
+              <text x="360" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Dic</text>
+              <text x="440" y="175" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">Ene</text>
+              <text x="520" y="175" text-anchor="middle" font-size="10" fill="#4f46e5" font-weight="700" font-family="Inter">Feb</text>
+
+              <defs>
+                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#4f46e5"/>
+                  <stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Bottom row: quick stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+          <div class="metric-card" style="display:flex;align-items:center;gap:14px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Clientes Activos</div>
+              <div style="font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">3,847</div>
+            </div>
+          </div>
+          <div class="metric-card" style="display:flex;align-items:center;gap:14px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Automatizaciones Activas</div>
+              <div style="font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">127</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW 2: CONVERSACIONES ===== -->
+      <div class="view-panel" id="view-conversaciones">
+        <div style="margin-bottom:16px;">
+          <div class="section-title">Conversaciones</div>
+          <div class="section-sub">Bandeja de entrada · IA respondiendo en tiempo real</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:0;background:white;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;height:580px;">
+          <!-- Left: Lead List -->
+          <div style="border-right:1px solid #e2e8f0;overflow-y:auto;">
+            <div style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Conversaciones Activas</div>
+
+            <div class="chat-list-item active" id="chat-lead-0">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:600;color:#0f172a;">Carlos Mendoza</div>
+                <div style="font-size:10px;color:#94a3b8;">hace 2m</div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Grupo Empresarial Norte</div>
+              <div style="font-size:12px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">¿Cuántos usuarios puede manejar la plataforma?</div>
+            </div>
+
+            <div class="chat-list-item" id="chat-lead-1">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:600;color:#0f172a;">Ana Rodríguez</div>
+                <div style="font-size:10px;color:#94a3b8;">hace 8m</div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">TechSolutions MX</div>
+              <div style="font-size:12px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Necesito integrar con mi sistema actual...</div>
+            </div>
+
+            <div class="chat-list-item" id="chat-lead-2">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:600;color:#0f172a;">Roberto Fuentes</div>
+                <div style="font-size:10px;color:#94a3b8;">hace 15m</div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Inversiones Fuentes SA</div>
+              <div style="font-size:12px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">¿Tienen soporte en español 24/7?</div>
+            </div>
+
+            <div class="chat-list-item" id="chat-lead-3">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:600;color:#0f172a;">Sofía Vargas</div>
+                <div style="font-size:10px;color:#94a3b8;">hace 22m</div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Consultora Digital SV</div>
+              <div style="font-size:12px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">¿Cuál es el precio del plan empresarial?</div>
+            </div>
+
+            <div class="chat-list-item" id="chat-lead-4">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:600;color:#0f172a;">Miguel Torres</div>
+                <div style="font-size:10px;color:#94a3b8;">hace 31m</div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Torres & Asociados</div>
+              <div style="font-size:12px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">¿Puedo automatizar mis seguimientos?</div>
+            </div>
+          </div>
+
+          <!-- Right: Active Chat -->
+          <div style="display:flex;flex-direction:column;height:100%;">
+            <!-- Chat Header -->
+            <div style="padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;" id="chat-avatar">CM</div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#0f172a;" id="chat-name">Carlos Mendoza</div>
+                <div style="font-size:11px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:4px;">
+                  <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+                  En línea · Grupo Empresarial Norte
+                </div>
+              </div>
+              <div style="margin-left:auto;display:flex;gap:8px;">
+                <div style="padding:5px 12px;background:#eef2ff;color:#4f46e5;border-radius:6px;font-size:11px;font-weight:600;">IA Activa</div>
+              </div>
+            </div>
+
+            <!-- Messages -->
+            <div style="flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;" id="chat-messages">
+              <!-- Messages injected by JS -->
+            </div>
+
+            <!-- Input bar (decorative) -->
+            <div style="padding:12px 18px;border-top:1px solid #f1f5f9;display:flex;gap:10px;align-items:center;">
+              <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13px;color:#94a3b8;">La IA está gestionando esta conversación...</div>
+              <div style="width:36px;height:36px;background:#4f46e5;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW 3: CALENDARIOS / KANBAN ===== -->
+      <div class="view-panel" id="view-calendarios">
+        <div style="margin-bottom:16px;">
+          <div class="section-title">Pipeline de Ventas</div>
+          <div class="section-sub">Gestión de oportunidades · Vista Kanban</div>
+        </div>
+
+        <div style="display:flex;gap:12px;height:580px;overflow-x:auto;">
+          <!-- Column: Nuevo -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span>🔵 Nuevo</span>
+              <span style="font-size:11px;color:#4f46e5;font-weight:700;">$284,500</span>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Carlos Mendoza</div>
+                <span class="priority-badge priority-high">Alta</span>
+              </div>
+              <div class="deal-company">Grupo Empresarial Norte</div>
+              <div class="deal-value">$85,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Contactar: 28 Feb
+              </div>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Sofía Vargas</div>
+                <span class="priority-badge priority-med">Media</span>
+              </div>
+              <div class="deal-company">Consultora Digital SV</div>
+              <div class="deal-value">$62,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Contactar: 1 Mar
+              </div>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Luis Herrera</div>
+                <span class="priority-badge priority-low">Baja</span>
+              </div>
+              <div class="deal-company">Herrera Logística</div>
+              <div class="deal-value">$137,500 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Contactar: 3 Mar
+              </div>
+            </div>
+          </div>
+
+          <!-- Column: Contactado -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span>🟡 Contactado</span>
+              <span style="font-size:11px;color:#d97706;font-weight:700;">$198,200</span>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Ana Rodríguez</div>
+                <span class="priority-badge priority-high">Alta</span>
+              </div>
+              <div class="deal-company">TechSolutions MX</div>
+              <div class="deal-value">$120,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Follow-up: 27 Feb
+              </div>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Miguel Torres</div>
+                <span class="priority-badge priority-med">Media</span>
+              </div>
+              <div class="deal-company">Torres & Asociados</div>
+              <div class="deal-value">$78,200 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Follow-up: 28 Feb
+              </div>
+            </div>
+          </div>
+
+          <!-- Column: Demo -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span>🟠 Demo</span>
+              <span style="font-size:11px;color:#ea580c;font-weight:700;">$342,000</span>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Roberto Fuentes</div>
+                <span class="priority-badge priority-high">Alta</span>
+              </div>
+              <div class="deal-company">Inversiones Fuentes SA</div>
+              <div class="deal-value">$195,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Demo: 27 Feb 14:00
+              </div>
+            </div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Patricia Leal</div>
+                <span class="priority-badge priority-med">Media</span>
+              </div>
+              <div class="deal-company">Grupo Leal Retail</div>
+              <div class="deal-value">$147,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Demo: 1 Mar 10:00
+              </div>
+            </div>
+          </div>
+
+          <!-- Column: Cerrado -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span>🟢 Cerrado</span>
+              <span style="font-size:11px;color:#16a34a;font-weight:700;">$521,800</span>
+            </div>
+            <div class="deal-card" style="border-left:3px solid #22c55e;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Empresa Alfa SA</div>
+                <span class="priority-badge priority-low">Ganado</span>
+              </div>
+              <div class="deal-company">Alfa Corporativo</div>
+              <div class="deal-value">$240,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#10b981;font-weight:600;">✓ Contrato firmado</div>
+            </div>
+            <div class="deal-card" style="border-left:3px solid #22c55e;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Nexo Digital</div>
+                <span class="priority-badge priority-low">Ganado</span>
+              </div>
+              <div class="deal-company">Nexo Digital Corp</div>
+              <div class="deal-value">$168,000 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#10b981;font-weight:600;">✓ Contrato firmado</div>
+            </div>
+            <div class="deal-card" style="border-left:3px solid #22c55e;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div class="deal-name">Soluciones Beta</div>
+                <span class="priority-badge priority-low">Ganado</span>
+              </div>
+              <div class="deal-company">Beta Enterprises</div>
+              <div class="deal-value">$113,800 MXN</div>
+              <div style="margin-top:8px;font-size:11px;color:#10b981;font-weight:600;">✓ Contrato firmado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW 4: AGENTES DE AI ===== -->
+      <div class="view-panel" id="view-agentes">
+        <div style="margin-bottom:16px;">
+          <div class="section-title">Agentes de AI</div>
+          <div class="section-sub">Asistentes inteligentes desplegados · 4 activos</div>
+        </div>
+
+        <!-- Agent Grid -->
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px;">
+          <!-- Agent 1 -->
+          <div class="agent-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:#0f172a;">Agente de Ventas</div>
+                  <div style="font-size:11px;color:#64748b;">Calificación y cierre</div>
+                </div>
+              </div>
+              <div class="agent-status"><span class="status-dot"></span>Activo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;color:#64748b;">Resolución</span>
+              <span style="font-size:12px;font-weight:700;color:#4f46e5;">96%</span>
+            </div>
+            <div class="resolution-bar"><div class="resolution-fill" style="width:96%;"></div></div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;">
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#0f172a;">847</div>
+                <div style="font-size:10px;color:#94a3b8;">Conversaciones</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#10b981;">812</div>
+                <div style="font-size:10px;color:#94a3b8;">Resueltas</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#f59e0b;">2.3s</div>
+                <div style="font-size:10px;color:#94a3b8;">Resp. prom.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent 2 -->
+          <div class="agent-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:#0f172a;">Soporte Técnico 24/7</div>
+                  <div style="font-size:11px;color:#64748b;">Resolución de incidencias</div>
+                </div>
+              </div>
+              <div class="agent-status"><span class="status-dot"></span>Activo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;color:#64748b;">Resolución</span>
+              <span style="font-size:12px;font-weight:700;color:#4f46e5;">91%</span>
+            </div>
+            <div class="resolution-bar"><div class="resolution-fill" style="width:91%;"></div></div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;">
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#0f172a;">1,203</div>
+                <div style="font-size:10px;color:#94a3b8;">Conversaciones</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#10b981;">1,095</div>
+                <div style="font-size:10px;color:#94a3b8;">Resueltas</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#f59e0b;">1.8s</div>
+                <div style="font-size:10px;color:#94a3b8;">Resp. prom.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent 3 -->
+          <div class="agent-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:#0f172a;">Calificador de Leads</div>
+                  <div style="font-size:11px;color:#64748b;">Scoring automático</div>
+                </div>
+              </div>
+              <div class="agent-status"><span class="status-dot"></span>Activo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;color:#64748b;">Resolución</span>
+              <span style="font-size:12px;font-weight:700;color:#4f46e5;">88%</span>
+            </div>
+            <div class="resolution-bar"><div class="resolution-fill" style="width:88%;"></div></div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;">
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#0f172a;">562</div>
+                <div style="font-size:10px;color:#94a3b8;">Conversaciones</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#10b981;">495</div>
+                <div style="font-size:10px;color:#94a3b8;">Resueltas</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#f59e0b;">3.1s</div>
+                <div style="font-size:10px;color:#94a3b8;">Resp. prom.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent 4 -->
+          <div class="agent-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:#0f172a;">Asistente de Onboarding</div>
+                  <div style="font-size:11px;color:#64748b;">Activación de clientes</div>
+                </div>
+              </div>
+              <div class="agent-status"><span class="status-dot"></span>Activo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;color:#64748b;">Resolución</span>
+              <span style="font-size:12px;font-weight:700;color:#4f46e5;">94%</span>
+            </div>
+            <div class="resolution-bar"><div class="resolution-fill" style="width:94%;"></div></div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;">
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#0f172a;">329</div>
+                <div style="font-size:10px;color:#94a3b8;">Conversaciones</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#10b981;">309</div>
+                <div style="font-size:10px;color:#94a3b8;">Resueltas</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#f59e0b;">2.7s</div>
+                <div style="font-size:10px;color:#94a3b8;">Resp. prom.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Tasks Log -->
+        <div style="background:white;border-radius:12px;padding:16px 18px;border:1px solid #e2e8f0;">
+          <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:12px;">Tareas Recientes Completadas</div>
+          <div class="task-log-item">
+            <div class="task-log-icon" style="background:#eef2ff;">🤖</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:#0f172a;">Agente de Ventas calificó 12 nuevos leads</div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Scoring completado · 8 leads marcados como alta prioridad</div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;white-space:nowrap;">hace 3 min</div>
+          </div>
+          <div class="task-log-item">
+            <div class="task-log-icon" style="background:#f0fdf4;">✅</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:#0f172a;">Soporte Técnico resolvió incidencia #4821</div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Tiempo de resolución: 4 minutos · Cliente satisfecho</div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;white-space:nowrap;">hace 7 min</div>
+          </div>
+          <div class="task-log-item">
+            <div class="task-log-icon" style="background:#fffbeb;">📧</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:#0f172a;">Asistente de Onboarding completó activación</div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Cliente: Nexo Digital Corp · Onboarding 100% completado</div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;white-space:nowrap;">hace 12 min</div>
+          </div>
+          <div class="task-log-item" style="border-bottom:none;">
+            <div class="task-log-icon" style="background:#faf5ff;">🎯</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:#0f172a;">Calificador procesó 34 formularios de contacto</div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;">Distribuidos automáticamente al equipo de ventas</div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;white-space:nowrap;">hace 18 min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW 5: AUTOMATIZACIÓN ===== -->
+      <div class="view-panel" id="view-automatizacion">
+        <div style="margin-bottom:16px;">
+          <div class="section-title">Automatización</div>
+          <div class="section-sub">Constructor de flujos de trabajo · Activo</div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar" style="margin-bottom:18px;">
+          <div class="stat-item">
+            <span class="stat-dot"></span>
+            <span style="font-weight:700;color:#0f172a;">847</span> ejecuciones este mes
+          </div>
+          <span class="stats-divider">·</span>
+          <div class="stat-item">
+            <span style="font-weight:700;color:#10b981;">98.2%</span> tasa de éxito
+          </div>
+          <span class="stats-divider">·</span>
+          <div class="stat-item">
+            Última ejecución: <span style="font-weight:600;color:#0f172a;">hace 3 min</span>
+          </div>
+          <div style="margin-left:auto;">
+            <span style="background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;">● EN EJECUCIÓN</span>
+          </div>
+        </div>
+
+        <!-- Workflow Canvas -->
+        <div style="background:white;border-radius:12px;border:1px solid #e2e8f0;padding:24px;overflow:auto;">
+          <div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;">Flujo: Bienvenida y Seguimiento de Leads</div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0;min-height:460px;">
+
+            <!-- Node 1: Trigger -->
+            <div style="display:flex;align-items:center;gap:0;">
+              <div class="workflow-node node-trigger">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <div>
+                  <div style="font-size:11px;font-weight:700;">DISPARADOR</div>
+                  <div style="font-size:13px;font-weight:700;color:#1e40af;">Nuevo Lead Registrado</div>
+                </div>
+                <div style="margin-left:8px;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">Activo</div>
+              </div>
+            </div>
+
+            <!-- Arrow 1 -->
+            <div class="flow-arrow">
+              <div class="dashed-line"></div>
+              <div class="arrow-head">▼</div>
+            </div>
+
+            <!-- Node 2: Action -->
+            <div class="workflow-node node-action-green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div>
+                <div style="font-size:11px;font-weight:700;">ACCIÓN</div>
+                <div style="font-size:13px;font-weight:700;color:#15803d;">Enviar WhatsApp de Bienvenida</div>
+              </div>
+              <div style="margin-left:8px;background:#dcfce7;color:#15803d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">847 veces</div>
+            </div>
+
+            <!-- Arrow 2 -->
+            <div class="flow-arrow">
+              <div class="dashed-line"></div>
+              <div class="arrow-head">▼</div>
+            </div>
+
+            <!-- Node 3: Condition (diamond shape) -->
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+              <div style="width:220px;height:60px;background:#fffbeb;border:2px solid #f59e0b;transform:rotate(0deg);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <div>
+                  <div style="font-size:11px;font-weight:700;color:#b45309;">CONDICIÓN</div>
+                  <div style="font-size:13px;font-weight:700;color:#92400e;">¿Respondió en 24h?</div>
+                </div>
+              </div>
+              <!-- Yes/No labels -->
+              <div style="position:absolute;left:-50px;font-size:10px;font-weight:700;color:#10b981;background:#f0fdf4;padding:2px 6px;border-radius:4px;">SÍ ↓</div>
+              <div style="position:absolute;right:-50px;font-size:10px;font-weight:700;color:#ef4444;background:#fef2f2;padding:2px 6px;border-radius:4px;">NO →</div>
+            </div>
+
+            <!-- Arrow 3 -->
+            <div class="flow-arrow">
+              <div class="dashed-line"></div>
+              <div class="arrow-head">▼</div>
+            </div>
+
+            <!-- Node 4: Email Sequence -->
+            <div class="workflow-node node-action-green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <div>
+                <div style="font-size:11px;font-weight:700;">ACCIÓN</div>
+                <div style="font-size:13px;font-weight:700;color:#15803d;">Secuencia de Email (3 pasos)</div>
+              </div>
+              <div style="margin-left:8px;background:#dcfce7;color:#15803d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">Día 1, 3, 7</div>
+            </div>
+
+            <!-- Arrow 4 -->
+            <div class="flow-arrow">
+              <div class="dashed-line"></div>
+              <div class="arrow-head">▼</div>
+            </div>
+
+            <!-- Node 5: Notify Agent -->
+            <div class="workflow-node node-action-purple">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <div>
+                <div style="font-size:11px;font-weight:700;">ACCIÓN</div>
+                <div style="font-size:13px;font-weight:700;color:#7e22ce;">Notificar al Agente de Ventas</div>
+              </div>
+              <div style="margin-left:8px;background:#faf5ff;color:#7e22ce;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;border:1px solid #e9d5ff;">Prioridad Alta</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+  </div><!-- end main-body -->
+</div><!-- end demo-wrapper -->
+
+<script>
+  // ============================================================
+  // OMNEXOR DEMO ENGINE
+  // ============================================================
+
+  const views = ['dashboard', 'conversaciones', 'calendarios', 'agentes', 'automatizacion'];
+  const navMap = {
+    'dashboard': 'nav-dashboard',
+    'conversaciones': 'nav-conversaciones',
+    'calendarios': 'nav-calendarios',
+    'agentes': 'nav-agentes',
+    'automatizacion': 'nav-automatizacion'
+  };
+  const breadcrumbMap = {
+    'dashboard': 'Dashboard',
+    'conversaciones': 'Conversaciones',
+    'calendarios': 'Pipeline de Ventas',
+    'agentes': 'Agentes de AI',
+    'automatizacion': 'Automatización'
+  };
+
+  let currentViewIndex = 0;
+  let cycleTimer = null;
+  let chatTimer = null;
+
+  // ---- CHAT DATA ----
+  const chatLeads = [
+    {
+      id: 0,
+      name: 'Carlos Mendoza',
+      company: 'Grupo Empresarial Norte',
+      initials: 'CM',
+      question: '¿Cuántos usuarios puede manejar la plataforma simultáneamente? Somos una empresa de 200 personas.',
+      answer: 'Excelente pregunta, Carlos. Omnexor está diseñado para escalar sin límites. Nuestro plan Empresarial soporta usuarios ilimitados con acceso concurrente garantizado. Para una empresa de 200 personas, recomendamos nuestro plan Enterprise que incluye SSO, roles personalizados y un gestor de cuenta dedicado. ¿Le gustaría agendar una demostración personalizada?'
+    },
+    {
+      id: 1,
+      name: 'Ana Rodríguez',
+      company: 'TechSolutions MX',
+      initials: 'AR',
+      question: 'Necesito integrar Omnexor con mi sistema ERP actual. ¿Tienen API disponible?',
+      answer: 'Hola Ana, absolutamente. Omnexor cuenta con una API REST completa con documentación detallada, webhooks en tiempo real y más de 200 integraciones nativas. Para sistemas ERP, ofrecemos conectores específicos para los principales proveedores del mercado. Nuestro equipo técnico puede guiarle en la integración sin costo adicional durante el primer mes.'
+    },
+    {
+      id: 2,
+      name: 'Roberto Fuentes',
+      company: 'Inversiones Fuentes SA',
+      initials: 'RF',
+      question: '¿Tienen soporte en español 24/7? Necesito garantías de disponibilidad para mi equipo.',
+      answer: 'Roberto, con gusto le confirmo que Omnexor ofrece soporte en español 24/7/365 a través de chat en vivo, teléfono y correo electrónico. Nuestro SLA garantiza respuesta en menos de 2 horas para incidencias críticas. Además, contará con un Gerente de Éxito del Cliente asignado exclusivamente a su cuenta.'
+    }
+  ];
+
+  let currentChatLead = 0;
+  let chatPhase = 'question'; // 'question' | 'typing' | 'answer'
+
+  function renderChatMessage(type, text, name) {
+    const container = document.getElementById('chat-messages');
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `display:flex;align-items:flex-end;gap:8px;${type === 'user' ? 'flex-direction:row-reverse;' : ''}`;
+
+    if (type === 'ai') {
+      const avatar = document.createElement('div');
+      avatar.style.cssText = 'width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0;';
+      avatar.textContent = 'AI';
+      wrapper.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${type === 'user' ? 'user' : 'ai'}`;
+    bubble.textContent = text;
+    wrapper.appendChild(bubble);
+
+    if (type === 'user') {
+      const initials = chatLeads[currentChatLead].initials;
+      const avatar = document.createElement('div');
+      avatar.style.cssText = 'width:28px;height:28px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#475569;font-size:10px;font-weight:700;flex-shrink:0;';
+      avatar.textContent = initials;
+      wrapper.appendChild(avatar);
+    }
+
+    wrapper.style.opacity = '0';
+    wrapper.style.transform = 'translateY(8px)';
+    wrapper.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    container.appendChild(wrapper);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        wrapper.style.opacity = '1';
+        wrapper.style.transform = 'translateY(0)';
+      });
+    });
+
+    container.scrollTop = container.scrollHeight;
+    return wrapper;
+  }
+
+  function renderTypingIndicator() {
+    const container = document.getElementById('chat-messages');
+    const wrapper = document.createElement('div');
+    wrapper.id = 'typing-wrapper';
+    wrapper.style.cssText = 'display:flex;align-items:flex-end;gap:8px;';
+
+    const avatar = document.createElement('div');
+    avatar.style.cssText = 'width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0;';
+    avatar.textContent = 'AI';
+
+    const indicator = document.createElement('div');
+    indicator.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:10px;color:#94a3b8;font-weight:500;';
+    label.textContent = 'La IA está escribiendo...';
+
+    const dots = document.createElement('div');
+    dots.className = 'typing-indicator';
+    dots.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+    indicator.appendChild(label);
+    indicator.appendChild(dots);
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(indicator);
+
+    wrapper.style.opacity = '0';
+    wrapper.style.transition = 'opacity 0.3s ease';
+    container.appendChild(wrapper);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { wrapper.style.opacity = '1'; });
+    });
+
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typing-wrapper');
+    if (el) el.remove();
+  }
+
+  function updateChatHeader(leadIndex) {
+    const lead = chatLeads[leadIndex];
+    document.getElementById('chat-avatar').textContent = lead.initials;
+    document.getElementById('chat-name').textContent = lead.name;
+  }
+
+  function highlightChatLead(index) {
+    document.querySelectorAll('.chat-list-item').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+  }
+
+  function runChatSequence() {
+    if (chatTimer) clearTimeout(chatTimer);
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '';
+
+    const lead = chatLeads[currentChatLead];
+    updateChatHeader(currentChatLead);
+    highlightChatLead(currentChatLead);
+
+    // Show user question
+    renderChatMessage('user', lead.question, lead.name);
+
+    // Show typing after 800ms
+    chatTimer = setTimeout(() => {
+      renderTypingIndicator();
+
+      // Show AI answer after 2s
+      chatTimer = setTimeout(() => {
+        removeTypingIndicator();
+        renderChatMessage('ai', lead.answer, 'Omnexor AI');
+
+        // Move to next lead after 3s
+        chatTimer = setTimeout(() => {
+          currentChatLead = (currentChatLead + 1) % chatLeads.length;
+          runChatSequence();
+        }, 3000);
+      }, 2000);
+    }, 800);
+  }
+
+  // ---- VIEW SWITCHING ----
+  function switchToView(index) {
+    const viewId = views[index];
+
+    // Deactivate all views
+    views.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.remove('active');
+    });
+
+    // Deactivate all nav items
+    Object.values(navMap).forEach(navId => {
+      const el = document.getElementById(navId);
+      if (el) el.classList.remove('active');
+    });
+
+    // Activate target view (with slight delay for exit animation)
+    setTimeout(() => {
+      const targetView = document.getElementById(`view-${viewId}`);
+      if (targetView) targetView.classList.add('active');
+
+      // Activate nav item
+      const navEl = document.getElementById(navMap[viewId]);
+      if (navEl) navEl.classList.add('active');
+
+      // Update breadcrumb
+      const bc = document.getElementById('breadcrumbCurrent');
+      if (bc) bc.textContent = breadcrumbMap[viewId];
+
+      // Start chat sequence when conversaciones is active
+      if (viewId === 'conversaciones') {
+        currentChatLead = 0;
+        runChatSequence();
+      } else {
+        if (chatTimer) clearTimeout(chatTimer);
+      }
+    }, 100);
+  }
+
+  // ---- AUTO CYCLE ----
+  function startCycle() {
+    switchToView(currentViewIndex);
+
+    cycleTimer = setInterval(() => {
+      currentViewIndex = (currentViewIndex + 1) % views.length;
+      switchToView(currentViewIndex);
+    }, 6000);
+  }
+
+  // Start on load
+  window.addEventListener('load', () => {
+    startCycle();
+  });
+</script>
+
+</body>
+</html>
