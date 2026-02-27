@@ -79,11 +79,11 @@
       animation: typing-bounce 1.2s ease-in-out infinite;
     }
 
-    /* ── Premium Kanban Card ── */
+    /* ── Premium Kanban Card (light) ── */
     .kanban-card-premium {
       position: relative;
-      background: rgba(12, 12, 25, 0.9);
-      border: 1px solid rgba(59,130,246,0.18);
+      background: #ffffff; /* ★ CHANGED: dark → white */
+      border: 1px solid rgba(59,130,246,0.2);
       border-radius: 0.875rem;
       padding: 1rem;
       overflow: hidden;
@@ -124,11 +124,11 @@
       box-shadow: 0 0 20px rgba(245,158,11,0.15);
     }
 
-    /* ── Bento Box Dashboard ── */
+    /* ── Bento Box Dashboard (light) ── */
     .bento-card {
       position: relative;
-      background: rgba(10, 10, 20, 0.75);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: #ffffff; /* ★ CHANGED: dark → white */
+      border: 1px solid rgba(59,130,246,0.12);
       border-radius: 1.125rem;
       padding: 1.375rem;
       overflow: hidden;
@@ -208,22 +208,22 @@
     html, body { height: 100%; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-      background-color: #030303;
-      color: #e2e8f0;
+      background-color: #ffffff; /* ★ CHANGED: dark #030303 → white #ffffff */
+      color: #1e293b;            /* ★ CHANGED: light #e2e8f0 → dark slate #1e293b */
       -webkit-font-smoothing: antialiased;
     }
 
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 99px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.35); border-radius: 99px; }
 
-    /* ── Glassmorphism container ── */
+    /* ── Glassmorphism container (light) ── */
     .glass-panel {
-      background: rgba(10, 10, 15, 0.80);
+      background: rgba(241, 245, 249, 0.85); /* ★ CHANGED: dark → light gray #f1f5f9 at 85% */
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.18); /* ★ CHANGED: subtle blue border */
     }
 
     /* ── Rotating border-beam glow ── */
@@ -267,7 +267,7 @@
       height: 100%;
       background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
       background-size: 200% 100%;
-      animation: progress-bar 10s linear forwards, border-beam 3s ease infinite;
+      animation: progress-bar 6s linear forwards, border-beam 3s ease infinite; /* ★ CHANGED: 10s → 6s */
       border-radius: 99px;
     }
 
@@ -276,7 +276,7 @@
       animation: fade-in 0.4s ease both;
     }
 
-    /* ── Sidebar nav item ── */
+    /* ── Sidebar nav item (light) ── */
     .nav-item {
       display: flex;
       align-items: center;
@@ -285,57 +285,57 @@
       border-radius: 0.625rem;
       font-size: 0.8125rem;
       font-weight: 500;
-      color: rgba(148,163,184,0.85);
-      cursor: pointer;
+      color: #64748b; /* slate-500 */
+      pointer-events: none; /* ★ CHANGED: disable clicks on nav items */
       transition: all 0.2s ease;
       white-space: nowrap;
       border: 1px solid transparent;
     }
     .nav-item:hover {
       background: rgba(59,130,246,0.08);
-      color: #e2e8f0;
+      color: #1e293b;
     }
     .nav-item.active {
-      background: rgba(59,130,246,0.15);
+      background: rgba(59,130,246,0.12);
       color: #3b82f6;
       border-color: rgba(59,130,246,0.25);
     }
     .nav-item.active svg {
-      filter: drop-shadow(0 0 4px rgba(59,130,246,0.6));
+      filter: drop-shadow(0 0 4px rgba(59,130,246,0.5));
     }
 
-    /* ── Stat card ── */
+    /* ── Stat card (light) ── */
     .stat-card {
-      background: rgba(15,15,25,0.7);
-      border: 1px solid rgba(59,130,246,0.1);
+      background: rgba(255,255,255,0.85); /* ★ CHANGED: dark → white */
+      border: 1px solid rgba(59,130,246,0.12);
       border-radius: 1rem;
       padding: 1.25rem;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .stat-card:hover {
       border-color: rgba(59,130,246,0.3);
-      box-shadow: 0 0 20px rgba(59,130,246,0.1);
+      box-shadow: 0 4px 20px rgba(59,130,246,0.08); /* ★ CHANGED: soft blue shadow */
     }
 
-    /* ── Kanban column ── */
+    /* ── Kanban column (light) ── */
     .kanban-col {
-      background: rgba(10,10,20,0.6);
-      border: 1px solid rgba(59,130,246,0.1);
+      background: rgba(248,250,252,0.9); /* ★ CHANGED: dark → very light slate */
+      border: 1px solid rgba(59,130,246,0.12);
       border-radius: 1rem;
       min-width: 260px;
       max-width: 260px;
     }
     .kanban-card {
-      background: rgba(15,15,30,0.8);
-      border: 1px solid rgba(59,130,246,0.08);
+      background: #ffffff; /* ★ CHANGED: dark → white */
+      border: 1px solid rgba(59,130,246,0.1);
       border-radius: 0.75rem;
       padding: 0.875rem;
       transition: border-color 0.2s, box-shadow 0.2s;
       cursor: grab;
     }
     .kanban-card:hover {
-      border-color: rgba(59,130,246,0.25);
-      box-shadow: 0 4px 20px rgba(59,130,246,0.08);
+      border-color: rgba(59,130,246,0.3);
+      box-shadow: 0 4px 16px rgba(59,130,246,0.1);
     }
 
     /* ── Calendar grid ── */
@@ -369,7 +369,7 @@
     }
     .cal-day { position: relative; }
 
-    /* ── Conversation item ── */
+    /* ── Conversation item (light) ── */
     .conv-item {
       display: flex;
       align-items: center;
@@ -381,12 +381,12 @@
       border: 1px solid transparent;
     }
     .conv-item:hover {
-      background: rgba(59,130,246,0.07);
-      border-color: rgba(59,130,246,0.12);
+      background: rgba(59,130,246,0.06);
+      border-color: rgba(59,130,246,0.15);
     }
     .conv-item.active-conv {
-      background: rgba(59,130,246,0.12);
-      border-color: rgba(59,130,246,0.2);
+      background: rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.22);
     }
 
     /* ── Glow dot ── */
@@ -394,21 +394,22 @@
       width: 8px; height: 8px;
       border-radius: 50%;
       background: #3b82f6;
-      box-shadow: 0 0 6px 2px rgba(59,130,246,0.6);
+      box-shadow: 0 0 6px 2px rgba(59,130,246,0.5);
       animation: pulse-glow 2s ease-in-out infinite;
     }
 
-    /* ── Top bar icon btn ── */
+    /* ── Top bar icon btn (light) ── */
     .topbar-btn {
       width: 2rem; height: 2rem;
       display: flex; align-items: center; justify-content: center;
       border-radius: 0.5rem;
-      color: rgba(148,163,184,0.7);
+      color: #94a3b8; /* slate-400 */
+      pointer-events: none; /* ★ CHANGED: disable clicks on icon buttons */
       transition: all 0.2s;
-      cursor: pointer;
+      cursor: default;
     }
     .topbar-btn:hover {
-      background: rgba(59,130,246,0.1);
+      background: rgba(59,130,246,0.08);
       color: #3b82f6;
     }
   </style>
@@ -423,24 +424,24 @@
   <!-- ══════════════════════════════════════════
        PROGRESS BAR (top of viewport)
   ══════════════════════════════════════════ -->
-  <div class="fixed top-0 left-0 right-0 z-50 h-[2px] bg-white/5">
+  <div class="fixed top-0 left-0 right-0 z-50 h-[2px] bg-slate-200">
     <div
       class="progress-fill"
       :key="progressKey"
-      :style="'animation-duration: 10s'"
+      :style="'animation-duration: 6s'" <!-- ★ CHANGED: 10s → 6s -->
     ></div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       AMBIENT BACKGROUND ORBS
+       AMBIENT BACKGROUND ORBS (light mode)
   ══════════════════════════════════════════ -->
   <div class="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
     <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full"
-         style="background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);"></div>
+         style="background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);"></div>
     <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full"
          style="background: radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%);"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
-         style="background: radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 60%);"></div>
+         style="background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 60%);"></div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -451,60 +452,59 @@
     <!-- ════════════════════════════
          SIDEBAR
     ════════════════════════════ -->
-    <aside class="flex flex-col flex-shrink-0 w-56 glass-panel border-r border-white/5 z-10">
+    <aside class="flex flex-col flex-shrink-0 w-56 glass-panel border-r border-slate-200 z-10">
 
       <!-- Logo -->
-      <div class="flex items-center gap-3 px-4 h-14 border-b border-white/5 flex-shrink-0">
+      <div class="flex items-center gap-3 px-4 h-14 border-b border-slate-200 flex-shrink-0">
         <!-- Animated logo mark -->
         <div class="relative flex-shrink-0 w-7 h-7">
-          <div class="absolute inset-0 rounded-lg bg-blue-500/20 animate-pulse-glow"></div>
+          <div class="absolute inset-0 rounded-lg bg-blue-500/15 animate-pulse-glow"></div>
           <div class="relative w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
         </div>
         <div>
-          <span class="text-sm font-bold text-white tracking-wide">Omnexor</span>
+          <span class="text-sm font-bold text-slate-900 tracking-wide">Omnexor</span>
           <div class="flex items-center gap-1 mt-0.5">
             <div class="glow-dot" style="width:5px;height:5px;"></div>
-            <span class="text-[10px] text-blue-400/80 font-medium">En línea</span>
+            <span class="text-[10px] text-blue-500 font-medium">En línea</span>
           </div>
         </div>
       </div>
 
       <!-- Navigation -->
       <nav class="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-        <p class="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-600">Principal</p>
+        <p class="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Principal</p>
 
         <template x-for="item in navItems" :key="item.id">
           <div
             class="nav-item"
             :class="{ 'active': activeNav === item.id }"
-            @click="activeNav = item.id"
           >
             <svg class="flex-shrink-0 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
               <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
             </svg>
             <span x-text="item.label"></span>
             <!-- Active indicator dot -->
-            <div x-show="activeNav === item.id" class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_2px_rgba(59,130,246,0.6)]"></div>
+            <div x-show="activeNav === item.id" class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"></div>
           </div>
         </template>
       </nav>
 
       <!-- User profile -->
-      <div class="flex-shrink-0 border-t border-white/5 p-3">
+      <div class="flex-shrink-0 border-t border-slate-200 p-3">
         <div class="flex items-center gap-2.5">
           <div class="relative flex-shrink-0">
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
-              <span class="text-xs font-bold text-white">JD</span>
+              <span class="text-xs font-bold text-slate-900">JD</span>
             </div>
-            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
           </div>
           <div class="min-w-0">
-            <p class="text-xs font-semibold text-white truncate">Jane Doe</p>
-            <p class="text-[10px] text-slate-500 truncate">jane@omnexor.io</p>
+            <p class="text-xs font-semibold text-slate-800 truncate">Jane Doe</p>
+            <p class="text-[10px] text-slate-400 truncate">jane@omnexor.io</p>
           </div>
           <button class="ml-auto topbar-btn flex-shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -522,32 +522,31 @@
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
 
       <!-- ── TOP BAR ── -->
-      <header class="flex-shrink-0 flex items-center justify-between h-14 px-5 glass-panel border-b border-white/5 z-10">
+      <header class="flex-shrink-0 flex items-center justify-between h-14 px-5 glass-panel border-b border-slate-200 z-10">
 
         <!-- Left: breadcrumb / page title -->
         <div class="flex items-center gap-2">
-          <span class="text-[10px] text-slate-600 font-medium">Omnexor</span>
-          <svg class="w-3 h-3 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <span class="text-[10px] text-slate-400 font-medium">Omnexor</span>
+          <svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          <span class="text-xs font-semibold text-slate-300" x-text="navItems.find(n => n.id === activeNav)?.label || ''"></span>
+          <span class="text-xs font-semibold text-slate-400" x-text="navItems.find(n => n.id === activeNav)?.label || ''"></span>
         </div>
 
-        <!-- Center: Tab pills (auto-cycling) -->
-        <div class="hidden md:flex items-center gap-1 bg-white/5 rounded-xl p-1">
+        <!-- Center: Tab pills (auto-cycling) — pointer-events disabled -->
+        <div class="hidden md:flex items-center gap-1 bg-slate-100 rounded-xl p-1" style="pointer-events: none;">
           <template x-for="tab in cycleTabs" :key="tab">
             <button
-              @click="activeTab = tab; resetCycle()"
               class="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
               :class="activeTab === tab
-                ? 'bg-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                : 'text-slate-500 hover:text-slate-300'"
+                ? 'bg-blue-500/15 text-blue-600 shadow-[0_2px_8px_rgba(59,130,246,0.15)]'
+                : 'text-slate-400'"
               x-text="tab"
             ></button>
           </template>
         </div>
 
-        <!-- Right: icon actions -->
+        <!-- Right: icon actions (pointer-events disabled via .topbar-btn CSS) -->
         <div class="flex items-center gap-1">
           <!-- Search -->
           <button class="topbar-btn" title="Buscar">
@@ -560,7 +559,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_4px_rgba(59,130,246,0.8)]"></span>
+            <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_4px_rgba(59,130,246,0.6)]"></span>
           </button>
           <!-- Grid view -->
           <button class="topbar-btn" title="Vista de cuadrícula">
@@ -569,10 +568,10 @@
             </svg>
           </button>
           <!-- Divider -->
-          <div class="w-px h-5 bg-white/10 mx-1"></div>
+          <div class="w-px h-5 bg-slate-200 mx-1"></div>
           <!-- Avatar -->
-          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-            <span class="text-[10px] font-bold text-white">JD</span>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-[0_2px_8px_rgba(59,130,246,0.25)]" style="pointer-events:none;">
+            <span class="text-[10px] font-bold text-slate-900">JD</span>
           </div>
         </div>
       </header>
@@ -592,7 +591,7 @@
               <!-- Header row -->
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Bienvenido de vuelta, Jane</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Bienvenido de vuelta, Jane</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Aquí tienes un resumen de tu actividad reciente</p>
                 </div>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
@@ -617,7 +616,7 @@
                         x-text="card.change"
                       ></span>
                     </div>
-                    <p class="text-xl font-bold text-white" x-text="card.value"></p>
+                    <p class="text-xl font-bold text-slate-900" x-text="card.value"></p>
                     <p class="text-[11px] text-slate-500 mt-0.5" x-text="card.label"></p>
                   </div>
                 </template>
@@ -637,7 +636,7 @@
                           </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <p class="text-xs text-slate-300" x-text="act.text"></p>
+                          <p class="text-xs text-slate-600" x-text="act.text"></p>
                           <p class="text-[10px] text-slate-600 mt-0.5" x-text="act.time"></p>
                         </div>
                       </div>
@@ -678,7 +677,7 @@
               <!-- Header -->
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Dashboard</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Dashboard</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Automatizaciones y flujos activos en tiempo real</p>
                 </div>
                 <!-- Live indicator -->
@@ -719,11 +718,11 @@
                     </div>
 
                     <!-- Title & subtitle -->
-                    <h3 class="text-sm font-bold text-white mb-1" x-text="card.title"></h3>
+                    <h3 class="text-sm font-bold text-slate-900 mb-1" x-text="card.title"></h3>
                     <p class="text-[11px] text-slate-500 leading-relaxed" x-text="card.subtitle"></p>
 
                     <!-- Bottom stat row -->
-                    <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
                       <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" :style="'background:' + card.iconBg + '; color:' + card.iconColor" x-text="card.stat"></span>
                       <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -738,7 +737,7 @@
             <div x-show="activeNav === 'dashboard'" class="tab-content">
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Dashboard</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Dashboard</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Métricas y análisis en tiempo real</p>
                 </div>
               </div>
@@ -748,8 +747,8 @@
                 <template x-for="(card, i) in statCards" :key="i">
                   <div class="stat-card">
                     <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2" x-text="card.label"></p>
-                    <p class="text-2xl font-bold text-white" x-text="card.value"></p>
-                    <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <p class="text-2xl font-bold text-slate-900" x-text="card.value"></p>
+                    <div class="mt-2 h-1 bg-slate-100 rounded-full overflow-hidden">
                       <div class="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full" :style="'width:' + card.pct + '%'"></div>
                     </div>
                     <p class="text-[10px] mt-1" :class="card.up ? 'text-emerald-400' : 'text-red-400'" x-text="card.change + ' vs mes anterior'"></p>
@@ -791,7 +790,7 @@
               <!-- Header -->
               <div class="flex items-center justify-between mb-5">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Conversaciones</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Conversaciones</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Gestiona tus mensajes y chats activos</p>
                 </div>
                 <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
@@ -807,18 +806,18 @@
                 <!-- ── Sidebar: Conversation list ── -->
                 <div class="stat-card flex flex-col overflow-hidden">
                   <!-- Search -->
-                  <div class="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5 mb-3 flex-shrink-0">
+                  <div class="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 mb-3 flex-shrink-0">
                     <svg class="w-3.5 h-3.5 text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" placeholder="Buscar conversación..." class="bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none flex-1" />
+                    <input type="text" placeholder="Buscar conversación..." class="bg-transparent text-xs text-slate-600 placeholder-slate-600 outline-none flex-1" />
                   </div>
 
                   <!-- Filter tabs -->
                   <div class="flex gap-1 mb-3 flex-shrink-0">
                     <button class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/25">Todos</button>
-                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-300 transition-colors">No leídos</button>
-                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-300 transition-colors">Archivados</button>
+                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-600 transition-colors">No leídos</button>
+                    <button class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-slate-500 hover:text-slate-600 transition-colors">Archivados</button>
                   </div>
 
                   <!-- Conversation items -->
@@ -830,20 +829,20 @@
                         @click="selectedConv = conv.id"
                       >
                         <div class="relative flex-shrink-0">
-                          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" :style="'background:' + conv.color">
+                          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-slate-900" :style="'background:' + conv.color">
                             <span x-text="conv.initials"></span>
                           </div>
-                          <div x-show="conv.online" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
+                          <div x-show="conv.online" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
                         </div>
                         <div class="flex-1 min-w-0">
                           <div class="flex items-center justify-between gap-1">
-                            <p class="text-xs font-semibold truncate" :class="conv.unread > 0 ? 'text-white' : 'text-slate-300'" x-text="conv.name"></p>
+                            <p class="text-xs font-semibold truncate" :class="conv.unread > 0 ? 'text-slate-900' : 'text-slate-600'" x-text="conv.name"></p>
                             <span class="text-[10px] text-slate-600 flex-shrink-0" x-text="conv.time"></span>
                           </div>
                           <p class="text-[11px] text-slate-500 truncate mt-0.5" x-text="conv.last"></p>
                         </div>
                         <div x-show="conv.unread > 0" class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center shadow-[0_0_6px_rgba(59,130,246,0.6)]">
-                          <span class="text-[9px] font-bold text-white" x-text="conv.unread"></span>
+                          <span class="text-[9px] font-bold text-slate-900" x-text="conv.unread"></span>
                         </div>
                       </div>
                     </template>
@@ -854,13 +853,13 @@
                 <div class="lg:col-span-2 stat-card flex flex-col overflow-hidden">
 
                   <!-- Chat header -->
-                  <div class="flex items-center gap-3 pb-3 border-b border-white/5 mb-3 flex-shrink-0">
+                  <div class="flex items-center gap-3 pb-3 border-b border-slate-200 mb-3 flex-shrink-0">
                     <div class="relative">
-                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">MG</div>
-                      <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0a0a0f]"></div>
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-xs font-bold text-slate-900 shadow-lg">MG</div>
+                      <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
                     </div>
                     <div>
-                      <p class="text-xs font-bold text-white">María García</p>
+                      <p class="text-xs font-bold text-slate-900">María García</p>
                       <p class="text-[10px] text-emerald-400 flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
                         En línea
@@ -888,13 +887,13 @@
                     <template x-for="(msg, i) in seedMessages" :key="'seed-' + i">
                       <div class="flex chat-bubble-in" :class="msg.mine ? 'justify-end' : 'justify-start'">
                         <!-- Incoming: avatar -->
-                        <div x-show="!msg.mine" class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                        <div x-show="!msg.mine" class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0 mr-2 mt-1">MG</div>
                         <div class="max-w-[72%]">
                           <div
                             class="px-3 py-2 rounded-2xl text-xs leading-relaxed"
                             :class="msg.mine
-                              ? 'bg-blue-500 text-white rounded-br-sm shadow-[0_2px_12px_rgba(59,130,246,0.35)]'
-                              : 'bg-white/8 text-slate-200 rounded-bl-sm border border-white/8'"
+                              ? 'bg-blue-500 text-slate-900 rounded-br-sm shadow-[0_2px_12px_rgba(59,130,246,0.35)]'
+                              : 'bg-slate-100 text-slate-200 rounded-bl-sm border border-slate-200'"
                           >
                             <p x-text="msg.text"></p>
                           </div>
@@ -920,9 +919,9 @@
                       x-transition:enter-end="opacity-100 translate-y-0"
                       class="flex justify-start"
                     >
-                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0 mr-2 mt-1">MG</div>
                       <div class="max-w-[72%]">
-                        <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-xs leading-relaxed bg-white/8 text-slate-200 border border-white/8">
+                        <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-xs leading-relaxed bg-slate-100 text-slate-200 border border-slate-200">
                           <p>Hola, me gustaría agendar una llamada para saber más de Omnexor.</p>
                         </div>
                         <div class="flex items-center gap-1 mt-1">
@@ -942,7 +941,7 @@
                       x-transition:leave-end="opacity-0"
                       class="flex justify-start items-center gap-2"
                     >
-                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">IA</div>
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0">IA</div>
                       <div class="flex items-center gap-2 px-3 py-2 rounded-2xl rounded-bl-sm bg-blue-500/10 border border-blue-500/20">
                         <!-- Animated dots -->
                         <div class="flex items-center gap-1">
@@ -963,7 +962,7 @@
                       class="flex justify-end"
                     >
                       <div class="max-w-[72%]">
-                        <div class="px-3 py-2 rounded-2xl rounded-br-sm text-xs leading-relaxed bg-blue-500 text-white shadow-[0_2px_16px_rgba(59,130,246,0.4)]">
+                        <div class="px-3 py-2 rounded-2xl rounded-br-sm text-xs leading-relaxed bg-blue-500 text-slate-900 shadow-[0_2px_16px_rgba(59,130,246,0.4)]">
                           <p>¡Hola María! Claro que sí. ¿Te parece bien mañana a las 10:00 AM? He visto un hueco en el calendario.</p>
                         </div>
                         <div class="flex items-center gap-1 mt-1 justify-end">
@@ -979,18 +978,18 @@
                   </div><!-- /messages area -->
 
                   <!-- Input bar -->
-                  <div class="mt-3 flex-shrink-0 flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/8">
+                  <div class="mt-3 flex-shrink-0 flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2 border border-slate-200">
                     <!-- Emoji -->
                     <button class="topbar-btn w-7 h-7 flex-shrink-0">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
-                    <input type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none" />
+                    <input type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent text-xs text-slate-600 placeholder-slate-600 outline-none" />
                     <!-- Attach -->
                     <button class="topbar-btn w-7 h-7 flex-shrink-0">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                     </button>
                     <!-- Send -->
-                    <button class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 transition-all shadow-[0_0_10px_rgba(59,130,246,0.4)] flex-shrink-0">
+                    <button class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-slate-900 hover:bg-blue-600 transition-all shadow-[0_0_10px_rgba(59,130,246,0.4)] flex-shrink-0">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
@@ -1005,7 +1004,7 @@
             <div x-show="activeNav === 'calendarios' || (activeNav !== 'conversaciones' && activeNav !== 'calendarios' && activeNav !== 'clientes-potenciales' && activeTab === 'Calendarios')" class="tab-content">
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Calendarios</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Calendarios</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Gestiona tus eventos y reuniones</p>
                 </div>
                 <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-400 text-xs font-medium border border-blue-500/25 hover:bg-blue-500/25 transition-all">
@@ -1020,7 +1019,7 @@
                 <!-- Calendar grid -->
                 <div class="lg:col-span-2 stat-card">
                   <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-white">Febrero 2026</h3>
+                    <h3 class="text-sm font-semibold text-slate-900">Febrero 2026</h3>
                     <div class="flex gap-1">
                       <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
                       <button class="topbar-btn"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></button>
@@ -1038,7 +1037,7 @@
                       <div
                         class="cal-day text-slate-400"
                         :class="{
-                          'text-slate-700': !day.current,
+                          'text-slate-400': !day.current,
                           'today': day.today,
                           'has-event': day.event
                         }"
@@ -1053,14 +1052,14 @@
                   <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Próximos Eventos</h3>
                   <div class="space-y-3">
                     <template x-for="(ev, i) in upcomingEvents" :key="i">
-                      <div class="flex gap-3 p-2.5 rounded-lg bg-white/3 border border-white/5 hover:border-blue-500/20 transition-all">
+                      <div class="flex gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-blue-500/20 transition-all">
                         <div class="flex-shrink-0 w-1 rounded-full self-stretch" :style="'background:' + ev.color"></div>
                         <div class="min-w-0">
                           <p class="text-xs font-semibold text-slate-200 truncate" x-text="ev.title"></p>
                           <p class="text-[10px] text-slate-500 mt-0.5" x-text="ev.time"></p>
                           <div class="flex items-center gap-1 mt-1.5">
                             <template x-for="(att, j) in ev.attendees" :key="j">
-                              <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white -ml-1 first:ml-0 border border-[#0a0a0f]" :style="'background:' + att.color" x-text="att.initials"></div>
+                              <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-slate-900 -ml-1 first:ml-0 border border-white" :style="'background:' + att.color" x-text="att.initials"></div>
                             </template>
                           </div>
                         </div>
@@ -1075,18 +1074,18 @@
             <div x-show="activeNav === 'contactos'" class="tab-content">
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Contactos</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Contactos</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Directorio de contactos y clientes</p>
                 </div>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <template x-for="(c, i) in contacts" :key="i">
                   <div class="stat-card flex items-center gap-3 cursor-pointer hover:border-blue-500/25 transition-all">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0" :style="'background:' + c.color">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-slate-900 flex-shrink-0" :style="'background:' + c.color">
                       <span x-text="c.initials"></span>
                     </div>
                     <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white truncate" x-text="c.name"></p>
+                      <p class="text-sm font-semibold text-slate-900 truncate" x-text="c.name"></p>
                       <p class="text-[11px] text-slate-500 truncate" x-text="c.company"></p>
                       <p class="text-[10px] text-blue-400/70 truncate mt-0.5" x-text="c.email"></p>
                     </div>
@@ -1109,7 +1108,7 @@
               <!-- Header -->
               <div class="flex items-center justify-between mb-6">
                 <div>
-                  <h1 class="text-lg font-bold text-white">Clientes Potenciales</h1>
+                  <h1 class="text-lg font-bold text-slate-900">Clientes Potenciales</h1>
                   <p class="text-xs text-slate-500 mt-0.5">Pipeline de ventas — gestiona tus leads por etapa</p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -1118,7 +1117,7 @@
                     class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-semibold transition-all duration-500"
                     :class="animating
                       ? 'bg-blue-500/20 border-blue-500/40 text-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
-                      : 'bg-white/5 border-white/10 text-slate-500'"
+                      : 'bg-slate-100 border-white/10 text-slate-500'"
                   >
                     <svg class="w-3 h-3" :class="animating ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -1140,11 +1139,11 @@
 
                   <!-- ── Column: Nuevo Lead ── -->
                   <div class="kanban-col flex flex-col">
-                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
                       <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-blue-500" style="box-shadow: 0 0 6px #3b82f6"></div>
-                        <span class="text-xs font-semibold text-slate-300">Nuevo Lead</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="nuevoLeadCount"></span>
+                        <span class="text-xs font-semibold text-slate-600">Nuevo Lead</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium" x-text="nuevoLeadCount"></span>
                       </div>
                       <button class="topbar-btn w-6 h-6">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -1172,12 +1171,12 @@
                         <div class="flex items-start justify-between mb-3">
                           <div class="flex items-center gap-2.5">
                             <div class="relative">
-                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-lg">JP</div>
+                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-slate-900 shadow-lg">JP</div>
                               <!-- Active status ring -->
                               <div class="absolute -inset-0.5 rounded-full border-2 border-blue-500/60 animate-pulse"></div>
                             </div>
                             <div>
-                              <p class="text-xs font-bold text-white">Juan Pérez</p>
+                              <p class="text-xs font-bold text-slate-900">Juan Pérez</p>
                               <div class="flex items-center gap-1 mt-0.5">
                                 <div class="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_4px_rgba(59,130,246,0.8)]"></div>
                                 <span class="text-[10px] text-blue-400 font-medium">Activo</span>
@@ -1204,11 +1203,11 @@
                         <!-- Company & details -->
                         <div class="mb-3">
                           <p class="text-[10px] text-slate-500">Empresa</p>
-                          <p class="text-[11px] text-slate-300 font-medium">Pérez Consulting S.L.</p>
+                          <p class="text-[11px] text-slate-600 font-medium">Pérez Consulting S.L.</p>
                         </div>
 
                         <!-- Value + date row -->
-                        <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                        <div class="flex items-center justify-between pt-2.5 border-t border-slate-200">
                           <div class="flex items-center gap-1.5">
                             <span class="text-sm font-bold text-emerald-400">€1.500</span>
                             <span class="text-[9px] text-slate-600">/mes</span>
@@ -1223,7 +1222,7 @@
                         <div class="kanban-card">
                           <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2 min-w-0">
-                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6)">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6)">
                                 <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
                               </div>
                               <div class="min-w-0">
@@ -1233,7 +1232,7 @@
                             </div>
                             <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
                           </div>
-                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
                             <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
                             <span x-text="lead.fecha"></span>
                           </div>
@@ -1244,11 +1243,11 @@
 
                   <!-- ── Column: Lead Calificado ── -->
                   <div class="kanban-col flex flex-col">
-                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
                       <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-emerald-500" style="box-shadow: 0 0 6px #10b981"></div>
-                        <span class="text-xs font-semibold text-slate-300">Lead Calificado</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">2</span>
+                        <span class="text-xs font-semibold text-slate-600">Lead Calificado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">2</span>
                       </div>
                       <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
                     </div>
@@ -1257,7 +1256,7 @@
                         <div class="kanban-card">
                           <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2 min-w-0">
-                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #10b981, #3b82f6)">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0" style="background: linear-gradient(135deg, #10b981, #3b82f6)">
                                 <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
                               </div>
                               <div class="min-w-0">
@@ -1267,7 +1266,7 @@
                             </div>
                             <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
                           </div>
-                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
                             <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
                             <span x-text="lead.fecha"></span>
                           </div>
@@ -1278,11 +1277,11 @@
 
                   <!-- ── Column: Lead NO Calificado ── -->
                   <div class="kanban-col flex flex-col">
-                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
                       <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-red-500" style="box-shadow: 0 0 6px #ef4444"></div>
-                        <span class="text-xs font-semibold text-slate-300">Lead NO Calificado</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">1</span>
+                        <span class="text-xs font-semibold text-slate-600">Lead NO Calificado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">1</span>
                       </div>
                       <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
                     </div>
@@ -1291,7 +1290,7 @@
                         <div class="kanban-card opacity-60">
                           <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2 min-w-0">
-                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #ef4444, #f59e0b)">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0" style="background: linear-gradient(135deg, #ef4444, #f59e0b)">
                                 <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
                               </div>
                               <div class="min-w-0">
@@ -1301,7 +1300,7 @@
                             </div>
                             <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 font-semibold" x-text="lead.fuente"></span>
                           </div>
-                          <div class="flex items-center justify-between text-[10px] text-slate-600 mt-2 pt-2 border-t border-white/5">
+                          <div class="flex items-center justify-between text-[10px] text-slate-600 mt-2 pt-2 border-t border-slate-200">
                             <span x-text="'€' + lead.valor.toLocaleString()"></span>
                             <span x-text="lead.fecha"></span>
                           </div>
@@ -1312,11 +1311,11 @@
 
                   <!-- ── Column: Contactado ── -->
                   <div class="kanban-col flex flex-col">
-                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
                       <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-amber-500" style="box-shadow: 0 0 6px #f59e0b"></div>
-                        <span class="text-xs font-semibold text-slate-300">Contactado</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium" x-text="contactadoCount"></span>
+                        <span class="text-xs font-semibold text-slate-600">Contactado</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium" x-text="contactadoCount"></span>
                       </div>
                       <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
                     </div>
@@ -1335,11 +1334,11 @@
                         <div class="flex items-start justify-between mb-3">
                           <div class="flex items-center gap-2.5">
                             <div class="relative">
-                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-lg">JP</div>
+                              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-slate-900 shadow-lg">JP</div>
                               <div class="absolute -inset-0.5 rounded-full border-2 border-amber-500/60 animate-pulse"></div>
                             </div>
                             <div>
-                              <p class="text-xs font-bold text-white">Juan Pérez</p>
+                              <p class="text-xs font-bold text-slate-900">Juan Pérez</p>
                               <div class="flex items-center gap-1 mt-0.5">
                                 <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_4px_rgba(245,158,11,0.8)]"></div>
                                 <span class="text-[10px] text-amber-400 font-medium">Contactado</span>
@@ -1357,9 +1356,9 @@
                         </div>
                         <div class="mb-3">
                           <p class="text-[10px] text-slate-500">Empresa</p>
-                          <p class="text-[11px] text-slate-300 font-medium">Pérez Consulting S.L.</p>
+                          <p class="text-[11px] text-slate-600 font-medium">Pérez Consulting S.L.</p>
                         </div>
-                        <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                        <div class="flex items-center justify-between pt-2.5 border-t border-slate-200">
                           <div class="flex items-center gap-1.5">
                             <span class="text-sm font-bold text-emerald-400">€1.500</span>
                             <span class="text-[9px] text-slate-600">/mes</span>
@@ -1373,7 +1372,7 @@
                         <div class="kanban-card">
                           <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2 min-w-0">
-                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #f59e0b, #ef4444)">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0" style="background: linear-gradient(135deg, #f59e0b, #ef4444)">
                                 <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
                               </div>
                               <div class="min-w-0">
@@ -1383,7 +1382,7 @@
                             </div>
                             <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
                           </div>
-                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
                             <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
                             <span x-text="lead.fecha"></span>
                           </div>
@@ -1391,7 +1390,7 @@
                       </template>
 
                       <!-- Empty state when no leads and Juan not here yet -->
-                      <div x-show="contactadoLeads.length === 0 && !juanInContactado" class="flex flex-col items-center justify-center py-8 text-slate-700">
+                      <div x-show="contactadoLeads.length === 0 && !juanInContactado" class="flex flex-col items-center justify-center py-8 text-slate-400">
                         <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <p class="text-[10px]">Sin leads</p>
                       </div>
@@ -1400,11 +1399,11 @@
 
                   <!-- ── Column: Reunión Agendada ── -->
                   <div class="kanban-col flex flex-col">
-                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/5">
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
                       <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-violet-500" style="box-shadow: 0 0 6px #8b5cf6"></div>
-                        <span class="text-xs font-semibold text-slate-300">Reunión Agendada</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/8 text-slate-500 font-medium">1</span>
+                        <span class="text-xs font-semibold text-slate-600">Reunión Agendada</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">1</span>
                       </div>
                       <button class="topbar-btn w-6 h-6"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
                     </div>
@@ -1413,7 +1412,7 @@
                         <div class="kanban-card">
                           <div class="flex items-start justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2 min-w-0">
-                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-900 flex-shrink-0" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)">
                                 <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
                               </div>
                               <div class="min-w-0">
@@ -1423,7 +1422,7 @@
                             </div>
                             <span class="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold" :class="sourceBadge(lead.fuente)" x-text="lead.fuente"></span>
                           </div>
-                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-white/5">
+                          <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
                             <span class="text-emerald-400 font-semibold" x-text="'€' + lead.valor.toLocaleString()"></span>
                             <span x-text="lead.fecha"></span>
                           </div>
@@ -1445,11 +1444,11 @@
             <div class="flex items-center gap-1.5">
               <div
                 class="h-1 rounded-full transition-all duration-300"
-                :class="activeTab === tab ? 'w-6 bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' : 'w-1.5 bg-white/15'"
+                :class="activeTab === tab ? 'w-6 bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' : 'w-1.5 bg-slate-200'"
               ></div>
               <span
                 class="text-[10px] font-medium transition-colors duration-300"
-                :class="activeTab === tab ? 'text-blue-400' : 'text-slate-700'"
+                :class="activeTab === tab ? 'text-blue-400' : 'text-slate-400'"
                 x-text="tab"
               ></span>
             </div>
@@ -1629,7 +1628,7 @@
             this.cycleIndex = (this.cycleIndex + 1) % this.cycleTabs.length;
             this.activeTab = this.cycleTabs[this.cycleIndex];
             this.progressKey++; // force progress bar restart
-          }, 10000);
+          }, 6000); /* ★ CHANGED: 10000ms → 6000ms for faster slideshow */
         },
 
         resetCycle() {
