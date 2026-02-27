@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnexor — Panel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 99px; }
+
+    /* ── Progress bar ── */
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+      background-size: 200% 100%;
+      border-radius: 99px;
+      animation: prog 5s linear forwards;
+    }
+    @keyframes prog { from { width: 0% } to { width: 100% } }
+
+    /* ── View transitions ── */
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slide-out {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-32px); }
+    }
+    .view-enter { animation: slide-in 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    .view-leave {
+      animation: slide-out 0.35s ease-in both;
+      position: absolute; inset: 0; pointer-events: none;
+    }
+
+    /* ── Sidebar nav item ── */
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      color: #64748b; cursor: default;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-item.active {
+      background: rgba(59,130,246,0.10);
+      color: #3b82f6;
+      border-color: rgba(59,130,246,0.22);
+    }
+
+    /* ── Stat card ── */
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      transition: box-shadow 0.2s;
+    }
+
+    /* ── Kanban column ── */
+    .k-col {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      min-width: 220px; max-width: 220px;
+    }
+    .k-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    /* ── Chat ── */
+    .conv-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      cursor: default; border: 1px solid transparent;
+    }
+    .conv-item.active-c {
+      background: rgba(59,130,246,0.08);
+      border-color: rgba(59,130,246,0.18);
+    }
+
+    /* ── Typing dots ── */
+    @keyframes tdot {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30%          { transform: translateY(-4px); opacity: 1; }
+    }
+    .tdot { animation: tdot 1.2s ease-in-out infinite; }
+
+    /* ── Calendar ── */
+    .cal-day {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 12px; cursor: default;
+    }
+    .cal-day.today { background: rgba(59,130,246,0.18); color: #3b82f6; font-weight: 700; }
+    .cal-day.has-ev::after {
+      content: ''; display: block; width: 4px; height: 4px;
+      border-radius: 50%; background: #3b82f6;
+      position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+    }
+    .cal-day { position: relative; }
+  </style>
+</head>
+
+<body
+  class="min-h-screen"
+  x-data="omnexorPanel()"
+  x-init="init()"
+>
+
+  <!-- Top progress bar -->
+  <div class="fixed top-0 left-0 right-0 z-50 h-[2px] bg-slate-200">
+    <div class="progress-fill" :key="tick"></div>
+  </div>
+
+  <div class="flex h-screen overflow-hidden pt-[2px]">
+
+    <!-- ════════════ SIDEBAR ════════════ -->
+    <aside class="flex flex-col flex-shrink-0 w-56 bg-white border-r border-slate-200 z-10">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-4 h-14 border-b border-slate-200 flex-shrink-0">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-slate-900 tracking-wide">Omnexor</span>
+      </div>
+
+      <!-- Nav -->
+      <nav class="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+        <p class="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Principal</p>
+        <template x-for="item in navItems" :key="item.id">
+          <div class="nav-item" :class="currentView === item.id ? 'active' : ''">
+            <svg class="flex-shrink-0 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon"/>
+            </svg>
+            <span x-text="item.label"></span>
+            <div x-show="currentView === item.id" class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+          </div>
+        </template>
+      </nav>
+
+      <!-- User -->
+      <div class="flex-shrink-0 border-t border-slate-200 p-3">
+        <div class="flex items-center gap-2.5">
+          <div class="relative flex-shrink-0">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+              <span class="text-xs font-bold text-white">JD</span>
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-slate-800 truncate">Jane Doe</p>
+            <p class="text-[10px] text-slate-400 truncate">jane@omnexor.io</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ════════════ MAIN ════════════ -->
+    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+
+      <!-- Top bar -->
+      <header class="flex-shrink-0 flex items-center justify-between h-14 px-5 bg-white border-b border-slate-200 z-10">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] text-slate-400 font-medium">Omnexor</span>
+          <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="text-xs font-semibold text-slate-700" x-text="currentViewLabel"></span>
+        </div>
+
+        <!-- View pills -->
+        <div class="hidden md:flex items-center gap-1 bg-slate-100 rounded-xl p-1" style="pointer-events:none">
+          <template x-for="item in navItems" :key="item.id">
+            <div
+              class="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
+              :class="currentView === item.id
+                ? 'bg-blue-500/15 text-blue-600 shadow-sm'
+                : 'text-slate-400'"
+              x-text="item.label"
+            ></div>
+          </template>
+        </div>
+
+        <!-- Right icons -->
+        <div class="flex items-center gap-1" style="pointer-events:none">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 relative">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+          </div>
+          <div class="w-px h-5 bg-slate-200 mx-1"></div>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+            <span class="text-[10px] font-bold text-white">JD</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content area -->
+      <main class="flex-1 overflow-hidden relative">
+
+        <!-- ══════════════════════════════
+             VIEW 1: Inicio
+        ══════════════════════════════ -->
+        <div
+          x-show="currentView === 'inicio'"
+          x-transition:enter="view-enter"
+          x-transition:leave="view-leave"
+          class="absolute inset-0 overflow-y-auto p-5"
+        >
+          <div class="max-w-5xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h1 class="text-lg font-bold text-slate-900">Bienvenida de vuelta, Jane</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Aquí tienes un resumen de tu actividad reciente</p>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span>Actualizado ahora</span>
+              </div>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <template x-for="(c,i) in statCards" :key="i">
+                <div class="stat-card">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" :style="'background:'+c.iconBg">
+                      <svg class="w-4 h-4" :style="'color:'+c.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" :d="c.icon"/>
+                      </svg>
+                    </div>
+                    <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                      :class="c.up ? 'bg-emerald-500/12 text-emerald-600' : 'bg-red-500/12 text-red-500'"
+                      x-text="c.change"></span>
+                  </div>
+                  <p class="text-xl font-bold text-slate-900" x-text="c.value"></p>
+                  <p class="text-[11px] text-slate-500 mt-0.5" x-text="c.label"></p>
+                </div>
+              </template>
+            </div>
+
+            <!-- Activity + Quick actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div class="lg:col-span-2 stat-card">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Actividad Reciente</h3>
+                <div class="space-y-3">
+                  <template x-for="(a,i) in recentActivity" :key="i">
+                    <div class="flex items-start gap-3">
+                      <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5" :style="'background:'+a.bg">
+                        <svg class="w-3.5 h-3.5" :style="'color:'+a.color" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" :d="a.icon"/>
+                        </svg>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs text-slate-700" x-text="a.text"></p>
+                        <p class="text-[10px] text-slate-400 mt-0.5" x-text="a.time"></p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+              <div class="stat-card">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Acciones Rápidas</h3>
+                <div class="space-y-2">
+                  <template x-for="(qa,i) in quickActions" :key="i">
+                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-500 bg-slate-50 border border-slate-100">
+                      <svg class="w-4 h-4 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" :d="qa.icon"/>
+                      </svg>
+                      <span x-text="qa.label"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════
+             VIEW 2: Conversaciones
+        ══════════════════════════════ -->
+        <div
+          x-show="currentView === 'conversaciones'"
+          x-transition:enter="view-enter"
+          x-transition:leave="view-leave"
+          class="absolute inset-0 overflow-hidden p-5"
+          x-data="chatView()"
+          x-init="$watch('$root.currentView', v => { if(v==='conversaciones') setTimeout(()=>startDemo(),600); })"
+        >
+          <div class="max-w-5xl mx-auto h-full flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4 flex-shrink-0">
+              <div>
+                <h1 class="text-lg font-bold text-slate-900">Conversaciones</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Gestiona tus mensajes y chats activos</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+              <!-- Sidebar list -->
+              <div class="stat-card flex flex-col overflow-hidden">
+                <div class="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 mb-3 flex-shrink-0">
+                  <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  <span class="text-xs text-slate-400">Buscar conversación...</span>
+                </div>
+                <div class="flex-1 overflow-y-auto space-y-0.5">
+                  <template x-for="(c,i) in convList" :key="c.id">
+                    <div class="conv-item" :class="c.id==='mg'?'active-c':''">
+                      <div class="relative flex-shrink-0">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" :style="'background:'+c.color">
+                          <span x-text="c.initials"></span>
+                        </div>
+                        <div x-show="c.online" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1">
+                          <p class="text-xs font-semibold truncate" :class="c.unread>0?'text-slate-900':'text-slate-600'" x-text="c.name"></p>
+                          <span class="text-[10px] text-slate-400 flex-shrink-0" x-text="c.time"></span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 truncate mt-0.5" x-text="c.last"></p>
+                      </div>
+                      <div x-show="c.unread>0" class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                        <span class="text-[9px] font-bold text-white" x-text="c.unread"></span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Chat window -->
+              <div class="lg:col-span-2 stat-card flex flex-col overflow-hidden">
+                <!-- Chat header -->
+                <div class="flex items-center gap-3 pb-3 border-b border-slate-100 mb-3 flex-shrink-0">
+                  <div class="relative">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-xs font-bold text-white">MG</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-slate-900">María García</p>
+                    <p class="text-[10px] text-emerald-500">En línea</p>
+                  </div>
+                  <div class="ml-auto flex items-center gap-1.5">
+                    <div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+                      <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                      </svg>
+                      <span class="text-[10px] text-blue-500 font-semibold">Agente IA</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="flex-1 overflow-y-auto space-y-3 pr-1" x-ref="chatArea">
+                  <!-- Seed messages -->
+                  <template x-for="(m,i) in seedMsgs" :key="'s'+i">
+                    <div class="flex" :class="m.mine?'justify-end':'justify-start'">
+                      <div x-show="!m.mine" class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                      <div class="max-w-[70%]">
+                        <div class="px-3 py-2 rounded-2xl text-xs leading-relaxed"
+                          :class="m.mine
+                            ? 'bg-blue-500 text-white rounded-br-sm shadow-sm'
+                            : 'bg-slate-100 text-slate-700 rounded-bl-sm'">
+                          <p x-text="m.text"></p>
+                        </div>
+                        <div class="flex items-center gap-1 mt-1" :class="m.mine?'justify-end':'justify-start'">
+                          <span class="text-[9px] text-slate-400" x-text="m.time"></span>
+                          <template x-if="m.mine">
+                            <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M1 13l4 4"/>
+                            </svg>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Live: incoming -->
+                  <div
+                    x-show="showIncoming"
+                    x-transition:enter="transition ease-out duration-400"
+                    x-transition:enter-start="opacity-0 translate-y-3"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="flex justify-start"
+                  >
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1">MG</div>
+                    <div class="max-w-[70%]">
+                      <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-xs leading-relaxed bg-slate-100 text-slate-700">
+                        Hola, me gustaría agendar una llamada para saber más de Omnexor.
+                      </div>
+                      <div class="flex items-center gap-1 mt-1">
+                        <span class="text-[9px] text-slate-400" x-text="liveTime"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Live: typing -->
+                  <div
+                    x-show="showTyping"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="flex justify-start items-center gap-2"
+                  >
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">IA</div>
+                    <div class="flex items-center gap-2 px-3 py-2 rounded-2xl rounded-bl-sm bg-blue-500/10 border border-blue-500/20">
+                      <div class="flex items-center gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 tdot" style="animation-delay:0ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 tdot" style="animation-delay:200ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 tdot" style="animation-delay:400ms"></div>
+                      </div>
+                      <span class="text-[10px] text-blue-500 font-medium">Agente IA escribiendo...</span>
+                    </div>
+                  </div>
+
+                  <!-- Live: AI response -->
+                  <div
+                    x-show="showReply"
+                    x-transition:enter="transition ease-out duration-500"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="flex justify-end"
+                  >
+                    <div class="max-w-[70%]">
+                      <div class="px-3 py-2 rounded-2xl rounded-br-sm text-xs leading-relaxed bg-blue-500 text-white shadow-sm">
+                        ¡Hola María! Claro que sí. ¿Te parece bien mañana a las 10:00 AM? He visto un hueco en el calendario.
+                      </div>
+                      <div class="flex items-center gap-1 mt-1 justify-end">
+                        <span class="text-[9px] text-slate-400" x-text="liveTime"></span>
+                        <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M1 13l4 4"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Input bar -->
+                <div class="mt-3 flex-shrink-0 flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2">
+                  <span class="flex-1 text-xs text-slate-400">Escribe un mensaje...</span>
+                  <div class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════
+             VIEW 3: Pipeline (Kanban)
+        ══════════════════════════════ -->
+        <div
+          x-show="currentView === 'pipeline'"
+          x-transition:enter="view-enter"
+          x-transition:leave="view-leave"
+          class="absolute inset-0 overflow-hidden p-5"
+        >
+          <div class="max-w-5xl mx-auto h-full flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4 flex-shrink-0">
+              <div>
+                <h1 class="text-lg font-bold text-slate-900">Pipeline de Ventas</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Gestiona tus leads por etapa</p>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                <span class="text-[11px] font-semibold text-blue-600">5 leads activos</span>
+              </div>
+            </div>
+
+            <!-- Kanban -->
+            <div class="flex-1 overflow-x-auto pb-2">
+              <div class="flex gap-3 h-full" style="min-width: max-content;">
+                <template x-for="col in kanbanCols" :key="col.id">
+                  <div class="k-col flex flex-col" style="height: calc(100vh - 14rem);">
+                    <!-- Col header -->
+                    <div class="flex items-center justify-between px-3 py-2.5 border-b border-slate-200 flex-shrink-0">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" :style="'background:'+col.color"></div>
+                        <span class="text-xs font-semibold text-slate-700" x-text="col.title"></span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-500 font-medium" x-text="col.leads.length"></span>
+                      </div>
+                    </div>
+                    <!-- Cards -->
+                    <div class="flex-1 p-2 space-y-2 overflow-y-auto">
+                      <template x-for="lead in col.leads" :key="lead.id">
+                        <div class="k-card">
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">
+                                <span x-text="lead.nombre.split(' ').map(w=>w[0]).join('').slice(0,2)"></span>
+                              </div>
+                              <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-800 truncate" x-text="lead.nombre"></p>
+                                <p class="text-[10px] text-slate-400 truncate" x-text="lead.empresa||'—'"></p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center justify-between text-[10px] text-slate-400 mt-2 pt-2 border-t border-slate-100">
+                            <span class="text-emerald-600 font-semibold" x-text="'€'+lead.valor.toLocaleString()"></span>
+                            <span x-text="lead.fecha"></span>
+                          </div>
+                        </div>
+                      </template>
+                      <div x-show="col.leads.length===0" class="flex flex-col items-center justify-center py-8 text-slate-300">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <p class="text-[10px]">Sin leads</p>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Bottom cycle indicator -->
+      <div class="flex-shrink-0 bg-white border-t border-slate-100 px-5 py-2 flex items-center justify-center gap-4">
+        <template x-for="item in navItems" :key="item.id">
+          <div class="flex items-center gap-1.5">
+            <div class="h-1 rounded-full transition-all duration-300"
+              :class="currentView===item.id ? 'w-6 bg-blue-500' : 'w-1.5 bg-slate-200'"></div>
+            <span class="text-[10px] font-medium transition-colors duration-300"
+              :class="currentView===item.id ? 'text-blue-500' : 'text-slate-400'"
+              x-text="item.label"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function omnexorPanel() {
+      return {
+        currentView: 'inicio',
+        tick: 0,
+        cycleTimer: null,
+        views: ['inicio', 'conversaciones', 'pipeline'],
+        viewIndex: 0,
+
+        navItems: [
+          { id: 'inicio',          label: 'Inicio',          icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+          { id: 'conversaciones',  label: 'Conversaciones',  icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+          { id: 'pipeline',        label: 'Pipeline',        icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+        ],
+
+        get currentViewLabel() {
+          return this.navItems.find(n => n.id === this.currentView)?.label || '';
+        },
+
+        statCards: [
+          { label: 'Ingresos Totales',    value: '€48.295', change: '+12.5%', up: true,  icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981' },
+          { label: 'Proyectos Activos',   value: '24',      change: '+3',     up: true,  icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z', iconBg: 'rgba(59,130,246,0.12)', iconColor: '#3b82f6' },
+          { label: 'Miembros del Equipo', value: '138',     change: '-2',     up: false, icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', iconBg: 'rgba(139,92,246,0.12)', iconColor: '#8b5cf6' },
+          { label: 'Disponibilidad',      value: '99.98%',  change: '+0.02%', up: true,  icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b' },
+        ],
+
+        recentActivity: [
+          { text: 'Carlos Mendoza envió un nuevo mensaje', time: 'Hace 2 minutos', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', bg: 'rgba(59,130,246,0.12)', color: '#3b82f6' },
+          { text: 'Reunión con Innovatek agendada para mañana', time: 'Hace 15 minutos', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', bg: 'rgba(16,185,129,0.12)', color: '#10b981' },
+          { text: 'Nuevo lead: Sofía Herrera — €75.000', time: 'Hace 1 hora', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', bg: 'rgba(245,158,11,0.12)', color: '#f59e0b' },
+          { text: 'Proyecto "Rediseño Web" completado', time: 'Hace 3 horas', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'rgba(139,92,246,0.12)', color: '#8b5cf6' },
+          { text: 'Factura #1042 enviada a Grupo Ríos', time: 'Ayer, 18:30', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', bg: 'rgba(239,68,68,0.12)', color: '#ef4444' },
+        ],
+
+        quickActions: [
+          { label: 'Ver conversaciones',  icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+          { label: 'Abrir calendario',    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+          { label: 'Gestionar pipeline',  icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+          { label: 'Ver contactos',       icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+        ],
+
+        kanbanCols: [
+          { id: 'nuevo',      title: 'Nuevo Lead',       color: '#3b82f6', leads: [
+            { id:1, nombre:'Carlos Mendoza',  empresa:'TechSol MX',      valor:45000, fecha:'24 feb' },
+            { id:2, nombre:'Laura Ríos',       empresa:'Grupo Ríos',      valor:12000, fecha:'25 feb' },
+          ]},
+          { id: 'calificado', title: 'Lead Calificado',  color: '#10b981', leads: [
+            { id:3, nombre:'Sofía Herrera',    empresa:'Innovatek',       valor:75000, fecha:'20 feb' },
+          ]},
+          { id: 'contactado', title: 'Contactado',       color: '#f59e0b', leads: [
+            { id:4, nombre:'Roberto Salinas',  empresa:'Salinas Corp',    valor:9500,  fecha:'15 feb' },
+          ]},
+          { id: 'reunion',    title: 'Reunión Agendada', color: '#8b5cf6', leads: [
+            { id:5, nombre:'Patricia Vega',    empresa:'Vega & Asoc.',    valor:5000,  fecha:'18 feb' },
+          ]},
+          { id: 'cerrado',    title: 'Cerrado / Ganado', color: '#06b6d4', leads: [] },
+        ],
+
+        init() {
+          this.cycleTimer = setInterval(() => {
+            this.viewIndex = (this.viewIndex + 1) % this.views.length;
+            this.currentView = this.views[this.viewIndex];
+            this.tick++;
+          }, 5000);
+        },
+      };
+    }
+
+    function chatView() {
+      return {
+        showIncoming: false,
+        showTyping: false,
+        showReply: false,
+        demoDone: false,
+        liveTime: '',
+
+        convList: [
+          { id:'mg', name:'María García',  initials:'MG', color:'linear-gradient(135deg,#3b82f6,#8b5cf6)', online:true,  time:'Ahora', last:'Hola, me gustaría agendar...', unread:1 },
+          { id:'cr', name:'Carlos Ruiz',   initials:'CR', color:'linear-gradient(135deg,#10b981,#3b82f6)', online:true,  time:'5m',    last:'Perfecto, nos vemos el jueves.', unread:0 },
+          { id:'lp', name:'Laura Pérez',   initials:'LP', color:'linear-gradient(135deg,#f59e0b,#ef4444)', online:false, time:'32m',   last:'¿Podéis enviarme la propuesta?', unread:2 },
+          { id:'jm', name:'Javier Moreno', initials:'JM', color:'linear-gradient(135deg,#8b5cf6,#ec4899)', online:false, time:'2h',    last:'Gracias por la demo.', unread:0 },
+          { id:'as', name:'Ana Sánchez',   initials:'AS', color:'linear-gradient(135deg,#06b6d4,#3b82f6)', online:true,  time:'Ayer',  last:'Confirmo la reunión del viernes.', unread:0 },
+        ],
+
+        seedMsgs: [
+          { text:'Hola, vi vuestro anuncio en Instagram y me llamó mucho la atención.', time:'10:15', mine:false },
+          { text:'¡Hola María! Encantados de que hayas contactado. ¿En qué podemos ayudarte?', time:'10:16', mine:true },
+          { text:'Estoy buscando una solución para automatizar mis seguimientos de clientes.', time:'10:18', mine:false },
+          { text:'Omnexor es exactamente lo que necesitas. Tenemos flujos de automatización completos.', time:'10:19', mine:true },
+        ],
+
+        getNow() {
+          const d = new Date();
+          return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+        },
+
+        scrollBottom() {
+          this.$nextTick(() => {
+            const el = this.$refs.chatArea;
+            if (el) el.scrollTop = el.scrollHeight;
+          });
+        },
+
+        startDemo() {
+          if (this.demoDone) return;
+          this.liveTime = this.getNow();
+          setTimeout(() => {
+            this.showIncoming = true;
+            this.scrollBottom();
+            setTimeout(() => {
+              this.showTyping = true;
+              this.scrollBottom();
+              setTimeout(() => {
+                this.showTyping = false;
+                setTimeout(() => {
+                  this.showReply = true;
+                  this.demoDone = true;
+                  this.scrollBottom();
+                }, 200);
+              }, 2500);
+            }, 3000);
+          }, 2000);
+        },
+      };
+    }
+  </script>
+</body>
+</html>
