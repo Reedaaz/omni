@@ -250,18 +250,8 @@
           <span class="font-medium text-blue-600" x-text="activeTabLabel()"></span>
         </div>
 
-        <!-- Tab pills (center) -->
-        <div class="flex-1 flex items-center justify-center gap-1">
-          <template x-for="tab in cycleTabs" :key="tab">
-            <button
-              class="topbar-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
-              :class="activeTab === tab
-                ? 'bg-blue-500 text-white shadow-sm'
-                : 'text-slate-500 hover:bg-slate-100'"
-              x-text="tab"
-            ></button>
-          </template>
-        </div>
+        <!-- Spacer -->
+        <div class="flex-1"></div>
 
         <!-- Right actions -->
         <div class="flex items-center gap-2 shrink-0">
@@ -300,7 +290,7 @@
             <!-- Welcome header -->
             <div class="flex items-center justify-between">
               <div>
-                <h1 class="text-2xl font-extrabold text-slate-900">¡Bienvenida, Jane! 👋</h1>
+                <h1 class="text-2xl font-extrabold text-slate-900">¡Bienvenido, Usuario Demo! 👋</h1>
                 <p class="text-slate-500 text-sm mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
               </div>
               <div class="text-sm text-slate-400">27 de febrero, 2026</div>
@@ -445,79 +435,190 @@
         </div>
 
         <!-- ─────────────────────────────────────────────────────
-             CYCLE TABS CONTAINER
+             PAGOS VIEW
         ───────────────────────────────────────────────────── -->
         <div
-          x-show="activeNav !== 'inicio' && activeNav !== 'dashboard' && activeNav !== 'contactos'"
-          class="absolute inset-0 flex flex-col overflow-hidden"
+          x-show="activeNav === 'pagos'"
+          x-transition:enter="tab-enter-active"
+          x-transition:leave="tab-leave-active"
+          class="absolute inset-0 content-scroll p-5"
         >
-          <!-- Glass panel wrapper -->
-          <div class="flex-1 glass-panel m-3 rounded-2xl overflow-hidden flex flex-col">
-
-            <!-- ── TAB: DASHBOARD (BENTO) ── -->
-            <div
-              x-show="activeTab === 'Dashboard'"
-              x-data="bentoDashboard()"
-              x-init="initBento()"
-              x-transition:enter="tab-enter-active"
-              x-transition:leave="tab-leave-active"
-              class="absolute inset-0 content-scroll p-4"
-            >
-              <!-- Header -->
-              <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-extrabold text-slate-900">Dashboard</h2>
-                <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 live-dot"></span>
-                  En vivo
-                </span>
-              </div>
-
-              <!-- Bento Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <template x-for="(card, idx) in bentoCards" :key="card.title">
-                  <div
-                    class="bento-card stat-card p-4 cursor-default transition-all duration-200"
-                    :class="'hover:border-' + card.color + '-200 hover:shadow-' + card.color + '-100'"
-                    @mousemove="onMouseMove($event, $el)"
-                    @mouseleave="onMouseLeave($el)"
-                  >
-                    <div class="card-highlight"></div>
-                    <!-- Card header -->
-                    <div class="flex items-start justify-between mb-3 relative z-10">
-                      <div class="relative">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" :class="card.iconBg">
-                          <svg class="w-5 h-5" :class="card.iconColor" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon"/>
-                          </svg>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 sync-icon" :class="card.iconColor" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <span class="w-1.5 h-1.5 rounded-full live-dot" :class="card.dotColor"></span>
-                      </div>
+          <div class="max-w-5xl mx-auto space-y-5">
+            <div class="flex items-center justify-between">
+              <h1 class="text-2xl font-extrabold text-slate-900">Pagos</h1>
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 live-dot"></span>
+                Actualizado
+              </span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Ingresos del mes</div><div class="text-2xl font-extrabold text-slate-900">€24.800</div><div class="text-xs text-emerald-600 mt-1">+12% vs anterior</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Pagos pendientes</div><div class="text-2xl font-extrabold text-slate-900">7</div><div class="text-xs text-amber-600 mt-1">€3.200 en espera</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Suscripciones activas</div><div class="text-2xl font-extrabold text-slate-900">43</div><div class="text-xs text-emerald-600 mt-1">+5 este mes</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Tasa de cobro</div><div class="text-2xl font-extrabold text-slate-900">97.2%</div><div class="text-xs text-emerald-600 mt-1">Excelente</div></div>
+            </div>
+            <div class="stat-card p-4">
+              <h3 class="font-bold text-slate-900 mb-3 text-sm">Últimas transacciones</h3>
+              <div class="space-y-2">
+                <template x-for="tx in [
+                  { name: 'Ana Martínez', amount: '€299', date: '27 feb', status: 'Cobrado', color: 'text-emerald-600 bg-emerald-50' },
+                  { name: 'Carlos López', amount: '€149', date: '26 feb', status: 'Cobrado', color: 'text-emerald-600 bg-emerald-50' },
+                  { name: 'Miguel Torres', amount: '€499', date: '25 feb', status: 'Pendiente', color: 'text-amber-600 bg-amber-50' },
+                  { name: 'Elena Ruiz', amount: '€199', date: '24 feb', status: 'Cobrado', color: 'text-emerald-600 bg-emerald-50' },
+                  { name: 'David García', amount: '€349', date: '23 feb', status: 'Fallido', color: 'text-red-600 bg-red-50' },
+                ]" :key="tx.name">
+                  <div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <div class="flex items-center gap-3">
+                      <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold" x-text="tx.name.split(' ').map(w=>w[0]).join('')"></div>
+                      <div><div class="text-sm font-semibold text-slate-900" x-text="tx.name"></div><div class="text-xs text-slate-400" x-text="tx.date"></div></div>
                     </div>
-                    <!-- Card body -->
-                    <div class="relative z-10">
-                      <div class="font-bold text-slate-900 text-sm" x-text="card.title"></div>
-                      <div class="text-xs text-slate-500 mt-0.5" x-text="card.subtitle"></div>
-                    </div>
-                    <!-- Card footer -->
-                    <div class="flex items-center justify-between mt-3 relative z-10">
-                      <span class="text-xs font-semibold px-2.5 py-1 rounded-full" :class="card.badgeCls" x-text="card.stat"></span>
-                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    <div class="flex items-center gap-3">
+                      <span class="text-sm font-bold text-slate-900" x-text="tx.amount"></span>
+                      <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="tx.color" x-text="tx.status"></span>
                     </div>
                   </div>
                 </template>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────
+             AGENTES DE AI VIEW
+        ───────────────────────────────────────────────────── -->
+        <div
+          x-show="activeNav === 'agentes-ai'"
+          x-transition:enter="tab-enter-active"
+          x-transition:leave="tab-leave-active"
+          class="absolute inset-0 content-scroll p-5"
+        >
+          <div class="max-w-5xl mx-auto space-y-5">
+            <div class="flex items-center justify-between">
+              <h1 class="text-2xl font-extrabold text-slate-900">Agentes de AI</h1>
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 live-dot"></span>
+                3 agentes activos
+              </span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <template x-for="agent in [
+                { name: 'Agente de Ventas', desc: 'Califica leads y agenda reuniones automáticamente', status: 'Activo', conversations: 142, color: 'bg-blue-50 text-blue-600', dot: 'bg-blue-500' },
+                { name: 'Agente de Soporte', desc: 'Responde preguntas frecuentes 24/7 sin intervención', status: 'Activo', conversations: 89, color: 'bg-emerald-50 text-emerald-600', dot: 'bg-emerald-500' },
+                { name: 'Agente de Marketing', desc: 'Envía campañas personalizadas según comportamiento', status: 'Activo', conversations: 67, color: 'bg-violet-50 text-violet-600', dot: 'bg-violet-500' },
+              ]" :key="agent.name">
+                <div class="stat-card p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="agent.color" x-text="agent.status"></span>
+                    <span class="w-2 h-2 rounded-full live-dot" :class="agent.dot"></span>
+                  </div>
+                  <div class="font-bold text-slate-900 text-sm mb-1" x-text="agent.name"></div>
+                  <div class="text-xs text-slate-500 mb-3" x-text="agent.desc"></div>
+                  <div class="text-xs text-slate-400"><span class="font-semibold text-slate-700" x-text="agent.conversations"></span> conversaciones hoy</div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────
+             MARKETING VIEW
+        ───────────────────────────────────────────────────── -->
+        <div
+          x-show="activeNav === 'marketing'"
+          x-transition:enter="tab-enter-active"
+          x-transition:leave="tab-leave-active"
+          class="absolute inset-0 content-scroll p-5"
+        >
+          <div class="max-w-5xl mx-auto space-y-5">
+            <div class="flex items-center justify-between">
+              <h1 class="text-2xl font-extrabold text-slate-900">Marketing</h1>
+              <button class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-xl" style="pointer-events:none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Nueva campaña
+              </button>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Emails enviados</div><div class="text-2xl font-extrabold text-slate-900">4.820</div><div class="text-xs text-emerald-600 mt-1">98.4% entregados</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Tasa apertura</div><div class="text-2xl font-extrabold text-slate-900">34.7%</div><div class="text-xs text-emerald-600 mt-1">+5% vs anterior</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Clics</div><div class="text-2xl font-extrabold text-slate-900">1.243</div><div class="text-xs text-blue-600 mt-1">CTR 25.7%</div></div>
+              <div class="stat-card p-4"><div class="text-xs text-slate-500 mb-1">Conversiones</div><div class="text-2xl font-extrabold text-slate-900">312</div><div class="text-xs text-violet-600 mt-1">+18% este mes</div></div>
+            </div>
+            <div class="stat-card p-4">
+              <h3 class="font-bold text-slate-900 mb-3 text-sm">Campañas activas</h3>
+              <div class="space-y-3">
+                <template x-for="camp in [
+                  { name: 'Bienvenida nuevos leads', type: 'Email', sent: 1240, open: '38%', status: 'Activa' },
+                  { name: 'Seguimiento post-demo', type: 'Email + SMS', sent: 890, open: '42%', status: 'Activa' },
+                  { name: 'Reactivación clientes fríos', type: 'Email', sent: 560, open: '22%', status: 'Pausada' },
+                ]" :key="camp.name">
+                  <div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <div><div class="text-sm font-semibold text-slate-900" x-text="camp.name"></div><div class="text-xs text-slate-400" x-text="camp.type + ' · ' + camp.sent + ' enviados'"></div></div>
+                    <div class="flex items-center gap-3">
+                      <span class="text-xs text-slate-500" x-text="camp.open + ' apertura'"></span>
+                      <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="camp.status === 'Activa' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'" x-text="camp.status"></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────
+             AUTOMATIZACIÓN VIEW
+        ───────────────────────────────────────────────────── -->
+        <div
+          x-show="activeNav === 'automatizacion'"
+          x-transition:enter="tab-enter-active"
+          x-transition:leave="tab-leave-active"
+          class="absolute inset-0 content-scroll p-5"
+        >
+          <div class="max-w-5xl mx-auto space-y-5">
+            <div class="flex items-center justify-between">
+              <h1 class="text-2xl font-extrabold text-slate-900">Automatización</h1>
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 live-dot"></span>
+                8 flujos activos
+              </span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <template x-for="flow in [
+                { name: 'Captación → Bienvenida', desc: 'Nuevo lead recibe email + SMS en 5 min', triggers: 142, color: 'bg-blue-50 text-blue-600', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+                { name: 'Demo → Seguimiento', desc: 'Secuencia de 3 emails post-demo automática', triggers: 67, color: 'bg-violet-50 text-violet-600', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                { name: 'Lead frío → Reactivación', desc: 'Detecta inactividad y lanza campaña de retorno', triggers: 28, color: 'bg-amber-50 text-amber-600', icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' },
+                { name: 'Pago fallido → Recuperación', desc: 'Notifica y reintenta cobro automáticamente', triggers: 12, color: 'bg-red-50 text-red-600', icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
+              ]" :key="flow.name">
+                <div class="stat-card p-4 flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="flow.color.split(' ')[0]">
+                    <svg class="w-4 h-4" :class="flow.color.split(' ')[1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" :d="flow.icon"/></svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-slate-900 text-sm" x-text="flow.name"></div>
+                    <div class="text-xs text-slate-500 mt-0.5" x-text="flow.desc"></div>
+                    <div class="text-xs text-slate-400 mt-1.5"><span class="font-semibold text-slate-700" x-text="flow.triggers"></span> ejecuciones hoy</div>
+                  </div>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 shrink-0">Activo</span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────
+             CYCLE TABS CONTAINER (Conversaciones, Calendarios, Clientes Potenciales)
+        ───────────────────────────────────────────────────── -->
+        <div
+          x-show="activeNav === 'conversaciones' || activeNav === 'calendarios' || activeNav === 'clientes-potenciales'"
+          class="absolute inset-0 flex flex-col overflow-hidden"
+        >
+          <!-- Glass panel wrapper -->
+          <div class="flex-1 glass-panel m-3 rounded-2xl overflow-hidden flex flex-col">
 
             <!-- ── TAB: CONVERSACIONES ── -->
             <div
-              x-show="activeTab === 'Conversaciones'"
+              x-show="activeNav === 'conversaciones'"
               x-data="conversacionesChat()"
-              x-init="$watch('activeTab', val => { if (val === 'Conversaciones') { setTimeout(() => startLiveDemo(), 600); } })"
+              x-init="startLiveDemo()"
               x-transition:enter="tab-enter-active"
               x-transition:leave="tab-leave-active"
               class="absolute inset-0 flex overflow-hidden"
@@ -534,15 +635,15 @@
                 <!-- Filter tabs -->
                 <div class="flex gap-1 px-3 py-2 border-b border-slate-200/60">
                   <button class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-500 text-white" style="pointer-events:none">Todos</button>
-                  <button class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500 hover:bg-slate-100" style="pointer-events:none">No leídos</button>
-                  <button class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500 hover:bg-slate-100" style="pointer-events:none">Archivados</button>
+                  <button class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500" style="pointer-events:none">No leídos</button>
+                  <button class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500" style="pointer-events:none">Archivados</button>
                 </div>
                 <!-- Conversation list -->
                 <div class="flex-1 overflow-y-auto">
-                  <template x-for="conv in sidebarConvs" :key="conv.name">
+                  <template x-for="(conv, idx) in sidebarConvs" :key="conv.name">
                     <div
                       class="flex items-start gap-2.5 px-3 py-3 cursor-default transition-colors border-b border-slate-100/60"
-                      :class="conv.active ? 'bg-blue-50/60' : 'hover:bg-slate-50/60'"
+                      :class="idx === activeConvIdx ? 'bg-blue-50/60' : 'hover:bg-slate-50/60'"
                     >
                       <div class="relative shrink-0">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" :class="conv.avatarBg" x-text="conv.initials"></div>
@@ -566,22 +667,19 @@
                 <!-- Chat header -->
                 <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-200/60 bg-white/50 shrink-0">
                   <div class="relative shrink-0">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-white text-xs font-bold">MG</div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" :class="sidebarConvs[activeConvIdx].avatarBg" x-text="sidebarConvs[activeConvIdx].initials"></div>
                     <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></span>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div class="text-sm font-semibold text-slate-900">María García</div>
+                    <div class="text-sm font-semibold text-slate-900" x-text="sidebarConvs[activeConvIdx].name"></div>
                     <div class="flex items-center gap-1.5">
                       <span class="text-xs text-emerald-600">En línea</span>
                       <span class="text-xs font-semibold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md">Agente IA</span>
                     </div>
                   </div>
                   <div class="flex items-center gap-1">
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100" style="pointer-events:none">
+                    <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500" style="pointer-events:none">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    </button>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100" style="pointer-events:none">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     </button>
                   </div>
                 </div>
@@ -589,7 +687,7 @@
                 <!-- Chat messages -->
                 <div class="flex-1 overflow-y-auto p-4 space-y-3" x-ref="chatArea">
                   <!-- Seed messages -->
-                  <template x-for="msg in seedMessages" :key="msg.id">
+                  <template x-for="msg in currentMessages" :key="msg.id">
                     <div class="flex" :class="msg.outgoing ? 'justify-end' : 'justify-start'">
                       <div class="max-w-xs">
                         <div
@@ -599,9 +697,6 @@
                         ></div>
                         <div class="flex items-center gap-1 mt-1" :class="msg.outgoing ? 'justify-end' : 'justify-start'">
                           <span class="text-xs text-slate-400" x-text="msg.time"></span>
-                          <template x-if="msg.outgoing">
-                            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M9 17l4 4L23 11"/></svg>
-                          </template>
                         </div>
                       </div>
                     </div>
@@ -610,9 +705,7 @@
                   <!-- Live incoming message -->
                   <div x-show="showIncoming" class="flex justify-start">
                     <div class="max-w-xs">
-                      <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-sm leading-relaxed bg-white border border-slate-200 text-slate-700 chat-bubble-in">
-                        Hola, me gustaría agendar una llamada para saber más de Omnexor.
-                      </div>
+                      <div class="px-3 py-2 rounded-2xl rounded-bl-sm text-sm leading-relaxed bg-white border border-slate-200 text-slate-700 chat-bubble-in" x-text="sidebarConvs[activeConvIdx].liveQuestion"></div>
                       <div class="flex items-center gap-1 mt-1">
                         <span class="text-xs text-slate-400" x-text="liveTime"></span>
                       </div>
@@ -626,19 +719,17 @@
                       <span class="w-1.5 h-1.5 rounded-full bg-slate-400 typing-dot"></span>
                       <span class="w-1.5 h-1.5 rounded-full bg-slate-400 typing-dot"></span>
                     </div>
-                    <span class="text-xs text-slate-400">Agente IA escribiendo...</span>
+                    <span class="text-xs text-slate-400">La IA está escribiendo...</span>
                   </div>
 
                   <!-- AI response -->
                   <div x-show="showAIResponse" class="flex justify-end">
                     <div class="max-w-xs">
-                      <div class="px-3 py-2 rounded-2xl rounded-br-sm text-sm leading-relaxed bg-blue-500 text-white chat-bubble-in">
-                        ¡Hola María! Claro que sí. ¿Te parece bien mañana a las 10:00 AM? He visto un hueco en el calendario.
-                      </div>
+                      <div class="px-3 py-2 rounded-2xl rounded-br-sm text-sm leading-relaxed bg-blue-500 text-white chat-bubble-in" x-text="sidebarConvs[activeConvIdx].aiResponse"></div>
                       <div class="flex items-center gap-1 mt-1 justify-end">
                         <span class="text-xs text-slate-400" x-text="liveTime"></span>
-                        <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7M9 17l4 4L23 11"/></svg>
-                        <span class="text-xs text-blue-400 font-medium">Visto</span>
+                        <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-xs text-blue-400 font-medium">Enviado</span>
                       </div>
                     </div>
                   </div>
@@ -647,12 +738,6 @@
                 <!-- Input bar -->
                 <div class="px-4 py-3 border-t border-slate-200/60 bg-white/50 shrink-0">
                   <div class="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2">
-                    <button class="text-slate-400 hover:text-slate-600" style="pointer-events:none">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </button>
-                    <button class="text-slate-400 hover:text-slate-600" style="pointer-events:none">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    </button>
                     <div class="flex-1 text-xs text-slate-400 px-1">Escribe un mensaje...</div>
                     <button class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center" style="pointer-events:none">
                       <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
@@ -664,7 +749,7 @@
 
             <!-- ── TAB: CALENDARIOS ── -->
             <div
-              x-show="activeTab === 'Calendarios'"
+              x-show="activeNav === 'calendarios'"
               x-transition:enter="tab-enter-active"
               x-transition:leave="tab-leave-active"
               class="absolute inset-0 content-scroll p-4"
@@ -736,9 +821,9 @@
 
             <!-- ── TAB: CLIENTES POTENCIALES (KANBAN) ── -->
             <div
-              x-show="activeTab === 'Clientes Potenciales'"
+              x-show="activeNav === 'clientes-potenciales'"
               x-data="clientesPotencialesBoard()"
-              x-init="$watch('activeTab', val => { if (val === 'Clientes Potenciales') { onTabVisible(); setTimeout(() => scheduleAnim(), 600); } })"
+              x-init="$watch('activeNav', val => { if (val === 'clientes-potenciales') { onTabVisible(); setTimeout(() => scheduleAnim(), 600); } })"
               x-transition:enter="tab-enter-active"
               x-transition:leave="tab-leave-active"
               class="absolute inset-0 flex flex-col overflow-hidden p-4"
@@ -991,9 +1076,7 @@
     // ═══════════════════════════════════════════════════════════
     function omnexorApp() {
       return {
-        activeNav: 'clientes-potenciales',
-        activeTab: 'Dashboard',
-        cycleTabs: ['Dashboard', 'Conversaciones', 'Calendarios', 'Clientes Potenciales'],
+        activeNav: 'inicio',
         progressKey: 0,
         cycleTimer: null,
 
@@ -1071,25 +1154,15 @@
         })(),
 
         upcomingEvents: [
-          { title: 'Demo con Juan Pérez', time: '28 feb · 10:00 AM', borderColor: 'bg-blue-500', attendees: ['JP', 'JD'] },
-          { title: 'Webinar Omnexor Live', time: '3 mar · 6:00 PM', borderColor: 'bg-violet-500', attendees: ['JD', 'AM', 'CL'] },
-          { title: 'Revisión de pipeline', time: '5 mar · 11:00 AM', borderColor: 'bg-emerald-500', attendees: ['JD', 'MT'] },
-          { title: 'Onboarding cliente nuevo', time: '7 mar · 3:00 PM', borderColor: 'bg-amber-500', attendees: ['JD', 'LS'] },
+          { title: 'Demo con Juan Pérez', time: '28 feb · 10:00 AM', borderColor: 'bg-blue-500', attendees: ['JP', 'UD'] },
+          { title: 'Llamada de seguimiento — Ana Martínez', time: '3 mar · 11:00 AM', borderColor: 'bg-violet-500', attendees: ['AM', 'UD'] },
+          { title: 'Revisión de pipeline', time: '5 mar · 11:00 AM', borderColor: 'bg-emerald-500', attendees: ['UD', 'MT'] },
+          { title: 'Onboarding cliente nuevo', time: '7 mar · 3:00 PM', borderColor: 'bg-amber-500', attendees: ['UD', 'LS'] },
         ],
 
         activeTabLabel() {
-          const map = {
-            'inicio': 'Inicio',
-            'dashboard': 'Dashboard',
-            'conversaciones': 'Conversaciones',
-            'calendarios': 'Calendarios',
-            'contactos': 'Contactos',
-            'clientes-potenciales': 'Clientes Potenciales',
-          };
-          if (this.activeNav !== 'inicio' && this.activeNav !== 'dashboard' && this.activeNav !== 'contactos') {
-            return this.activeTab;
-          }
-          return map[this.activeNav] || this.activeNav;
+          const item = this.navItems.find(n => n.id === this.activeNav);
+          return item ? item.label : this.activeNav;
         },
 
         init() {
@@ -1099,10 +1172,11 @@
         startCycle() {
           if (this.cycleTimer) clearInterval(this.cycleTimer);
           this.cycleTimer = setInterval(() => {
-            const idx = this.cycleTabs.indexOf(this.activeTab);
-            this.activeTab = this.cycleTabs[(idx + 1) % this.cycleTabs.length];
+            const ids = this.navItems.map(n => n.id);
+            const idx = ids.indexOf(this.activeNav);
+            this.activeNav = ids[(idx + 1) % ids.length];
             this.progressKey++;
-          }, 6000);
+          }, 5000);
         },
 
         resetCycle() {
@@ -1143,10 +1217,10 @@
             badgeCls: 'bg-violet-50 text-violet-600', color: 'violet',
           },
           {
-            title: 'Página de Webinar',
-            subtitle: 'Landing page en directo',
-            stat: '312 registros',
-            icon: 'M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
+            title: 'Página de Captación',
+            subtitle: 'Landing page activa con formulario',
+            stat: '312 leads captados',
+            icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
             iconBg: 'bg-orange-50', iconColor: 'text-orange-500', dotColor: 'bg-orange-500',
             badgeCls: 'bg-orange-50 text-orange-600', color: 'orange',
           },
@@ -1190,27 +1264,49 @@
     // ═══════════════════════════════════════════════════════════
     function conversacionesChat() {
       return {
-        selectedConv: 'María García',
+        activeConvIdx: 0,
         showIncoming: false,
         showTyping: false,
         showAIResponse: false,
-        demoDone: false,
         liveTime: '',
+        convTimer: null,
 
         sidebarConvs: [
-          { name: 'María García', initials: 'MG', avatarBg: 'bg-gradient-to-br from-blue-400 to-violet-500', online: true, time: 'Ahora', preview: 'Hola, me gustaría agendar...', unread: 1, active: true },
-          { name: 'Carlos Ruiz', initials: 'CR', avatarBg: 'bg-gradient-to-br from-emerald-400 to-teal-500', online: false, time: '14:32', preview: 'Perfecto, hasta mañana.', unread: 0, active: false },
-          { name: 'Laura Pérez', initials: 'LP', avatarBg: 'bg-gradient-to-br from-pink-400 to-rose-500', online: true, time: '13:15', preview: '¿Cuándo podemos hablar?', unread: 2, active: false },
-          { name: 'Javier Moreno', initials: 'JM', avatarBg: 'bg-gradient-to-br from-amber-400 to-orange-500', online: false, time: 'Ayer', preview: 'Gracias por la información.', unread: 0, active: false },
-          { name: 'Ana Sánchez', initials: 'AS', avatarBg: 'bg-gradient-to-br from-violet-400 to-purple-500', online: false, time: 'Ayer', preview: 'Revisaré la propuesta.', unread: 0, active: false },
+          {
+            name: 'Carlos Mendoza', initials: 'CM', avatarBg: 'bg-gradient-to-br from-blue-400 to-violet-500', online: true, time: 'Ahora', preview: '¿Cuánto cuesta el plan Pro?', unread: 1,
+            messages: [
+              { id: 1, text: 'Hola, vi tu anuncio en LinkedIn y me interesa mucho la plataforma.', outgoing: false, time: '10:12' },
+              { id: 2, text: '¡Hola Carlos! Bienvenido. Cuéntame, ¿qué tipo de negocio tienes?', outgoing: true, time: '10:13' },
+              { id: 3, text: 'Tengo una agencia de marketing con 15 empleados. Buscamos automatizar la captación de clientes.', outgoing: false, time: '10:14' },
+            ],
+            liveQuestion: '¿Cuánto cuesta el plan Pro y qué incluye exactamente?',
+            aiResponse: '¡Buena pregunta, Carlos! El plan Pro cuesta €299/mes e incluye automatización ilimitada, agentes de IA, CRM completo y soporte prioritario. ¿Te hago una demo personalizada mañana?',
+          },
+          {
+            name: 'Laura Sánchez', initials: 'LS', avatarBg: 'bg-gradient-to-br from-pink-400 to-rose-500', online: true, time: '14:32', preview: 'Necesito integrar con mi CRM', unread: 2,
+            messages: [
+              { id: 1, text: 'Buenas tardes, tengo una consulta sobre las integraciones disponibles.', outgoing: false, time: '14:20' },
+              { id: 2, text: '¡Hola Laura! Claro, tenemos más de 200 integraciones nativas. ¿Con qué herramienta trabajas?', outgoing: true, time: '14:21' },
+              { id: 3, text: 'Usamos HubSpot y también Zapier para algunas automatizaciones.', outgoing: false, time: '14:22' },
+            ],
+            liveQuestion: '¿La integración con HubSpot sincroniza los contactos en tiempo real?',
+            aiResponse: '¡Sí, Laura! La integración con HubSpot es bidireccional y en tiempo real. Cada nuevo lead en Omnexor aparece automáticamente en HubSpot con todos sus datos. ¿Quieres que te envíe la guía de configuración?',
+          },
+          {
+            name: 'Roberto Vega', initials: 'RV', avatarBg: 'bg-gradient-to-br from-emerald-400 to-teal-500', online: false, time: '13:15', preview: 'Gracias por la demo', unread: 0,
+            messages: [
+              { id: 1, text: 'Acabo de ver la demo grabada. Impresionante lo que hace la IA.', outgoing: false, time: '13:10' },
+              { id: 2, text: '¡Gracias Roberto! ¿Hay alguna funcionalidad que te haya llamado especialmente la atención?', outgoing: true, time: '13:11' },
+              { id: 3, text: 'El agente de ventas que califica leads automáticamente. Eso nos ahorraría horas.', outgoing: false, time: '13:12' },
+            ],
+            liveQuestion: '¿Puedo probar el agente de ventas con mis propios leads antes de contratar?',
+            aiResponse: '¡Por supuesto, Roberto! Tenemos una prueba gratuita de 14 días con acceso completo al agente de ventas. Te creo la cuenta ahora mismo si quieres. ¿Cuántos leads tienes aproximadamente al mes?',
+          },
         ],
 
-        seedMessages: [
-          { id: 1, text: '¡Hola! Vi tu anuncio en Instagram y me interesa mucho Omnexor.', outgoing: false, time: '10:24' },
-          { id: 2, text: '¡Hola María! Encantados de tenerte aquí. ¿En qué podemos ayudarte?', outgoing: true, time: '10:25' },
-          { id: 3, text: 'Tengo una pequeña empresa y busco automatizar mis ventas.', outgoing: false, time: '10:26' },
-          { id: 4, text: 'Perfecto, Omnexor es ideal para eso. Te puedo mostrar cómo funciona.', outgoing: true, time: '10:27' },
-        ],
+        get currentMessages() {
+          return this.sidebarConvs[this.activeConvIdx].messages;
+        },
 
         getNow() {
           const now = new Date();
@@ -1225,26 +1321,38 @@
           });
         },
 
+        resetChat() {
+          this.showIncoming = false;
+          this.showTyping = false;
+          this.showAIResponse = false;
+        },
+
         startLiveDemo() {
-          if (this.demoDone) return;
+          this.resetChat();
           this.liveTime = this.getNow();
 
           setTimeout(() => {
             this.showIncoming = true;
             this.scrollToBottom();
-          }, 2000);
+          }, 1500);
 
           setTimeout(() => {
             this.showTyping = true;
             this.scrollToBottom();
-          }, 5000);
+          }, 3500);
 
           setTimeout(() => {
             this.showTyping = false;
             this.showAIResponse = true;
-            this.demoDone = true;
             this.scrollToBottom();
-          }, 7500);
+          }, 5500);
+
+          // Auto-rotate to next conversation after response is shown
+          setTimeout(() => {
+            this.activeConvIdx = (this.activeConvIdx + 1) % this.sidebarConvs.length;
+            this.resetChat();
+            this.startLiveDemo();
+          }, 8500);
         },
       };
     }
