@@ -228,7 +228,7 @@
             <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white online-dot"></span>
           </div>
           <div class="min-w-0">
-            <div class="text-sm font-semibold text-slate-900 truncate">Usuario Demo</div>
+            <div class="text-sm font-semibold text-slate-900 truncate">María Alcázar</div>
             <div class="text-xs text-slate-500 truncate">contacto@tuempresa.com</div>
           </div>
         </div>
@@ -290,7 +290,7 @@
             <!-- Welcome header -->
             <div class="flex items-center justify-between">
               <div>
-                <h1 class="text-2xl font-extrabold text-slate-900">¡Bienvenido, Usuario Demo! 👋</h1>
+                <h1 class="text-2xl font-extrabold text-slate-900">¡Bienvenida, María! 👋</h1>
                 <p class="text-slate-500 text-sm mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
               </div>
               <div class="text-sm text-slate-400">27 de febrero, 2026</div>
@@ -389,11 +389,13 @@
             <!-- Bar chart -->
             <div class="stat-card p-5">
               <h3 class="font-bold text-slate-900 mb-4 text-sm">Rendimiento Mensual</h3>
-              <div class="flex items-end gap-3 h-36">
+              <div class="flex items-end gap-2" style="height:120px;">
                 <template x-for="bar in chartBars" :key="bar.label">
-                  <div class="flex flex-col items-center gap-1 flex-1">
-                    <div class="w-full rounded-t-lg" :class="bar.color" :style="'height:' + bar.pct + '%; min-height:4px;'"></div>
-                    <span class="text-xs text-slate-400" x-text="bar.label"></span>
+                  <div class="flex flex-col items-center gap-1 flex-1" style="height:100%;">
+                    <div class="flex-1 flex items-end w-full">
+                      <div class="w-full rounded-t-lg" :class="bar.color" :style="'height:' + bar.pct + '%; min-height:6px;'"></div>
+                    </div>
+                    <span class="text-xs text-slate-400 shrink-0" x-text="bar.label"></span>
                   </div>
                 </template>
               </div>
