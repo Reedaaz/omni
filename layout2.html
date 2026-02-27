@@ -61,6 +61,85 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
+    /* ── Bento Box Dashboard ── */
+    .bento-card {
+      position: relative;
+      background: rgba(10, 10, 20, 0.75);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 1.125rem;
+      padding: 1.375rem;
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      cursor: default;
+    }
+    .bento-card:hover {
+      transform: translateY(-2px);
+    }
+    /* Mouse-follow highlight overlay */
+    .bento-card .card-highlight {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: radial-gradient(
+        400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255,255,255,0.04) 0%,
+        transparent 60%
+      );
+    }
+    .bento-card:hover .card-highlight {
+      opacity: 1;
+    }
+
+    /* Glow variants */
+    .bento-card.glow-blue:hover   { border-color: rgba(59,130,246,0.35);  box-shadow: 0 0 30px rgba(59,130,246,0.12); }
+    .bento-card.glow-green:hover  { border-color: rgba(16,185,129,0.35);  box-shadow: 0 0 30px rgba(16,185,129,0.12); }
+    .bento-card.glow-purple:hover { border-color: rgba(139,92,246,0.35);  box-shadow: 0 0 30px rgba(139,92,246,0.12); }
+    .bento-card.glow-orange:hover { border-color: rgba(249,115,22,0.35);  box-shadow: 0 0 30px rgba(249,115,22,0.12); }
+    .bento-card.glow-pink:hover   { border-color: rgba(236,72,153,0.35);  box-shadow: 0 0 30px rgba(236,72,153,0.12); }
+    .bento-card.glow-teal:hover   { border-color: rgba(20,184,166,0.35);  box-shadow: 0 0 30px rgba(20,184,166,0.12); }
+
+    /* Icon glow bg */
+    .bento-icon-wrap {
+      width: 2.5rem; height: 2.5rem;
+      border-radius: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .bento-icon-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 1rem;
+      opacity: 0.35;
+      filter: blur(8px);
+      background: inherit;
+      z-index: -1;
+    }
+
+    /* Live pulse dot */
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.75); }
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      animation: live-pulse 1.8s ease-in-out infinite;
+    }
+
+    /* Syncing spinner */
+    @keyframes sync-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .sync-icon {
+      animation: sync-spin 1.4s linear infinite;
+    }
+
     /* ── Base ── */
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; padding: 0; }
@@ -526,7 +605,73 @@
               </div>
             </div>
 
-            <!-- ── Tab: Dashboard ── -->
+            <!-- ── Tab: Dashboard (Bento Box) — visible when activeTab === 'Dashboard' ── -->
+            <div
+              x-show="activeTab === 'Dashboard' && activeNav !== 'dashboard'"
+              class="tab-content"
+              x-data="bentoDashboard()"
+              x-init="initBento()"
+            >
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h1 class="text-lg font-bold text-white">Dashboard</h1>
+                  <p class="text-xs text-slate-500 mt-0.5">Automatizaciones y flujos activos en tiempo real</p>
+                </div>
+                <!-- Live indicator -->
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <div class="live-dot bg-emerald-400"></div>
+                  <span class="text-[11px] font-semibold text-emerald-400">En vivo</span>
+                </div>
+              </div>
+
+              <!-- Bento Grid: 3 cols on lg, 2 on sm, 1 on mobile -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="(card, i) in bentoCards" :key="i">
+                  <div
+                    class="bento-card"
+                    :class="card.glow"
+                    @mousemove="onMouseMove($event, $el)"
+                    @mouseleave="onMouseLeave($el)"
+                  >
+                    <!-- Mouse-follow highlight -->
+                    <div class="card-highlight"></div>
+
+                    <!-- Top row: icon + live badge -->
+                    <div class="flex items-start justify-between mb-4">
+                      <!-- Icon -->
+                      <div class="bento-icon-wrap" :style="'background:' + card.iconBg">
+                        <svg class="w-5 h-5" :style="'color:' + card.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                          <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
+                        </svg>
+                      </div>
+                      <!-- Live / syncing badge -->
+                      <div class="flex items-center gap-1.5">
+                        <!-- Syncing spinner -->
+                        <svg class="sync-icon w-3 h-3" :style="'color:' + card.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <div class="live-dot" :style="'background:' + card.iconColor"></div>
+                      </div>
+                    </div>
+
+                    <!-- Title & subtitle -->
+                    <h3 class="text-sm font-bold text-white mb-1" x-text="card.title"></h3>
+                    <p class="text-[11px] text-slate-500 leading-relaxed" x-text="card.subtitle"></p>
+
+                    <!-- Bottom stat row -->
+                    <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                      <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" :style="'background:' + card.iconBg + '; color:' + card.iconColor" x-text="card.stat"></span>
+                      <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- ── Tab: Dashboard (nav) ── -->
             <div x-show="activeNav === 'dashboard'" class="tab-content">
               <div class="flex items-center justify-between mb-6">
                 <div>
@@ -863,8 +1008,8 @@
       return {
         /* ── State ── */
         activeNav: 'inicio',
-        activeTab: 'Conversaciones',
-        cycleTabs: ['Conversaciones', 'Calendarios', 'Clientes Potenciales'],
+        activeTab: 'Dashboard',
+        cycleTabs: ['Dashboard', 'Conversaciones', 'Calendarios', 'Clientes Potenciales'],
         cycleIndex: 0,
         cycleTimer: null,
         progressKey: 0,
@@ -1028,6 +1173,85 @@
         resetCycle() {
           this.progressKey++;
           this.startCycle();
+        },
+      };
+    }
+
+    /* ── Bento Dashboard Alpine component ── */
+    function bentoDashboard() {
+      return {
+        bentoCards: [
+          {
+            title: 'Captación de Leads',
+            subtitle: 'Formularios activos capturando prospectos en tiempo real desde múltiples canales.',
+            stat: '142 leads hoy',
+            glow: 'glow-blue',
+            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+            iconBg: 'rgba(59,130,246,0.18)',
+            iconColor: '#3b82f6',
+          },
+          {
+            title: 'Email de Bienvenida',
+            subtitle: 'Secuencia automatizada enviada al instante cuando un nuevo lead se registra.',
+            stat: '98.4% entregados',
+            glow: 'glow-green',
+            icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+            iconBg: 'rgba(16,185,129,0.18)',
+            iconColor: '#10b981',
+          },
+          {
+            title: 'Embudo de Ventas',
+            subtitle: 'Visualiza y optimiza cada etapa del pipeline para maximizar conversiones.',
+            stat: '67% conversión',
+            glow: 'glow-purple',
+            icon: 'M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12',
+            iconBg: 'rgba(139,92,246,0.18)',
+            iconColor: '#8b5cf6',
+          },
+          {
+            title: 'Página de Webinar',
+            subtitle: 'Landing page de alto impacto con registro automático y recordatorios programados.',
+            stat: '312 registros',
+            glow: 'glow-orange',
+            icon: 'M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
+            iconBg: 'rgba(249,115,22,0.18)',
+            iconColor: '#f97316',
+          },
+          {
+            title: 'SMS de Seguimiento',
+            subtitle: 'Mensajes de texto personalizados enviados en el momento exacto del ciclo de compra.',
+            stat: '91% tasa apertura',
+            glow: 'glow-pink',
+            icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+            iconBg: 'rgba(236,72,153,0.18)',
+            iconColor: '#ec4899',
+          },
+          {
+            title: 'Formulario de Reserva',
+            subtitle: 'Agenda citas y demos directamente desde el flujo de captación sin fricción.',
+            stat: '28 citas hoy',
+            glow: 'glow-teal',
+            icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+            iconBg: 'rgba(20,184,166,0.18)',
+            iconColor: '#14b8a6',
+          },
+        ],
+
+        initBento() {
+          // Nothing extra needed; mouse events are handled inline
+        },
+
+        onMouseMove(event, el) {
+          const rect = el.getBoundingClientRect();
+          const x = ((event.clientX - rect.left) / rect.width) * 100;
+          const y = ((event.clientY - rect.top) / rect.height) * 100;
+          el.style.setProperty('--mouse-x', x + '%');
+          el.style.setProperty('--mouse-y', y + '%');
+        },
+
+        onMouseLeave(el) {
+          el.style.setProperty('--mouse-x', '50%');
+          el.style.setProperty('--mouse-y', '50%');
         },
       };
     }
