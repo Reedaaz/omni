@@ -63,6 +63,11 @@ Agencia de marketing digital que construye un sistema GHL propio y un modelo rep
 
 ---
 
+### Tecnología a vigilar
+- **MoltClaw** (gomoltclaw.ai) — plataforma de agentes IA de GHL, beta desde feb 2026. Combina OpenClaw (open-source) con 350+ endpoints de GHL. Si saca API/MCP abierto, permitiría conectar Claude directamente a todo el stack de GHL (CRM, workflows, WhatsApp, Voice AI, Knowledge Base...). Pendiente de confirmar acceso externo.
+
+---
+
 ### Cliente activo: Tecnocasa (inmobiliaria)
 - Bot: **Inma** — 3 perfiles (comprador, vendedor, alquiler)
 - 11 custom fields, 3 pipelines, 10 workflows
