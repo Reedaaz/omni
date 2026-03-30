@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnexor — Sistemas de Crecimiento</title>
+
+    <!-- Fonts: Syne (display) + Outfit (body) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Omnexor — Dark tech pitch
+           =========================================== */
+        :root {
+            --bg-primary: #060a14;
+            --bg-secondary: #0c1222;
+            --bg-card: #0f1629;
+            --text-primary: #edf2ff;
+            --text-secondary: #64748b;
+            --text-dim: #3b4563;
+            --accent-blue: #2563eb;
+            --accent-blue-light: #60a5fa;
+            --accent-green: #10b981;
+            --accent-green-light: #34d399;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --glow-blue: rgba(37, 99, 235, 0.15);
+            --glow-green: rgba(16, 185, 129, 0.12);
+            --border: rgba(37, 99, 235, 0.1);
+
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --title-size: clamp(2rem, 6vw, 4.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+            --body-size: clamp(0.75rem, 1.4vw, 1.05rem);
+            --small-size: clamp(0.6rem, 1vw, 0.8rem);
+            --micro-size: clamp(0.5rem, 0.8vw, 0.7rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --duration-normal: 0.7s;
+        }
+
+        /* ===========================================
+           RESET + BASE
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===========================================
+           VIEWPORT BASE (from viewport-base.css)
+           =========================================== */
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px);
+            max-height: min(80vh, 700px);
+        }
+
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity var(--duration-normal), transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity var(--duration-normal), transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity var(--duration-normal), transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal,
+        .slide.visible .reveal-scale,
+        .slide.visible .reveal-left,
+        .slide.visible .reveal-right {
+            opacity: 1;
+            transform: translateY(0) translateX(0) scale(1);
+        }
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.15s; }
+        .reveal:nth-child(3) { transition-delay: 0.25s; }
+        .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5) { transition-delay: 0.45s; }
+        .reveal:nth-child(6) { transition-delay: 0.55s; }
+
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+        @keyframes glow { 0%,100%{opacity:.6} 50%{opacity:1} }
+        @keyframes countUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes barGrow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        @keyframes slideInLeft { from{opacity:0;transform:translateX(-100%)} to{opacity:1;transform:translateX(0)} }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            z-index: 9999;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px var(--glow-blue);
+        }
+
+        /* ===========================================
+           NAV DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(12px, 2vw, 24px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 10px);
+            z-index: 9998;
+        }
+        .nav-dot {
+            width: clamp(6px, 0.8vw, 8px);
+            height: clamp(6px, 0.8vw, 8px);
+            border-radius: 50%;
+            background: var(--text-dim);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+        .nav-dot.active {
+            background: var(--accent-blue);
+            box-shadow: 0 0 8px var(--glow-blue);
+            transform: scale(1.3);
+        }
+
+        /* ===========================================
+           SLIDE BACKGROUNDS
+           =========================================== */
+        .bg-grid {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.025) 1px, transparent 0);
+            background-size: clamp(30px, 4vw, 48px) clamp(30px, 4vw, 48px);
+        }
+        .bg-glow-blue::before {
+            content: '';
+            position: absolute;
+            width: 60vw; height: 60vw;
+            max-width: 700px; max-height: 700px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, var(--glow-blue) 0%, transparent 60%);
+            pointer-events: none;
+            animation: float 10s ease-in-out infinite;
+        }
+        .bg-glow-green::after {
+            content: '';
+            position: absolute;
+            width: 40vw; height: 40vw;
+            max-width: 500px; max-height: 500px;
+            bottom: 10%; left: 20%;
+            background: radial-gradient(circle, var(--glow-green) 0%, transparent 55%);
+            pointer-events: none;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        .display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.04em; line-height: 0.92; }
+        .heading { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 1.0; }
+        .mono { font-family: var(--font-mono); font-weight: 500; }
+        .label {
+            font-size: var(--micro-size);
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent-blue-light);
+        }
+        .grad-text {
+            background: linear-gradient(135deg, var(--accent-blue-light), var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===========================================
+           LAYOUT COMPONENTS
+           =========================================== */
+        .centered { text-align: center; align-items: center; }
+        .max-w { max-width: min(90vw, 1100px); margin: 0 auto; width: 100%; }
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--content-gap);
+            align-items: center;
+            width: 100%;
+        }
+        @media (max-width: 768px) { .split { grid-template-columns: 1fr; } }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(4px, 0.5vw, 8px);
+            font-size: var(--micro-size);
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-blue-light);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 100px;
+            padding: clamp(4px, 0.5vh, 8px) clamp(12px, 2vw, 22px);
+            backdrop-filter: blur(8px);
+            background: rgba(96, 165, 250, 0.04);
+        }
+        .badge-dot {
+            width: clamp(4px, 0.5vw, 6px);
+            height: clamp(4px, 0.5vw, 6px);
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* ===========================================
+           STAT CARDS
+           =========================================== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(8px, 1.5vw, 16px);
+        }
+        @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            padding: clamp(16px, 2.5vh, 32px) clamp(12px, 1.5vw, 20px);
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: clamp(10px, 1.5vw, 16px);
+            background: rgba(15, 22, 41, 0.6);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover { border-color: rgba(37, 99, 235, 0.25); background: rgba(15, 22, 41, 0.9); }
+        .stat-val {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: clamp(4px, 0.5vh, 8px);
+        }
+        .stat-val.blue { color: var(--accent-blue-light); }
+        .stat-val.green { color: var(--accent-green-light); }
+        .stat-val.red { color: var(--accent-red); }
+        .stat-label { font-size: var(--small-size); color: var(--text-secondary); line-height: 1.3; }
+
+        /* ===========================================
+           COMPARISON ROWS
+           =========================================== */
+        .compare-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: clamp(8px, 2vw, 24px);
+            padding: clamp(8px, 1vh, 14px) 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            align-items: center;
+            font-size: var(--body-size);
+        }
+        .compare-row:last-child { border: none; }
+        .compare-label { color: var(--text-secondary); }
+        .compare-bad { color: var(--accent-red); font-weight: 600; font-family: var(--font-mono); text-align: right; min-width: clamp(60px, 10vw, 120px); }
+        .compare-good { color: var(--accent-green); font-weight: 700; font-family: var(--font-mono); text-align: right; min-width: clamp(60px, 10vw, 120px); }
+
+        /* ===========================================
+           PAIN CARDS
+           =========================================== */
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(8px, 1.5vw, 16px);
+        }
+        @media (max-width: 768px) { .pain-grid { grid-template-columns: 1fr; } }
+        .pain-card {
+            padding: clamp(16px, 2vh, 28px) clamp(14px, 1.5vw, 22px);
+            border-radius: clamp(10px, 1.5vw, 16px);
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.12);
+            transition: all 0.3s ease;
+        }
+        .pain-card:hover { background: rgba(239, 68, 68, 0.08); transform: translateY(-4px); }
+        .pain-icon { font-size: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: clamp(6px, 1vh, 12px); }
+        .pain-card h4 { font-family: var(--font-display); font-size: var(--body-size); font-weight: 700; margin-bottom: clamp(4px, 0.5vh, 6px); }
+        .pain-card p { font-size: var(--small-size); color: var(--text-secondary); line-height: 1.45; }
+
+        /* ===========================================
+           FUNNEL BARS
+           =========================================== */
+        .funnel-bar {
+            border-radius: clamp(8px, 1vw, 12px);
+            padding: clamp(10px, 1.5vh, 16px) clamp(14px, 2vw, 22px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: clamp(2px, 0.3vh, 4px) auto;
+            transition: transform 0.2s ease;
+        }
+        .funnel-bar:hover { transform: scale(1.015); }
+        .funnel-label { font-size: var(--body-size); font-weight: 600; color: rgba(255,255,255,.9); }
+        .funnel-pct { font-family: var(--font-display); font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-weight: 800; color: #fff; }
+        .funnel-arrow { text-align: center; color: var(--text-dim); font-size: var(--body-size); padding: clamp(1px, 0.2vh, 3px) 0; }
+
+        /* ===========================================
+           PACK CARDS (inline for slides)
+           =========================================== */
+        .pack-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(6px, 1vw, 12px);
+            align-items: start;
+        }
+        @media (max-width: 900px) { .pack-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .pack-grid { grid-template-columns: 1fr; } }
+        .pack-card {
+            border-radius: clamp(10px, 1.5vw, 16px);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+        .pack-card:hover { border-color: rgba(37, 99, 235, 0.2); transform: translateY(-4px); }
+        .pack-card.featured {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 32px var(--glow-blue);
+            transform: translateY(calc(-1 * clamp(4px, 0.5vh, 8px)));
+        }
+        .pack-head {
+            padding: clamp(12px, 1.5vh, 20px) clamp(10px, 1.5vw, 18px);
+            position: relative;
+        }
+        .pack-head.dark { background: linear-gradient(145deg, #0c1222, #1e3a5f); }
+        .pack-head.light { background: linear-gradient(145deg, #1a2744, var(--accent-blue)); }
+        .pack-head.deep { background: linear-gradient(145deg, #060a14, #0c1222); }
+        .pack-name { font-size: var(--micro-size); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-blue-light); margin-bottom: clamp(2px, 0.3vh, 4px); }
+        .pack-title { font-family: var(--font-display); font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 700; color: #fff; line-height: 1.1; }
+        .pack-body { padding: clamp(10px, 1.2vh, 16px) clamp(10px, 1.5vw, 18px); }
+        .pack-price { display: flex; gap: clamp(4px, 0.5vw, 8px); margin-bottom: clamp(6px, 0.8vh, 10px); }
+        .price-tag {
+            flex: 1;
+            padding: clamp(6px, 0.8vh, 10px) clamp(6px, 0.8vw, 10px);
+            border-radius: clamp(6px, 0.8vw, 8px);
+            background: rgba(37, 99, 235, 0.06);
+            border: 1px solid var(--border);
+        }
+        .price-lbl { font-size: var(--micro-size); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+        .price-val { font-family: var(--font-display); font-size: clamp(0.75rem, 1.3vw, 1rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+        .pack-roi { font-family: var(--font-display); font-size: var(--body-size); font-weight: 700; margin-bottom: clamp(4px, 0.5vh, 8px); }
+        .roi-bar { height: clamp(4px, 0.5vh, 6px); background: rgba(37, 99, 235, 0.1); border-radius: 100px; overflow: hidden; }
+        .roi-fill { height: 100%; border-radius: 100px; transform-origin: left; }
+        .pack-feat-tag {
+            position: absolute; top: 0; right: clamp(10px, 1.5vw, 18px);
+            background: linear-gradient(135deg, var(--accent-blue), #1e3a8a);
+            color: #fff;
+            font-size: var(--micro-size);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: clamp(3px, 0.4vh, 5px) clamp(8px, 1vw, 14px);
+            border-radius: 0 0 8px 8px;
+        }
+        .pack-ia {
+            font-size: var(--micro-size);
+            font-weight: 600;
+            color: var(--accent-blue-light);
+            padding: clamp(2px, 0.3vh, 4px) clamp(6px, 0.8vw, 10px);
+            border-radius: 100px;
+            border: 1px dashed rgba(37, 99, 235, 0.25);
+            background: rgba(37, 99, 235, 0.05);
+            display: inline-block;
+        }
+        .pack-ia.included {
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.06);
+            border-style: solid;
+        }
+
+        /* 2-column pack grid for detailed slides */
+        .pack-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, 1.2vw, 16px);
+            align-items: start;
+        }
+        @media (max-width: 700px) { .pack-grid-2 { grid-template-columns: 1fr; } }
+
+        .pack-card-lg {
+            border-radius: clamp(10px, 1.5vw, 16px);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+        .pack-card-lg:hover { border-color: rgba(37, 99, 235, 0.2); transform: translateY(-3px); }
+        .pack-card-lg.featured {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 32px var(--glow-blue);
+        }
+        .pack-tagline {
+            font-size: var(--micro-size);
+            color: rgba(255,255,255,0.6);
+            margin-top: clamp(2px, 0.3vh, 4px);
+            line-height: 1.3;
+        }
+        .pack-body-lg {
+            padding: clamp(8px, 1vh, 14px) clamp(10px, 1.5vw, 18px);
+        }
+        .pack-features-list {
+            margin: clamp(4px, 0.5vh, 8px) 0;
+        }
+        .pf-section-title {
+            font-size: var(--micro-size);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent-blue-light);
+            margin-top: clamp(4px, 0.5vh, 6px);
+            margin-bottom: clamp(1px, 0.2vh, 3px);
+        }
+        .pf-item-s {
+            font-size: clamp(0.55rem, 0.9vw, 0.78rem);
+            color: var(--text-secondary);
+            line-height: 1.35;
+            padding: clamp(1px, 0.15vh, 2px) 0;
+        }
+        .pf-check {
+            color: var(--accent-green);
+            font-weight: 700;
+            margin-right: clamp(2px, 0.3vw, 4px);
+        }
+        .pack-bottom {
+            margin-top: clamp(4px, 0.5vh, 8px);
+            padding-top: clamp(4px, 0.5vh, 8px);
+            border-top: 1px solid var(--border);
+        }
+        .pack-timing-s {
+            font-size: var(--micro-size);
+            color: var(--text-dim);
+            margin-top: clamp(2px, 0.3vh, 4px);
+        }
+        .pack-note-ads {
+            font-size: var(--micro-size);
+            color: #ef4444;
+            font-weight: 600;
+            margin-top: clamp(2px, 0.3vh, 4px);
+        }
+
+        /* ===========================================
+           TIMELINE
+           =========================================== */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(8px, 1.5vw, 16px);
+        }
+        @media (max-width: 768px) { .timeline-grid { grid-template-columns: repeat(2, 1fr); } }
+        .tl-card {
+            padding: clamp(14px, 2vh, 24px) clamp(12px, 1.5vw, 18px);
+            border-radius: clamp(10px, 1.5vw, 14px);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            position: relative;
+        }
+        .tl-num {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: clamp(4px, 0.5vh, 8px);
+        }
+        .tl-phase { font-size: var(--micro-size); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-blue-light); margin-bottom: clamp(2px, 0.3vh, 4px); }
+        .tl-title { font-family: var(--font-display); font-size: var(--body-size); font-weight: 700; margin-bottom: clamp(4px, 0.5vh, 6px); }
+        .tl-desc { font-size: var(--small-size); color: var(--text-secondary); line-height: 1.45; }
+        .tl-connector {
+            position: absolute;
+            right: calc(-1 * clamp(4px, 0.75vw, 8px));
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-blue);
+            font-size: var(--body-size);
+        }
+        .tl-card:last-child .tl-connector { display: none; }
+
+        /* ===========================================
+           CTA SECTION
+           =========================================== */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(6px, 0.8vw, 10px);
+            background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            font-weight: 600;
+            padding: clamp(12px, 1.8vh, 20px) clamp(24px, 4vw, 48px);
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3), 0 12px 40px rgba(37, 99, 235, 0.25);
+            transition: all 0.3s var(--ease-out-expo);
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.5), 0 20px 56px rgba(37, 99, 235, 0.35);
+        }
+
+        /* ===========================================
+           COST TICKER
+           =========================================== */
+        .cost-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(239, 68, 68, 0.02));
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: clamp(12px, 1.5vw, 20px);
+            padding: clamp(20px, 3vh, 40px) clamp(20px, 3vw, 40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(16px, 3vw, 40px);
+        }
+        .cost-amount {
+            font-family: var(--font-mono);
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 600;
+            color: var(--accent-red);
+            line-height: 1;
+        }
+        .cost-label { font-size: var(--body-size); color: var(--text-secondary); max-width: 280px; line-height: 1.5; }
+        .cost-label strong { color: var(--text-primary); display: block; font-size: clamp(0.9rem, 1.5vw, 1.1rem); margin-bottom: 4px; }
+
+        /* ===========================================
+           ROI GRID
+           =========================================== */
+        .roi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px;
+            border-radius: clamp(12px, 1.5vw, 20px);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        @media (max-width: 768px) { .roi-grid { grid-template-columns: 1fr; } }
+        .roi-col { background: var(--bg-card); }
+        .roi-col.roi-accent { background: rgba(37, 99, 235, 0.08); }
+        .roi-col.roi-result { background: rgba(16, 185, 129, 0.06); }
+        .roi-header {
+            padding: clamp(10px, 1.5vh, 18px) clamp(12px, 1.5vw, 20px);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: var(--micro-size);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .roi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(6px, 1vh, 12px) clamp(12px, 1.5vw, 20px);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .roi-row:last-child { border: none; }
+        .roi-lbl { font-size: var(--small-size); color: var(--text-secondary); }
+        .roi-val { font-family: var(--font-display); font-size: clamp(0.9rem, 1.8vw, 1.3rem); font-weight: 700; }
+
+        /* ===========================================
+           SWITCH COMPARISON
+           =========================================== */
+        .switch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(8px, 1.5vw, 16px);
+        }
+        @media (max-width: 768px) { .switch-grid { grid-template-columns: 1fr; } }
+        .switch-col {
+            border-radius: clamp(12px, 1.5vw, 18px);
+            padding: clamp(16px, 2.5vh, 28px) clamp(14px, 2vw, 24px);
+        }
+        .switch-bad { background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.1); }
+        .switch-good { background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.1); }
+        .switch-title { font-family: var(--font-display); font-size: var(--small-size); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: clamp(8px, 1.2vh, 16px); }
+        .switch-bad .switch-title { color: var(--accent-red); }
+        .switch-good .switch-title { color: var(--accent-green); }
+        .switch-item {
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(6px, 0.8vw, 10px);
+            padding: clamp(4px, 0.6vh, 8px) 0;
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.4;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .switch-item:last-child { border: none; }
+        .sw-dot {
+            width: clamp(16px, 2vw, 20px);
+            height: clamp(16px, 2vw, 20px);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--micro-size);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .sw-dot.bad { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .sw-dot.good { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    <!-- Nav dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- ===========================================
+         SLIDE 1: HERO
+         =========================================== -->
+    <section class="slide bg-grid bg-glow-blue bg-glow-green" id="slide-hero">
+        <div class="slide-content centered">
+            <div class="badge reveal" style="margin-bottom:clamp(20px,4vh,48px);">
+                <span class="badge-dot"></span> Omnexor · Sistemas de Crecimiento
+            </div>
+            <h1 class="display reveal" style="font-size:var(--title-size);margin-bottom:clamp(12px,2vh,28px);">
+                Deja de perder<br><span class="grad-text">clientes</span>
+            </h1>
+            <p class="reveal" style="font-size:var(--body-size);color:var(--text-secondary);max-width:min(90vw,520px);line-height:1.65;margin-bottom:clamp(20px,3vh,40px);">
+                El <strong style="color:var(--text-primary)">78% de los leads</strong> compra al primero que responde.<br>Si tardas más de 5 minutos, ya los has perdido.
+            </p>
+            <div class="reveal" style="display:flex;gap:clamp(24px,5vw,56px);margin-bottom:clamp(20px,3vh,40px);">
+                <div style="text-align:center;">
+                    <div class="stat-val blue" style="font-size:clamp(1.5rem,3.5vw,2.5rem);" data-target="92" data-suffix="%">0%</div>
+                    <div class="stat-label" style="font-size:var(--micro-size);color:var(--text-dim);">Leads contactados</div>
+                </div>
+                <div style="text-align:center;">
+                    <div class="stat-val" style="font-size:clamp(1.5rem,3.5vw,2.5rem);color:var(--text-primary);">&lt;2<span style="font-size:0.6em;color:var(--accent-blue-light);">min</span></div>
+                    <div class="stat-label" style="font-size:var(--micro-size);color:var(--text-dim);">Tiempo respuesta</div>
+                </div>
+                <div style="text-align:center;">
+                    <div class="stat-val green" style="font-size:clamp(1.5rem,3.5vw,2.5rem);" data-target="8" data-suffix="x">0x</div>
+                    <div class="stat-label" style="font-size:var(--micro-size);color:var(--text-dim);">ROI medio</div>
+                </div>
+            </div>
+            <button class="cta-btn reveal" onclick="document.getElementById('slide-cta').scrollIntoView({behavior:'smooth'})">Hablemos de tu caso →</button>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 2: THE PROBLEM
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-problem">
+        <div class="slide-content centered max-w">
+            <div class="label reveal" style="margin-bottom:clamp(8px,1.5vh,16px);">El problema real</div>
+            <div class="display reveal grad-text" style="font-size:clamp(4rem,12vw,10rem);line-height:0.85;margin-bottom:clamp(6px,1vh,12px);">78%</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(6px,1vh,12px);">de tus leads se pierden<br>antes de que los toques</h2>
+            <p class="reveal" style="font-size:var(--body-size);color:var(--text-secondary);max-width:min(90vw,480px);line-height:1.55;margin-bottom:clamp(12px,2vh,28px);">
+                No es que tu servicio sea malo. Es que <strong style="color:var(--text-primary)">no tienes un sistema</strong> que responda, califique y agende por ti.
+            </p>
+            <div class="pain-grid reveal">
+                <div class="pain-card">
+                    <div class="pain-icon">⏰</div>
+                    <h4>Respondes tarde</h4>
+                    <p>El 50% compra al que responde en 5 min. Tú tardas horas.</p>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">📋</div>
+                    <h4>No haces seguimiento</h4>
+                    <p>El 80% de ventas necesitan 5+ contactos. Tú haces 1 o 2.</p>
+                </div>
+                <div class="pain-card">
+                    <div class="pain-icon">🎯</div>
+                    <h4>No priorizas</h4>
+                    <p>Tu comercial pierde tiempo con leads fríos sin cualificar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 3: COST OF INACTION
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-cost">
+        <div class="slide-content centered max-w">
+            <div class="label reveal" style="margin-bottom:clamp(12px,2vh,24px);">El coste de no actuar</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(16px,3vh,36px);">
+                ¿Cuánto dinero dejas<br>en la mesa <span style="color:var(--accent-red);">cada mes?</span>
+            </h2>
+            <div class="cost-box reveal">
+                <div class="cost-label">
+                    <strong>5 clientes perdidos al mes</strong>
+                    por responder tarde, con un ticket medio de 2.000€...
+                </div>
+                <div class="cost-amount" data-target="10000" data-suffix="€">0€</div>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--text-dim);margin-top:clamp(12px,2vh,20px);">
+                Cada día sin sistema = otro día perdiendo clientes que ya estaban listos para comprar.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 4: SIN vs CON
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-compare">
+        <div class="slide-content max-w">
+            <div class="label reveal" style="margin-bottom:clamp(8px,1vh,12px);">La diferencia</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(12px,2vh,24px);">
+                Sin sistema vs. <span class="grad-text">con Omnexor</span>
+            </h2>
+            <div class="switch-grid reveal">
+                <div class="switch-col switch-bad">
+                    <div class="switch-title">✗ Sin sistema</div>
+                    <div class="switch-item"><span class="sw-dot bad">✗</span> Respuesta: 4–24 horas</div>
+                    <div class="switch-item"><span class="sw-dot bad">✗</span> Solo contactas al 35%</div>
+                    <div class="switch-item"><span class="sw-dot bad">✗</span> 1–2 intentos de seguimiento</div>
+                    <div class="switch-item"><span class="sw-dot bad">✗</span> Dependencia del comercial</div>
+                    <div class="switch-item"><span class="sw-dot bad">✗</span> Coste por cita: 80–200€</div>
+                </div>
+                <div class="switch-col switch-good">
+                    <div class="switch-title">✓ Con Omnexor</div>
+                    <div class="switch-item"><span class="sw-dot good">✓</span> Respuesta automática < 2 min</div>
+                    <div class="switch-item"><span class="sw-dot good">✓</span> +92% de leads contactados</div>
+                    <div class="switch-item"><span class="sw-dot good">✓</span> Hasta 7 touchpoints automáticos</div>
+                    <div class="switch-item"><span class="sw-dot good">✓</span> Sistema 24/7 sin descanso</div>
+                    <div class="switch-item"><span class="sw-dot good">✓</span> Coste por cita: 12–40€</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 5: IMPACT NUMBERS
+         =========================================== -->
+    <section class="slide bg-grid bg-glow-blue" id="slide-impact">
+        <div class="slide-content centered max-w">
+            <div class="label reveal" style="margin-bottom:clamp(8px,1.5vh,16px);">Resultados reales</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(16px,3vh,36px);">
+                Impacto medible desde<br>los primeros <span class="grad-text">30 días</span>
+            </h2>
+            <div class="stat-grid reveal">
+                <div class="stat-card">
+                    <div class="stat-val blue" data-target="67" data-suffix="%">0%</div>
+                    <div class="stat-label"><strong style="color:var(--text-primary)">Más citas</strong><br>mismo volumen de leads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val green" data-target="58" data-prefix="-" data-suffix="%">0%</div>
+                    <div class="stat-label"><strong style="color:var(--text-primary)">Menos CPL</strong><br>coste por lead cualificado</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val blue" data-target="8" data-suffix="x">0x</div>
+                    <div class="stat-label"><strong style="color:var(--text-primary)">ROI medio</strong><br>sobre inversión total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val green" data-target="40" data-suffix="%">0%</div>
+                    <div class="stat-label"><strong style="color:var(--text-primary)">Mayor cierre</strong><br>cualificación IA</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 6: FUNNEL
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-funnel">
+        <div class="slide-content max-w">
+            <div class="label reveal" style="margin-bottom:clamp(6px,1vh,10px);">Cómo funciona</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(12px,2vh,24px);">
+                De lead frío a cliente<br><span class="grad-text">sin intervención</span>
+            </h2>
+            <div class="split reveal">
+                <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,12px);">
+                    <div style="display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);padding:clamp(10px,1.5vh,16px);background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+                        <div style="width:clamp(28px,3.5vw,40px);height:clamp(28px,3.5vw,40px);border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:var(--body-size);font-weight:700;color:#fff;flex-shrink:0;">1</div>
+                        <div><div style="font-weight:600;font-size:var(--small-size);">Respuesta instantánea</div><div style="font-size:var(--micro-size);color:var(--text-secondary);">WhatsApp en < 2 min, 24/7</div></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);padding:clamp(10px,1.5vh,16px);background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+                        <div style="width:clamp(28px,3.5vw,40px);height:clamp(28px,3.5vw,40px);border-radius:10px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:var(--body-size);font-weight:700;color:#fff;flex-shrink:0;">2</div>
+                        <div><div style="font-weight:600;font-size:var(--small-size);">Calificación IA</div><div style="font-size:var(--micro-size);color:var(--text-secondary);">Preguntas clave automáticas</div></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);padding:clamp(10px,1.5vh,16px);background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+                        <div style="width:clamp(28px,3.5vw,40px);height:clamp(28px,3.5vw,40px);border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#93c5fd);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:var(--body-size);font-weight:700;color:#fff;flex-shrink:0;">3</div>
+                        <div><div style="font-weight:600;font-size:var(--small-size);">Booking automático</div><div style="font-size:var(--micro-size);color:var(--text-secondary);">El lead elige su hueco</div></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);padding:clamp(10px,1.5vh,16px);background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+                        <div style="width:clamp(28px,3.5vw,40px);height:clamp(28px,3.5vw,40px);border-radius:10px;background:linear-gradient(135deg,#047857,#10b981);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:var(--body-size);font-weight:700;color:#fff;flex-shrink:0;">4</div>
+                        <div><div style="font-weight:600;font-size:var(--small-size);">Tu closer solo cierra</div><div style="font-size:var(--micro-size);color:var(--text-secondary);">Lead calificado, con contexto</div></div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="funnel-bar" style="width:100%;background:linear-gradient(135deg,#1e3a8a,#2563eb);"><span class="funnel-label">Leads</span><span class="funnel-pct">100%</span></div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-bar" style="width:92%;background:linear-gradient(135deg,#1d4ed8,#3b82f6);"><span class="funnel-label">Contactados</span><span class="funnel-pct">92%</span></div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-bar" style="width:76%;background:linear-gradient(135deg,#2563eb,#60a5fa);"><span class="funnel-label">Calificados</span><span class="funnel-pct">58%</span></div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-bar" style="width:58%;background:linear-gradient(135deg,#1e40af,#3b82f6);"><span class="funnel-label">Citas</span><span class="funnel-pct">35%</span></div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-bar" style="width:44%;background:linear-gradient(135deg,#047857,#10b981);"><span class="funnel-label">Clientes</span><span class="funnel-pct">18%</span></div>
+                    <div style="margin-top:clamp(8px,1.2vh,14px);padding:clamp(8px,1vh,14px) clamp(12px,1.5vw,20px);background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;text-align:center;">
+                        <div style="font-size:var(--body-size);font-weight:700;color:var(--accent-green);">100 leads → 18 clientes</div>
+                        <div style="font-size:var(--micro-size);color:var(--text-secondary);">Sin sistema: 100 → 3–5 clientes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 7: ROI CALCULATOR
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-roi">
+        <div class="slide-content centered max-w">
+            <div class="label reveal" style="margin-bottom:clamp(6px,1vh,10px);">El retorno</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(4px,0.8vh,8px);">
+                Los números hablan
+            </h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--text-secondary);margin-bottom:clamp(12px,2vh,24px);">Ticket medio 2.000€ · 50 leads/mes</p>
+            <div class="roi-grid reveal">
+                <div class="roi-col">
+                    <div class="roi-header" style="color:var(--accent-red);">✗ Sin sistema</div>
+                    <div class="roi-row"><span class="roi-lbl">Contactados</span><span class="roi-val" style="color:var(--accent-red);">~18</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Citas</span><span class="roi-val" style="color:var(--accent-red);">5</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Clientes</span><span class="roi-val" style="color:var(--accent-red);">2</span></div>
+                    <div class="roi-row"><span class="roi-lbl" style="font-weight:600;color:var(--text-primary);">Resultado</span><span class="roi-val" style="color:var(--text-primary);">4.000€</span></div>
+                </div>
+                <div class="roi-col roi-accent">
+                    <div class="roi-header" style="color:var(--accent-blue-light);">⚡ Con Omnexor</div>
+                    <div class="roi-row"><span class="roi-lbl">Contactados</span><span class="roi-val" style="color:var(--accent-green);">~46</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Citas</span><span class="roi-val" style="color:var(--accent-green);">18</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Clientes</span><span class="roi-val" style="color:var(--accent-green);">7</span></div>
+                    <div class="roi-row"><span class="roi-lbl" style="font-weight:600;color:var(--text-primary);">Resultado</span><span class="roi-val" style="color:var(--accent-blue-light);">13.400€</span></div>
+                </div>
+                <div class="roi-col roi-result">
+                    <div class="roi-header" style="color:var(--accent-green);">↑ Beneficio extra</div>
+                    <div class="roi-row"><span class="roi-lbl">Más contactados</span><span class="roi-val" style="color:var(--accent-green);">+28</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Más citas</span><span class="roi-val" style="color:var(--accent-green);">+13</span></div>
+                    <div class="roi-row"><span class="roi-lbl">Más clientes</span><span class="roi-val" style="color:var(--accent-green);">+5</span></div>
+                    <div class="roi-row"><span class="roi-lbl" style="font-weight:700;color:var(--accent-green);">Neto extra</span><span class="roi-val" style="color:var(--accent-green);font-size:clamp(1.2rem,2.5vw,1.8rem);">+9.400€</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 8a: PACKS 00 + 01
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-packs-1">
+        <div class="slide-content max-w">
+            <div class="label reveal" style="margin-bottom:clamp(4px,0.6vh,8px);">Planes</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(8px,1.2vh,16px);">
+                Elige tu nivel
+            </h2>
+            <div class="pack-grid-2 reveal">
+                <!-- Pack 00 -->
+                <div class="pack-card-lg">
+                    <div class="pack-head dark">
+                        <div class="pack-name">Pack 00</div>
+                        <div class="pack-title">GHL Local Start</div>
+                        <div class="pack-tagline">Para no perder ni un lead y profesionalizar tu gestión.</div>
+                    </div>
+                    <div class="pack-body-lg">
+                        <div class="pack-price">
+                            <div class="price-tag"><div class="price-lbl">Setup</div><div class="price-val">300–600€</div></div>
+                            <div class="price-tag"><div class="price-lbl">Mensual</div><div class="price-val">97–197€</div></div>
+                        </div>
+                        <div class="pack-features-list">
+                            <div class="pf-section-title">Infraestructura</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Subcuenta GHL + CRM + Pipeline</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> WhatsApp API integrado</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Calendario + reserva automática</div>
+                            <div class="pf-section-title">Automatizaciones</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Respuesta inmediata al lead</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Confirmación + recordatorios</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> No-show + reagendado</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Solicitud de reseña automática</div>
+                        </div>
+                        <div class="pack-bottom">
+                            <div class="pack-roi" style="color:var(--accent-green);">ROI 2x – 4x</div>
+                            <div class="roi-bar"><div class="roi-fill" style="width:22%;background:linear-gradient(90deg,var(--accent-green),var(--accent-green-light));"></div></div>
+                            <div class="pack-ia">🤖 IA opcional · desde 900€</div>
+                            <div class="pack-timing-s">⏱ 7–10 días · Mínimo 3 meses</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pack 01 -->
+                <div class="pack-card-lg">
+                    <div class="pack-head" style="background:linear-gradient(145deg,#1a2744,#2563eb);">
+                        <div class="pack-name">Pack 01</div>
+                        <div class="pack-title">Lead System</div>
+                        <div class="pack-tagline">Para convertir mejor los leads que ya tienes.</div>
+                    </div>
+                    <div class="pack-body-lg">
+                        <div class="pack-price">
+                            <div class="price-tag"><div class="price-lbl">Setup</div><div class="price-val">800–1.500€</div></div>
+                            <div class="price-tag"><div class="price-lbl">Mensual</div><div class="price-val">197–397€</div></div>
+                        </div>
+                        <div class="pack-features-list">
+                            <div class="pf-section-title">Todo de Local Start +</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Landing page optimizada (móvil)</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Formulario → CRM directo</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Seguimiento automático Día 0–7</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Reactivación base existente</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Multicanal WhatsApp + Email</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Segmentación básica de leads</div>
+                        </div>
+                        <div class="pack-bottom">
+                            <div class="pack-roi" style="color:var(--accent-blue-light);">ROI 3x – 6x</div>
+                            <div class="roi-bar"><div class="roi-fill" style="width:40%;background:linear-gradient(90deg,var(--accent-blue),var(--accent-blue-light));"></div></div>
+                            <div class="pack-ia">🤖 IA opcional · desde 900€</div>
+                            <div class="pack-timing-s">⏱ 10–20 días · Mínimo 3 meses</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--micro-size);color:var(--text-dim);text-align:center;margin-top:clamp(4px,0.6vh,8px);">
+                Cada plan incluye todo lo del anterior · Escala cuando quieras
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 8b: PACKS 02 + 03
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-packs-2">
+        <div class="slide-content max-w">
+            <div class="label reveal" style="margin-bottom:clamp(4px,0.6vh,8px);">Planes</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(8px,1.2vh,16px);">
+                Escala sin límites
+            </h2>
+            <div class="pack-grid-2 reveal">
+                <!-- Pack 02 FEATURED -->
+                <div class="pack-card-lg featured">
+                    <div class="pack-head light">
+                        <div class="pack-feat-tag">⭐ Popular</div>
+                        <div class="pack-name">Pack 02</div>
+                        <div class="pack-title">Growth System</div>
+                        <div class="pack-tagline">Para escalar con captación activa y datos reales.</div>
+                    </div>
+                    <div class="pack-body-lg">
+                        <div class="pack-price">
+                            <div class="price-tag"><div class="price-lbl">Setup</div><div class="price-val">1.500–3.000€</div></div>
+                            <div class="price-tag"><div class="price-lbl">Mensual</div><div class="price-val">Desde 500€</div></div>
+                        </div>
+                        <div class="pack-features-list">
+                            <div class="pf-section-title">Todo de Lead System +</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> 1 canal Ads: Google o Meta</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Hasta 6 creatividades/mes</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Optimización semanal (CTR, CPL)</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Google Tag Manager + GA4</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> GHL ↔ Ads sincronizados</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> API de conversión + Reportes</div>
+                        </div>
+                        <div class="pack-bottom">
+                            <div class="pack-roi" style="color:var(--accent-blue-light);">ROI 5x – 8x</div>
+                            <div class="roi-bar"><div class="roi-fill" style="width:58%;background:linear-gradient(90deg,#1e3a8a,var(--accent-blue));"></div></div>
+                            <div class="pack-ia">🤖 IA opcional · desde 900€</div>
+                            <div class="pack-timing-s">⏱ 20–30 días · Mínimo 3 meses</div>
+                            <div class="pack-note-ads">⚠ Inversión en ads no incluida</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pack 03 -->
+                <div class="pack-card-lg">
+                    <div class="pack-head deep">
+                        <div class="pack-name">Pack 03</div>
+                        <div class="pack-title">Full System</div>
+                        <div class="pack-tagline">Sistema completo: IA + ads + optimización por revenue.</div>
+                    </div>
+                    <div class="pack-body-lg">
+                        <div class="pack-price">
+                            <div class="price-tag"><div class="price-lbl">Setup</div><div class="price-val">3.000–4.500€</div></div>
+                            <div class="price-tag"><div class="price-lbl">Mensual</div><div class="price-val">1.000–3.000€</div></div>
+                        </div>
+                        <div class="pack-features-list">
+                            <div class="pf-section-title">Todo de Growth +</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Google Ads + Meta Ads — ambos</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> 10 creatividades + A/B testing</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Workflows complejos + APIs</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Lead scoring avanzado</div>
+                            <div class="pf-section-title">🤖 IA incluida</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Atención 24/7 WhatsApp + web</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Calificación + booking sin intervención</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Gestión objeciones + escalado</div>
+                            <div class="pf-section-title">Revenue</div>
+                            <div class="pf-item-s"><span class="pf-check">✓</span> Análisis pipeline + reportes estratégicos</div>
+                        </div>
+                        <div class="pack-bottom">
+                            <div class="pack-roi" style="color:var(--accent-green);">ROI 6x – 12x</div>
+                            <div class="roi-bar"><div class="roi-fill" style="width:80%;background:linear-gradient(90deg,#060a14,#1e3a8a);"></div></div>
+                            <div class="pack-ia included">✓ IA avanzada incluida</div>
+                            <div class="pack-timing-s">⏱ 30–60 días · Mínimo 3–6 meses</div>
+                            <div class="pack-note-ads">⚠ Inversión en ads no incluida</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--micro-size);color:var(--text-dim);text-align:center;margin-top:clamp(4px,0.6vh,8px);">
+                Cada plan incluye todo lo del anterior · Escala cuando quieras
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 9: TIMELINE
+         =========================================== -->
+    <section class="slide bg-grid" id="slide-timeline">
+        <div class="slide-content centered max-w">
+            <div class="label reveal" style="margin-bottom:clamp(8px,1.5vh,16px);">Implementación</div>
+            <h2 class="heading reveal" style="font-size:var(--h2-size);margin-bottom:clamp(6px,1vh,12px);">
+                De cero al sistema <span class="grad-text">en 4 fases</span>
+            </h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--text-secondary);margin-bottom:clamp(16px,3vh,36px);max-width:min(90vw,480px);">Sin interrumpir tu negocio. Cada fase se entrega, testa y aprueba antes de avanzar.</p>
+            <div class="timeline-grid reveal">
+                <div class="tl-card">
+                    <div class="tl-num grad-text">01</div>
+                    <div class="tl-phase">Semana 1</div>
+                    <div class="tl-title">Infraestructura</div>
+                    <div class="tl-desc">CRM, pipeline, WhatsApp, calendario y campos personalizados.</div>
+                    <div class="tl-connector">→</div>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-num grad-text">02</div>
+                    <div class="tl-phase">Semana 1–2</div>
+                    <div class="tl-title">Captación</div>
+                    <div class="tl-desc">Landing optimizada, formularios conectados, primera secuencia activa.</div>
+                    <div class="tl-connector">→</div>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-num grad-text">03</div>
+                    <div class="tl-phase">Semana 2–3</div>
+                    <div class="tl-title">Bots & automatización</div>
+                    <div class="tl-desc">Calificación IA, booking automático, workflows avanzados.</div>
+                    <div class="tl-connector">→</div>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-num" style="background:linear-gradient(135deg,var(--accent-green-light),var(--accent-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">04</div>
+                    <div class="tl-phase" style="color:var(--accent-green-light);">Semana 3–4</div>
+                    <div class="tl-title">Lanzamiento</div>
+                    <div class="tl-desc">Sistema en marcha, primeros leads, ajustes con datos reales.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 10: CTA
+         =========================================== -->
+    <section class="slide bg-grid bg-glow-blue bg-glow-green" id="slide-cta">
+        <div class="slide-content centered">
+            <h2 class="display reveal" style="font-size:var(--title-size);margin-bottom:clamp(12px,2vh,24px);">
+                ¿Seguirás perdiendo<br><span class="grad-text">10.000€ al mes?</span>
+            </h2>
+            <p class="reveal" style="font-size:var(--body-size);color:var(--text-secondary);max-width:min(90vw,460px);line-height:1.6;margin-bottom:clamp(20px,4vh,48px);">
+                Cada día sin sistema es otro día perdiendo clientes que ya estaban listos para comprar.
+            </p>
+            <button class="cta-btn reveal" style="font-size:clamp(0.9rem,1.8vw,1.15rem);padding:clamp(14px,2vh,22px) clamp(32px,5vw,56px);">
+                Reserva tu consulta gratuita →
+            </button>
+            <p class="reveal" style="font-size:var(--micro-size);color:var(--text-dim);margin-top:clamp(12px,2vh,20px);">
+                Sin compromiso · 15 minutos · Análisis personalizado
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+       SLIDE PRESENTATION CONTROLLER
+       =========================================== -->
+    <script>
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.currentSlide = 0;
+            this.isScrolling = false;
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupProgressBar();
+            this.setupNavDots();
+            this.setupCounters();
+        }
+
+        /* --- Intersection Observer: add .visible when slide enters --- */
+        setupIntersectionObserver() {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        const idx = Array.from(this.slides).indexOf(e.target);
+                        if (idx >= 0) {
+                            this.currentSlide = idx;
+                            this.updateProgressBar();
+                            this.updateNavDots();
+                            this.runCounters(e.target);
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+            this.slides.forEach(s => obs.observe(s));
+        }
+
+        /* --- Keyboard: arrows, space, page up/down --- */
+        setupKeyboardNav() {
+            document.addEventListener('keydown', e => {
+                if (['ArrowDown', 'ArrowRight', 'Space', 'PageDown'].includes(e.code)) {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide + 1);
+                } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.code)) {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            });
+        }
+
+        /* --- Touch/swipe --- */
+        setupTouchNav() {
+            let startY = 0;
+            document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+            document.addEventListener('touchend', e => {
+                const diff = startY - e.changedTouches[0].clientY;
+                if (Math.abs(diff) > 50) {
+                    this.goToSlide(this.currentSlide + (diff > 0 ? 1 : -1));
+                }
+            }, { passive: true });
+        }
+
+        /* --- Progress bar --- */
+        setupProgressBar() {
+            this.progressBar = document.getElementById('progressBar');
+            this.updateProgressBar();
+        }
+        updateProgressBar() {
+            if (!this.progressBar) return;
+            const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+            this.progressBar.style.width = pct + '%';
+        }
+
+        /* --- Nav dots --- */
+        setupNavDots() {
+            const nav = document.getElementById('navDots');
+            if (!nav) return;
+            this.slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => this.goToSlide(i));
+                nav.appendChild(dot);
+            });
+            this.dots = nav.querySelectorAll('.nav-dot');
+        }
+        updateNavDots() {
+            if (!this.dots) return;
+            this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
+        }
+
+        /* --- Navigate to slide --- */
+        goToSlide(idx) {
+            idx = Math.max(0, Math.min(idx, this.slides.length - 1));
+            this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* --- Counter animations --- */
+        setupCounters() {
+            this.counted = new Set();
+        }
+        runCounters(container) {
+            container.querySelectorAll('[data-target]').forEach(el => {
+                if (this.counted.has(el)) return;
+                this.counted.add(el);
+                const t = parseInt(el.dataset.target);
+                const pre = el.dataset.prefix || '';
+                const suf = el.dataset.suffix || '';
+                let c = 0;
+                const step = Math.max(1, Math.ceil(t / 40));
+                const timer = setInterval(() => {
+                    c = Math.min(c + step, t);
+                    el.textContent = pre + c.toLocaleString('es-ES') + suf;
+                    if (c >= t) clearInterval(timer);
+                }, 30);
+            });
+        }
+    }
+
+    /* Initialize */
+    new SlidePresentation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cold Email — Mejoras para Joel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:#f1f5f9;
+    color:#1e293b;
+    line-height:1.6;
+  }
+
+  .wrapper{
+    max-width:860px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+  }
+
+  /* Header */
+  .doc-header{
+    background:linear-gradient(135deg,#060a14,#1e3a8a);
+    border-radius:16px;
+    padding:40px 48px;
+    color:#fff;
+    margin-bottom:32px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .doc-header::after{
+    content:'';
+    position:absolute;
+    top:-60px;right:-60px;
+    width:220px;height:220px;
+    background:radial-gradient(circle,rgba(37,99,235,.25),transparent 70%);
+    border-radius:50%;
+  }
+
+  .doc-meta{
+    display:flex;
+    gap:24px;
+    margin-bottom:20px;
+  }
+
+  .doc-meta span{
+    font-size:12px;
+    font-weight:500;
+    color:rgba(255,255,255,.45);
+    letter-spacing:.04em;
+  }
+
+  .doc-meta span strong{color:rgba(255,255,255,.8);}
+
+  .doc-header h1{
+    font-size:32px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    line-height:1.15;
+    position:relative;
+    z-index:1;
+  }
+
+  .doc-header h1 em{
+    font-style:normal;
+    color:#60a5fa;
+  }
+
+  .doc-header p{
+    font-size:15px;
+    color:rgba(255,255,255,.6);
+    margin-top:10px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* Section titles */
+  .section{margin-bottom:36px;}
+
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#2563eb;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .section-title::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:#e2e8f0;
+  }
+
+  /* Problem table */
+  .problem-card{
+    background:#fff;
+    border-radius:12px;
+    padding:28px 32px;
+    border:1px solid #e2e8f0;
+  }
+
+  table{width:100%;border-collapse:collapse;}
+
+  thead tr{background:#f8fafc;}
+
+  th{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#94a3b8;
+    padding:10px 16px;
+    text-align:left;
+    border-bottom:1px solid #e2e8f0;
+  }
+
+  td{
+    padding:12px 16px;
+    font-size:14px;
+    color:#475569;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:top;
+  }
+
+  tr:last-child td{border-bottom:none;}
+
+  td:first-child{font-weight:700;color:#1e293b;width:30px;}
+
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:3px 10px;
+    border-radius:100px;
+    background:#fef2f2;
+    color:#dc2626;
+    border:1px solid #fecaca;
+  }
+
+  /* Email cards */
+  .email-card{
+    background:#fff;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+
+  .email-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 28px;
+    background:#f8fafc;
+    border-bottom:1px solid #e2e8f0;
+  }
+
+  .email-step{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .step-badge{
+    width:32px;height:32px;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:700;
+    flex-shrink:0;
+  }
+
+  .step-name{
+    font-size:14px;
+    font-weight:600;
+    color:#1e293b;
+  }
+
+  .step-day{
+    font-size:12px;
+    font-weight:500;
+    color:#94a3b8;
+    background:#e2e8f0;
+    padding:4px 12px;
+    border-radius:100px;
+  }
+
+  .email-subjects{
+    padding:16px 28px;
+    border-bottom:1px solid #f1f5f9;
+    background:#fafbfc;
+  }
+
+  .subject-label{
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#94a3b8;
+    margin-bottom:8px;
+  }
+
+  .subject-variants{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .subject-pill{
+    font-size:12.5px;
+    font-weight:500;
+    color:#1e3a8a;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    border-radius:8px;
+    padding:6px 14px;
+  }
+
+  .email-body{
+    padding:24px 28px;
+    border-bottom:1px solid #f1f5f9;
+  }
+
+  .email-body p{
+    font-size:14px;
+    color:#334155;
+    line-height:1.7;
+    margin-bottom:8px;
+    font-family:'Inter',sans-serif;
+  }
+
+  .var{
+    color:#7c3aed;
+    font-weight:500;
+  }
+
+  .email-why{
+    padding:16px 28px;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:#f0fdf4;
+  }
+
+  .why-icon{
+    width:20px;height:20px;
+    background:#10b981;
+    color:#fff;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:700;
+    flex-shrink:0;
+    margin-top:1px;
+  }
+
+  .why-text{
+    font-size:13px;
+    color:#065f46;
+    line-height:1.55;
+  }
+
+  .why-text strong{font-weight:600;}
+
+  /* Config + metrics tables */
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+
+  .data-card{
+    background:#fff;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    overflow:hidden;
+  }
+
+  .data-card-title{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#64748b;
+    padding:14px 20px;
+    background:#f8fafc;
+    border-bottom:1px solid #e2e8f0;
+  }
+
+  .data-card table{margin:0;}
+
+  .data-card td{
+    padding:10px 20px;
+    font-size:13px;
+  }
+
+  .data-card td:last-child{
+    font-weight:600;
+    color:#1e293b;
+    text-align:right;
+  }
+
+  .val-green{color:#10b981 !important;}
+  .val-red{color:#dc2626 !important;}
+  .val-blue{color:#2563eb !important;}
+
+  /* Footer */
+  .doc-footer{
+    text-align:center;
+    margin-top:48px;
+    font-size:12px;
+    color:#94a3b8;
+  }
+
+  .brand{font-weight:700;color:#1e293b;}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-meta">
+      <span><strong>Para:</strong> Joel</span>
+      <span><strong>De:</strong> Redas</span>
+      <span><strong>Fecha:</strong> 25 marzo 2026</span>
+    </div>
+    <h1>Cold Email Clínicas Dentales<br><em>Diagnóstico + propuesta de mejora</em></h1>
+    <p>La secuencia actual no genera respuestas. Aquí está el por qué y cómo lo arreglamos.</p>
+  </div>
+
+  <!-- PROBLEMAS -->
+  <div class="section">
+    <div class="section-title">El problema — por qué no responden</div>
+    <div class="problem-card">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Problema</th>
+            <th>Dónde ocurre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Email 1 demasiado largo — 3 preguntas de golpe. Nadie lee más de 5 líneas en un cold email en 2026</td>
+            <td><span class="tag">Step 1</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Hook genérico — "he visto que tenéis bastante movimiento de citas" no demuestra que sabemos nada de ellos</td>
+            <td><span class="tag">Step 1</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Táctica "curiosidad → pitch en follow-up" completamente quemada en 2026. Los decisores la reconocen al instante</td>
+            <td><span class="tag">Step 1 → 2</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>"Prometo que este es mi último mensaje" — la frase más usada del cold email. Ya no genera ninguna reacción</td>
+            <td><span class="tag">Step 3</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Pedimos una llamada demasiado pronto — en el segundo contacto. El CTA es demasiado pesado</td>
+            <td><span class="tag">Step 2</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Sin prueba social con número real. "En otras clínicas" no convence. Necesita cifra concreta</td>
+            <td><span class="tag">Toda la secuencia</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NUEVA SECUENCIA -->
+  <div class="section">
+    <div class="section-title">Propuesta — nueva secuencia (4 steps)</div>
+
+    <!-- STEP 1 -->
+    <div class="email-card">
+      <div class="email-card-header">
+        <div class="email-step">
+          <div class="step-badge">1</div>
+          <div class="step-name">Primer contacto — curiosidad + número real</div>
+        </div>
+        <div class="step-day">Día 0</div>
+      </div>
+      <div class="email-subjects">
+        <div class="subject-label">Asuntos (A/B)</div>
+        <div class="subject-variants">
+          <div class="subject-pill">pregunta rápida, <span class="var">{{firstName}}</span></div>
+          <div class="subject-pill">las citas perdidas de <span class="var">{{companyName}}</span></div>
+          <div class="subject-pill"><span class="var">{{companyName}}</span> — una cosa que vi</div>
+        </div>
+      </div>
+      <div class="email-body">
+        <p>Hola <span class="var">{{firstName}}</span>,</p>
+        <p>Trabajo con clínicas dentales en España automatizando la recuperación de pacientes que no se presentan.</p>
+        <p>Una clínica en <span class="var">{{city}}</span> recuperó 14 huecos muertos el primer mes — sin que recepción tuviera que llamar a nadie.</p>
+        <p>¿Es la gestión de no-shows algo que estáis mirando ahora mismo en <span class="var">{{companyName}}</span>, o ya lo tenéis resuelto?</p>
+        <p><span class="var">{{senderName}}</span></p>
+      </div>
+      <div class="email-why">
+        <div class="why-icon">✓</div>
+        <div class="why-text"><strong>Por qué funciona:</strong> personalización real (ciudad), número específico (14 huecos), pregunta fácil de responder sí/no, 60 palabras, sin pitch ni presión.</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="email-card">
+      <div class="email-card-header">
+        <div class="email-step">
+          <div class="step-badge">2</div>
+          <div class="step-name">Follow-up — revelar el sistema + CTA suave</div>
+        </div>
+        <div class="step-day">Día 3</div>
+      </div>
+      <div class="email-subjects">
+        <div class="subject-label">Asunto (reply thread)</div>
+        <div class="subject-variants">
+          <div class="subject-pill">re: pregunta rápida, <span class="var">{{firstName}}</span></div>
+        </div>
+      </div>
+      <div class="email-body">
+        <p><span class="var">{{firstName}}</span>, por si se perdió entre los demás correos.</p>
+        <p>Para darte contexto: montamos un sistema que manda recordatorios por WhatsApp y reagenda automáticamente cuando el paciente no confirma. Sin apps nuevas, sin cambiar vuestro sistema actual.</p>
+        <p>En clínicas con 8–15 citas al día, el ahorro medio es de 2.200€/mes en huecos recuperados.</p>
+        <p>Si tiene sentido para <span class="var">{{companyName}}</span>, ¿te parece bien que te mande un resumen de cómo funciona? (un PDF de 2 páginas, sin llamada)</p>
+        <p><span class="var">{{senderName}}</span></p>
+      </div>
+      <div class="email-why">
+        <div class="why-icon">✓</div>
+        <div class="why-text"><strong>Por qué funciona:</strong> CTA de baja fricción — pide un PDF, no una llamada. Número concreto (2.200€/mes). No impone nada.</div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="email-card">
+      <div class="email-card-header">
+        <div class="email-step">
+          <div class="step-badge">3</div>
+          <div class="step-name">Ángulo nuevo — coste de tiempo del equipo</div>
+        </div>
+        <div class="step-day">Día 7</div>
+      </div>
+      <div class="email-subjects">
+        <div class="subject-label">Asuntos (A/B)</div>
+        <div class="subject-variants">
+          <div class="subject-pill">el coste oculto de <span class="var">{{companyName}}</span></div>
+          <div class="subject-pill">¿cuánto tiempo pierde recepción al día en esto?</div>
+        </div>
+      </div>
+      <div class="email-body">
+        <p><span class="var">{{firstName}}</span>,</p>
+        <p>Dato que solemos ver en clínicas antes de trabajar con ellas:</p>
+        <p>Recepción dedica entre 45 min y 1h30 al día a confirmar citas, perseguir no-shows y reasignar huecos a mano.</p>
+        <p>Eso son 30+ horas al mes de una persona haciendo trabajo que se puede automatizar al 90%.</p>
+        <p>¿Eso os suena a <span class="var">{{companyName}}</span> o ya lo tenéis optimizado?</p>
+        <p><span class="var">{{senderName}}</span></p>
+      </div>
+      <div class="email-why">
+        <div class="why-icon">✓</div>
+        <div class="why-text"><strong>Por qué funciona:</strong> ángulo completamente diferente al Step 1 (tiempo del equipo, no dinero). Nueva oportunidad de responder sí/no para quien ignoró los anteriores.</div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="email-card">
+      <div class="email-card-header">
+        <div class="email-step">
+          <div class="step-badge">4</div>
+          <div class="step-name">Breakup con valor — dejar buena impresión</div>
+        </div>
+        <div class="step-day">Día 12</div>
+      </div>
+      <div class="email-subjects">
+        <div class="subject-label">Asuntos (A/B)</div>
+        <div class="subject-variants">
+          <div class="subject-pill">último mensaje, <span class="var">{{firstName}}</span></div>
+          <div class="subject-pill">te dejo esto por si acaso</div>
+        </div>
+      </div>
+      <div class="email-body">
+        <p><span class="var">{{firstName}}</span>,</p>
+        <p>No voy a insistir más — entiendo que el timing no siempre es el correcto.</p>
+        <p>Te dejo esto por si te es útil: hemos documentado los 5 errores más comunes en la gestión de citas en clínicas dentales. Sin pitch, solo el documento.</p>
+        <p>¿Lo quieres?</p>
+        <p>Y si en algún momento el tema vuelve a estar sobre la mesa, aquí estaré.</p>
+        <p><span class="var">{{senderName}}</span></p>
+      </div>
+      <div class="email-why">
+        <div class="why-icon">✓</div>
+        <div class="why-text"><strong>Por qué funciona:</strong> no mendiga, aporta valor real (el PDF), deja la puerta abierta con dignidad. Los que responden aquí son leads calientes.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG + MÉTRICAS -->
+  <div class="section">
+    <div class="section-title">Configuración y métricas esperadas</div>
+    <div class="two-col">
+      <div class="data-card">
+        <div class="data-card-title">Configuración Instantly</div>
+        <table>
+          <tr><td>Step 1 → 2</td><td>3 días</td></tr>
+          <tr><td>Step 2 → 3</td><td>4 días</td></tr>
+          <tr><td>Step 3 → 4</td><td>5 días</td></tr>
+          <tr><td>Hora de envío</td><td>9:00–10:30h</td></tr>
+          <tr><td>Días activos</td><td>Mar, mié, jue</td></tr>
+          <tr><td>Emails/día por dominio</td><td>Máx. 40</td></tr>
+          <tr><td>Stop on reply</td><td class="val-green">✓ Activado</td></tr>
+        </table>
+      </div>
+      <div class="data-card">
+        <div class="data-card-title">Resultados esperados</div>
+        <table>
+          <tr><td>Open rate</td><td class="val-blue">35–45%</td></tr>
+          <tr><td>Reply rate actual</td><td class="val-red">~0–1%</td></tr>
+          <tr><td>Reply rate objetivo</td><td class="val-green">3–6%</td></tr>
+          <tr><td>Interesados reales</td><td class="val-green">1–3%</td></tr>
+          <tr><td>Tests prioritarios</td><td>Asuntos Step 1</td></tr>
+          <tr><td>CTA a probar</td><td>PDF vs llamada</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="brand">omnexor.</span> — Documento interno · Marzo 2026
+  </div>
+
+</div>
+</body>
+</html>

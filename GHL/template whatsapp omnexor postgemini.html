@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Templates WhatsApp — Omnexor (Master Copy Edition)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f1117; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.7; }
+  .header { background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%); border-bottom: 1px solid #2d3748; padding: 32px 40px; }
+  .header h1 { font-size: 26px; font-weight: 700; color: #f7fafc; margin-bottom: 4px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
+  .section-title { font-size: 17px; font-weight: 700; color: #f7fafc; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #2d3748; }
+  .tpl-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3748; margin-bottom: 20px; overflow: hidden; }
+  .tpl-header { padding: 12px 20px; border-bottom: 1px solid #2d3748; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+  .tpl-name { font-family: monospace; font-size: 11px; color: #63b3ed; background: rgba(99,179,237,0.1); padding: 2px 8px; border-radius: 4px; }
+  .tpl-body { padding: 16px 20px; }
+  .wa-bubble { background: #1e3a2f; border-radius: 12px; padding: 14px 16px; max-width: 500px; border-left: 4px solid #68d391; }
+  .wa-body { color: #e2e8f0; white-space: pre-wrap; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Templates WhatsApp — Omnexor (Versión Final Master)</h1>
+  <p style="color:#718096">**Estructura: Saludo en Body | Con Emoticonos | Recordatorios Asertivos | Luna como Equipo**</p>
+</div>
+
+<div class="container">
+
+  <div class="section-title">WF-1 Activación — Captación</div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>1. Bienvenida</h3><span class="tpl-name">omx_bienvenida_lead</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, gracias por tu interés en Omnexor.** 👋 **Para aprovechar al máximo nuestra sesión, le he pedido a Luna, de mi equipo, que te haga un par de preguntas rápidas sobre la operativa de {{4}}.** 📋 **¿Tienes 2 minutos ahora mismo para responderle?**</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>2. Seguimiento 2h</h3><span class="tpl-name">omx_followup_2h</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, te escribo rápido.** ⚡ **Imagino que estás a tope, pero quería saber si pudiste revisar esos detalles con Luna sobre la captación en {{4}}.** 🚀 **Si tienes cualquier duda, dime y te echo una mano.**</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>3. Último aviso 24h</h3><span class="tpl-name">omx_followup_24h</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, este es mi último mensaje para no saturar tu bandeja.** 📩 **Tenemos disponibilidad para analizar el caso de {{4}} en una sesión rápida y ver si nuestra metodología os encaja. Si te interesa, avísame. Si no es el momento, lo dejamos aquí sin problema.** 👍</div></div></div>
+  </div>
+
+  <div class="section-title">WF-3 Recordatorios — Notificación Directa</div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>4. Confirmación Cita</h3><span class="tpl-name">omx_confirmacion_cita</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, sesión confirmada.** ✅ **Nos vemos el {{2}} a las {{3}}. Analizaremos cómo optimizar el proceso de {{4}} para que no se escape ningún lead.** 📈 **Te pasaré el enlace por aquí 5 minutos antes de empezar.**</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>5. Recordatorio 24h</h3><span class="tpl-name">omx_recordatorio_24h</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, mañana es nuestra sesión.** 📅 **Nos vemos el {{2}} a las {{3}}. He estado revisando el caso de {{4}} y tengo un par de puntos específicos que quiero enseñarte.** 🔍 **¡Hablamos mañana!**</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>6. Recordatorio 1h</h3><span class="tpl-name">omx_recordatorio_1h</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, empezamos en exactamente una hora.** ⏳ **Te dejo ya el enlace por aquí para que lo tengas a mano: {{5}}. Nos vemos en un rato para repasar la estrategia de {{4}}.** 💻</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>7. Recordatorio 5 min</h3><span class="tpl-name">omx_recordatorio_5min</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, yo ya estoy dentro de la sala.** 🎯 **Te dejo el enlace de nuevo a mano por si acaso: {{5}}. ¡Te espero!**</div></div></div>
+  </div>
+
+  <div class="section-title">WF No Show — Recuperación Elegante</div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>8. Contacto No-Show (Opción Agenda)</h3><span class="tpl-name">omx_noshow_contacto</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, lamento que no hayamos podido conectar hoy.** ✉️ **Supongo que habrás tenido algún imprevisto de agenda en {{4}}. Si sigues con interés en optimizar vuestra captación, dime qué otro momento te encaja y buscamos un nuevo hueco.** 👋</div></div></div>
+  </div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>9. Recuperación Final (24h)</h3><span class="tpl-name">omx_noshow_24h</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, te escribo por última vez sobre nuestra sesión pendiente.** 📩 **Si mejorar la captación en {{4}} ya no es una prioridad para vosotros, lo entiendo perfectamente y cerramos el seguimiento aquí. Si solo fue un cruce de horarios, avísame y buscamos un minuto rápido.** 👋</div></div></div>
+  </div>
+
+  <div class="section-title">WF Post-Sesión — Validación Final</div>
+
+  <div class="tpl-card">
+    <div class="tpl-header"><h3>10. Gracias + Siguiente Paso</h3><span class="tpl-name">omx_post_sesion</span></div>
+    <div class="tpl-body"><div class="wa-bubble"><div class="wa-body">**Hola {{1}}, un placer saludarte tras nuestra charla.** 😊 **Ha sido muy productivo validar cómo encaja nuestra metodología en la operativa de {{4}}. Seguimos en contacto para los siguientes pasos. ¡Hablamos pronto! 🚀**</div></div></div>
+  </div>
+
+</div>
+</body>
+</html>

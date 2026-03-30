@@ -1,0 +1,818 @@
+{
+  "name": "WF1 - Bot Luna - Cualificación Omnexor",
+  "nodes": [
+    {
+      "id": "wh-01",
+      "name": "Webhook - Mensaje WA",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "parameters": {
+        "path": "luna-cualificacion",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "resp-01",
+      "name": "Responder 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [220, 100],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "OK",
+        "options": {}
+      }
+    },
+    {
+      "id": "set-01",
+      "name": "Extraer Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "contactId",      "value": "={{ $json.body.contactId }}",                              "type": "string" },
+            { "id": "2", "name": "messageBody",    "value": "={{ $json.body.body || $json.body.message || '' }}",       "type": "string" },
+            { "id": "3", "name": "conversationId", "value": "={{ $json.body.conversationId }}",                        "type": "string" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "http-get-contact",
+      "name": "GHL - Obtener Contacto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Variables').item.json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Version", "value": "2021-07-28" }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" }
+      }
+    },
+    {
+      "id": "set-02",
+      "name": "Extraer Step y Tags",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1",  "name": "luna_step",             "value": "={{ ($json.customFields || []).find(f => f.key === 'luna_step')?.value || '' }}",                           "type": "string"  },
+            { "id": "2",  "name": "has_anna_activa",       "value": "={{ ($json.tags || []).includes('anna_activa') }}",                                                         "type": "boolean" },
+            { "id": "3",  "name": "has_bot_completado",    "value": "={{ ($json.tags || []).includes('bot_completado') }}",                                                      "type": "boolean" },
+            { "id": "4",  "name": "first_name",            "value": "={{ $json.firstName || '' }}",                                                                              "type": "string"  },
+            { "id": "5",  "name": "dedica_empresanegocio", "value": "={{ ($json.customFields || []).find(f => f.key === 'dedica_empresanegocio')?.value || '' }}",               "type": "string"  },
+            { "id": "6",  "name": "mayor_desafio",         "value": "={{ ($json.customFields || []).find(f => f.key === 'mayor_desafio_ahora_mismo')?.value || '' }}",           "type": "string"  },
+            { "id": "7",  "name": "contactId",             "value": "={{ $('Extraer Variables').item.json.contactId }}",                                                         "type": "string"  },
+            { "id": "8",  "name": "messageBody",           "value": "={{ $('Extraer Variables').item.json.messageBody }}",                                                       "type": "string"  },
+            { "id": "9",  "name": "conversationId",        "value": "={{ $('Extraer Variables').item.json.conversationId }}",                                                    "type": "string"  }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "if-tags",
+      "name": "Filtro Tags",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "leftValue": "={{ $json.has_anna_activa }}",    "rightValue": true,  "operator": { "type": "boolean", "operation": "equals" } },
+            { "leftValue": "={{ $json.has_bot_completado }}", "rightValue": false, "operator": { "type": "boolean", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "noop-stop",
+      "name": "Stop - No aplica",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [880, 100],
+      "parameters": {}
+    },
+    {
+      "id": "switch-step",
+      "name": "Switch luna_step",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1100, 300],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "rules": [
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "",         "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 0" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "1",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 1" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "2",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 2" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "3",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 3" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "4",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 4" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "5",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Paso 5" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "decisor",  "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Decisor" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.luna_step }}", "rightValue": "booking",  "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Booking" }
+          ]
+        },
+        "options": {}
+      }
+    },
+
+    // ─── PASO 0: Bienvenida ───────────────────────────────────────────────────
+    {
+      "id": "p0-update",
+      "name": "P0 - Actualizar Step a 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 80],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"luna_step\", \"field_value\": \"1\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "p0-msg",
+      "name": "P0 - Enviar Bienvenida",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 80],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"Hola {{ $('Extraer Step y Tags').item.json.first_name }} 👋 Soy Luna, del equipo de Omnexor. Antes de pasarte con el equipo, te hago un par de preguntas rápidas para ayudarte mejor. ¿Empezamos?\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO 1: Empresa / Perfil cliente ─────────────────────────────────────
+    {
+      "id": "p1-update",
+      "name": "P1 - Guardar perfil_cliente + Step 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 240],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"perfil_cliente\", \"field_value\": \"{{ $json.messageBody }}\" },\n    { \"key\": \"luna_step\",     \"field_value\": \"2\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "p1-msg",
+      "name": "P1 - Enviar Pregunta Desafío",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 240],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"{{ $('Extraer Step y Tags').item.json.mayor_desafio ? 'Me comentaste que lo que más os cuesta es ' + $('Extraer Step y Tags').item.json.mayor_desafio + '... ¿qué es lo que más os quita el sueño de ese tema?' : '¿Cuál dirías que es vuestro mayor obstáculo ahora mismo para conseguir clientes de forma estable?' }}\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO 2: Desafío ──────────────────────────────────────────────────────
+    {
+      "id": "p2-update",
+      "name": "P2 - Guardar mayor_desafio + Step 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 400],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"mayor_desafio_ahora_mismo\", \"field_value\": \"{{ $json.messageBody }}\" },\n    { \"key\": \"luna_step\",               \"field_value\": \"3\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "p2-msg",
+      "name": "P2 - Enviar Pregunta Facturación",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"Una pregunta de contexto: ¿en qué rango estáis de facturación mensual? Un aproximado me sirve 😊\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO 3: Facturación ──────────────────────────────────────────────────
+    {
+      "id": "p3-update",
+      "name": "P3 - Guardar facturacion_media + Step 4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 560],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"facturacion_media\", \"field_value\": \"{{ $json.messageBody }}\" },\n    { \"key\": \"luna_step\",       \"field_value\": \"4\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "p3-msg",
+      "name": "P3 - Enviar Pregunta Historial",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 560],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"¿Habéis probado antes alguna estrategia de captación? Ads, SEO, agencias...\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO 4: Historial ────────────────────────────────────────────────────
+    {
+      "id": "p4-update",
+      "name": "P4 - Guardar intentado_antes + Step 5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 720],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"intentado_antes\", \"field_value\": \"{{ $json.messageBody }}\" },\n    { \"key\": \"luna_step\",     \"field_value\": \"5\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "p4-msg",
+      "name": "P4 - Enviar Pregunta Presupuesto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 720],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"Para que la reunión sea lo más útil posible, ¿qué presupuesto mensual estimáis para invertir en captación? (un rango aproximado está genial)\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO 5: Presupuesto + OpenAI Tier ───────────────────────────────────
+    {
+      "id": "p5-update",
+      "name": "P5 - Guardar presupuesto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 880],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"presupuesto\", \"field_value\": \"{{ $json.messageBody }}\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "openai-tier",
+      "name": "OpenAI - Clasificar Tier",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 880],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Analiza la respuesta del lead sobre su presupuesto mensual de marketing. Clasifica en UNA sola palabra sin espacios ni explicaciones adicionales:\\n- Enterprise (presupuesto igual o mayor a 5000€ al mes)\\n- Midmarket (entre 1500€ y 4999€ al mes)\\n- Small (entre 150€ y 1499€ al mes)\\n- Nocualificado (menos de 150€ o claramente sin presupuesto)\\n- Nosabe (ambiguo, no sabe, no quiere decirlo, respuesta evasiva)\\n\\nEjemplos: 'unos 2000 euros' → Midmarket. 'no sé' → Nosabe. 'poco, unos 50€' → Nocualificado. 'sobre 6000' → Enterprise. Devuelve SOLO la palabra.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"={{ $('Extraer Step y Tags').item.json.messageBody }}\"\n    }\n  ],\n  \"temperature\": 0,\n  \"max_tokens\": 20\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_OPENAI_CRED_ID", "name": "OpenAI API Key" } }
+    },
+    {
+      "id": "set-tier",
+      "name": "Extraer Tier",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1760, 880],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "tier",           "value": "={{ $json.choices[0].message.content.trim() }}",                          "type": "string" },
+            { "id": "2", "name": "contactId",      "value": "={{ $('Extraer Step y Tags').item.json.contactId }}",                      "type": "string" },
+            { "id": "3", "name": "conversationId", "value": "={{ $('Extraer Step y Tags').item.json.conversationId }}",                 "type": "string" },
+            { "id": "4", "name": "first_name",     "value": "={{ $('Extraer Step y Tags').item.json.first_name }}",                     "type": "string" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "switch-tier",
+      "name": "Switch Tier",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1980, 880],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "rules": [
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.tier }}", "rightValue": "Enterprise",    "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Enterprise" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.tier }}", "rightValue": "Midmarket",     "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Midmarket" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.tier }}", "rightValue": "Small",         "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Small" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.tier }}", "rightValue": "Nosabe",        "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Nosabe" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.tier }}", "rightValue": "Nocualificado", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Nocualificado" }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      }
+    },
+
+    // ─── TIER: Cualificado (Enterprise / Midmarket / Small) → Pregunta Decisor
+    {
+      "id": "tier-q-update",
+      "name": "Tier Cualificado - Guardar tier + Step decisor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2200, 700],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"tier\",       \"field_value\": \"{{ $json.tier }}\" },\n    { \"key\": \"luna_step\", \"field_value\": \"decisor\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "tier-q-msg",
+      "name": "Tier Cualificado - Enviar Pregunta Decisor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2420, 700],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"Perfecto 👌 Una última cosa antes de buscar hueco: ¿tú eres quien toma las decisiones sobre inversiones en marketing, o hay alguien más involucrado?\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── TIER: Nosabe ─────────────────────────────────────────────────────────
+    {
+      "id": "nosabe-update",
+      "name": "Nosabe - Guardar tier + Step booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2200, 880],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"tier\",       \"field_value\": \"Nosabe\" },\n    { \"key\": \"luna_step\", \"field_value\": \"booking\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "nosabe-msg",
+      "name": "Nosabe - Enviar Mensaje Empático",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2420, 880],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"No te preocupes, es normal no tener una cifra clara todavía 😊 En la demo lo vemos juntos. ¿Te parece bien que lo agendemos?\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── TIER: Nocualificado ──────────────────────────────────────────────────
+    {
+      "id": "nocualif-update",
+      "name": "Nocualificado - Guardar tier + Step fin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2200, 1060],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"tier\",       \"field_value\": \"Nocualificado\" },\n    { \"key\": \"luna_step\", \"field_value\": \"fin\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "nocualif-msg",
+      "name": "Nocualificado - Enviar Despedida",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2420, 1060],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"Muchas gracias por contarme, {{ $('Extraer Step y Tags').item.json.first_name }} 😊 Ahora mismo nuestros servicios están orientados a empresas con una inversión mínima en marketing. Si en algún momento cambia la situación, aquí estaremos. ¡Mucho éxito!\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "nocualif-add-tags",
+      "name": "Nocualificado - Añadir Tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2640, 1060],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"descartado\", \"bot_completado\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "nocualif-remove-tag",
+      "name": "Nocualificado - Quitar anna_activa",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2860, 1060],
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"anna_activa\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO DECISOR ─────────────────────────────────────────────────────────
+    {
+      "id": "decisor-update",
+      "name": "Decisor - Guardar es_decisor + Step booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 1200],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"customFields\": [\n    { \"key\": \"es_decisor\",  \"field_value\": \"{{ $json.messageBody }}\" },\n    { \"key\": \"luna_step\",  \"field_value\": \"booking\" }\n  ]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "decisor-msg",
+      "name": "Decisor - Enviar Link Agenda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 1200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"¡Genial! Vamos a buscar un hueco para que hables con el equipo. Elige el día y hora que mejor te venga 👇\\nOMNEXOR_CALENDAR_URL\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "decisor-add-tags",
+      "name": "Decisor - Añadir bot_completado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 1200],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"bot_completado\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "decisor-remove-tag",
+      "name": "Decisor - Quitar anna_activa",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1980, 1200],
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"anna_activa\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+
+    // ─── PASO BOOKING (desde Nosabe) ──────────────────────────────────────────
+    {
+      "id": "booking-msg",
+      "name": "Booking - Enviar Link Agenda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 1380],
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"type\": \"WhatsApp\",\n  \"conversationId\": \"{{ $('Extraer Step y Tags').item.json.conversationId }}\",\n  \"message\": \"¡Genial! Vamos a buscar un hueco para que hables con el equipo. Elige el día y hora que mejor te venga 👇\\nOMNEXOR_CALENDAR_URL\"\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "booking-add-tags",
+      "name": "Booking - Añadir bot_completado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 1380],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"bot_completado\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    },
+    {
+      "id": "booking-remove-tag",
+      "name": "Booking - Quitar anna_activa",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 1380],
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Extraer Step y Tags').item.json.contactId }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Version", "value": "2021-07-28" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\n  \"tags\": [\"anna_activa\"]\n}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "FILL_CRED_ID", "name": "GHL API Key" } }
+    }
+  ],
+
+  "connections": {
+    "Webhook - Mensaje WA": {
+      "main": [
+        [
+          { "node": "Responder 200",    "type": "main", "index": 0 },
+          { "node": "Extraer Variables", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Extraer Variables": {
+      "main": [[{ "node": "GHL - Obtener Contacto", "type": "main", "index": 0 }]]
+    },
+    "GHL - Obtener Contacto": {
+      "main": [[{ "node": "Extraer Step y Tags", "type": "main", "index": 0 }]]
+    },
+    "Extraer Step y Tags": {
+      "main": [[{ "node": "Filtro Tags", "type": "main", "index": 0 }]]
+    },
+    "Filtro Tags": {
+      "main": [
+        [{ "node": "Switch luna_step",  "type": "main", "index": 0 }],
+        [{ "node": "Stop - No aplica",  "type": "main", "index": 0 }]
+      ]
+    },
+    "Switch luna_step": {
+      "main": [
+        [{ "node": "P0 - Actualizar Step a 1",              "type": "main", "index": 0 }],
+        [{ "node": "P1 - Guardar perfil_cliente + Step 2",  "type": "main", "index": 0 }],
+        [{ "node": "P2 - Guardar mayor_desafio + Step 3",   "type": "main", "index": 0 }],
+        [{ "node": "P3 - Guardar facturacion_media + Step 4","type": "main", "index": 0 }],
+        [{ "node": "P4 - Guardar intentado_antes + Step 5", "type": "main", "index": 0 }],
+        [{ "node": "P5 - Guardar presupuesto",              "type": "main", "index": 0 }],
+        [{ "node": "Decisor - Guardar es_decisor + Step booking", "type": "main", "index": 0 }],
+        [{ "node": "Booking - Enviar Link Agenda",          "type": "main", "index": 0 }]
+      ]
+    },
+    "P0 - Actualizar Step a 1":             { "main": [[{ "node": "P0 - Enviar Bienvenida",              "type": "main", "index": 0 }]] },
+    "P1 - Guardar perfil_cliente + Step 2": { "main": [[{ "node": "P1 - Enviar Pregunta Desafío",         "type": "main", "index": 0 }]] },
+    "P2 - Guardar mayor_desafio + Step 3":  { "main": [[{ "node": "P2 - Enviar Pregunta Facturación",     "type": "main", "index": 0 }]] },
+    "P3 - Guardar facturacion_media + Step 4":{ "main": [[{ "node": "P3 - Enviar Pregunta Historial",     "type": "main", "index": 0 }]] },
+    "P4 - Guardar intentado_antes + Step 5":{ "main": [[{ "node": "P4 - Enviar Pregunta Presupuesto",     "type": "main", "index": 0 }]] },
+    "P5 - Guardar presupuesto":             { "main": [[{ "node": "OpenAI - Clasificar Tier",             "type": "main", "index": 0 }]] },
+    "OpenAI - Clasificar Tier":             { "main": [[{ "node": "Extraer Tier",                         "type": "main", "index": 0 }]] },
+    "Extraer Tier":                         { "main": [[{ "node": "Switch Tier",                          "type": "main", "index": 0 }]] },
+    "Switch Tier": {
+      "main": [
+        [{ "node": "Tier Cualificado - Guardar tier + Step decisor", "type": "main", "index": 0 }],
+        [{ "node": "Tier Cualificado - Guardar tier + Step decisor", "type": "main", "index": 0 }],
+        [{ "node": "Tier Cualificado - Guardar tier + Step decisor", "type": "main", "index": 0 }],
+        [{ "node": "Nosabe - Guardar tier + Step booking",           "type": "main", "index": 0 }],
+        [{ "node": "Nocualificado - Guardar tier + Step fin",        "type": "main", "index": 0 }]
+      ]
+    },
+    "Tier Cualificado - Guardar tier + Step decisor": { "main": [[{ "node": "Tier Cualificado - Enviar Pregunta Decisor", "type": "main", "index": 0 }]] },
+    "Nosabe - Guardar tier + Step booking":           { "main": [[{ "node": "Nosabe - Enviar Mensaje Empático",           "type": "main", "index": 0 }]] },
+    "Nosabe - Enviar Mensaje Empático":               { "main": [[{ "node": "Booking - Enviar Link Agenda",               "type": "main", "index": 0 }]] },
+    "Nocualificado - Guardar tier + Step fin":        { "main": [[{ "node": "Nocualificado - Enviar Despedida",           "type": "main", "index": 0 }]] },
+    "Nocualificado - Enviar Despedida":               { "main": [[{ "node": "Nocualificado - Añadir Tags",                "type": "main", "index": 0 }]] },
+    "Nocualificado - Añadir Tags":                    { "main": [[{ "node": "Nocualificado - Quitar anna_activa",         "type": "main", "index": 0 }]] },
+    "Decisor - Guardar es_decisor + Step booking":    { "main": [[{ "node": "Decisor - Enviar Link Agenda",              "type": "main", "index": 0 }]] },
+    "Decisor - Enviar Link Agenda":                   { "main": [[{ "node": "Decisor - Añadir bot_completado",           "type": "main", "index": 0 }]] },
+    "Decisor - Añadir bot_completado":                { "main": [[{ "node": "Decisor - Quitar anna_activa",              "type": "main", "index": 0 }]] },
+    "Booking - Enviar Link Agenda":                   { "main": [[{ "node": "Booking - Añadir bot_completado",           "type": "main", "index": 0 }]] },
+    "Booking - Añadir bot_completado":                { "main": [[{ "node": "Booking - Quitar anna_activa",              "type": "main", "index": 0 }]] }
+  },
+
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  }
+}

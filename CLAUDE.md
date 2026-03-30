@@ -103,3 +103,23 @@ Agencia de marketing digital que construye un sistema GHL propio y un modelo rep
 
 ### Notas
 
+
+---
+
+## Contexto personal (second brain)
+
+Archivos de contexto — cargar con @ cuando sea relevante, no se auto-importan:
+
+- `@context/me.md` — perfil de Redas
+- `@context/work.md` — detalle completo de Omnexor, packs, clientes, herramientas
+- `@context/team.md` — equipo (Redas + Joel)
+- `@context/current-priorities.md` — prioridades Q2 2026
+- `@context/goals.md` — milestones del trimestre
+
+**Decisiones importantes:** `decisions/log.md` (append-only)
+**Templates:** `templates/session-summary.md`
+
+### Skills a construir (backlog)
+- WF de onboarding replicable para clientes nuevos
+- Workflow de prospección outbound (clínicas, inmobiliarias)
+- Generador de pipelines base + calendarios GHL

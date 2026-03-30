@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría GHL — Omnexor</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f1117; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.7; }
+
+  .header { background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%); border-bottom: 1px solid #2d3748; padding: 32px 40px; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #f7fafc; margin-bottom: 4px; }
+  .header .meta { color: #718096; font-size: 13px; margin-bottom: 24px; }
+  .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+  .badge { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .badge-red { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+  .badge-orange { background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+  .badge-green { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+  .badge-blue { background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 40px; }
+  .section-title { font-size: 18px; font-weight: 700; color: #f7fafc; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #2d3748; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .summary-card { background: #1a1f2e; border-radius: 10px; padding: 20px; border: 1px solid #2d3748; text-align: center; }
+  .summary-card .num { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+  .summary-card .label { font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; }
+  .num-red { color: #fc8181; }
+  .num-orange { color: #f6ad55; }
+  .num-green { color: #68d391; }
+  .num-blue { color: #63b3ed; }
+
+  .critical-banner { background: rgba(252,129,129,0.08); border: 1px solid rgba(252,129,129,0.3); border-left: 4px solid #fc8181; border-radius: 8px; padding: 16px 20px; margin-bottom: 12px; }
+  .critical-banner .title { color: #fc8181; font-weight: 700; margin-bottom: 6px; font-size: 15px; }
+  .critical-banner .desc { color: #cbd5e0; font-size: 13px; line-height: 1.7; }
+
+  .matrix-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .matrix-table th { background: #1a1f2e; color: #a0aec0; font-size: 12px; text-transform: uppercase; padding: 10px 14px; text-align: left; border: 1px solid #2d3748; }
+  .matrix-table td { padding: 10px 14px; border: 1px solid #2d3748; vertical-align: top; line-height: 1.6; }
+  .matrix-table tr:nth-child(even) td { background: #161b27; }
+  .conflict-high { background: rgba(252,129,129,0.1) !important; }
+  .conflict-med { background: rgba(246,173,85,0.08) !important; }
+  .dot-red { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #fc8181; margin-right: 6px; }
+  .dot-orange { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f6ad55; margin-right: 6px; }
+
+  .wf-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3748; margin-bottom: 24px; overflow: hidden; }
+  .wf-card-header { padding: 16px 24px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid #2d3748; gap: 16px; }
+  .wf-card-header h3 { font-size: 16px; font-weight: 700; color: #f7fafc; }
+  .wf-card-header .trigger { font-size: 12px; color: #718096; margin-top: 3px; }
+  .wf-card-body { padding: 20px 24px; }
+
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; margin-bottom: 20px; padding: 16px; background: #0f1117; border-radius: 8px; border: 1px solid #2d3748; font-size: 12px; }
+  .flow-node { background: #2d3748; border-radius: 6px; padding: 4px 10px; color: #e2e8f0; }
+  .flow-node-trigger { background: rgba(99,179,237,0.2); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+  .flow-node-action { background: rgba(104,211,145,0.15); color: #68d391; }
+  .flow-node-wait { background: rgba(246,173,85,0.15); color: #f6ad55; }
+  .flow-node-condition { background: rgba(159,122,234,0.15); color: #b794f4; }
+  .flow-node-error { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+  .flow-arrow { color: #4a5568; align-self: center; }
+
+  .findings-table { width: 100%; border-collapse: collapse; }
+  .findings-table th { background: #161b27; color: #a0aec0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; text-align: left; border-bottom: 1px solid #2d3748; }
+  .findings-table td { padding: 14px 12px; border-bottom: 1px solid #1e2535; vertical-align: top; }
+  .findings-table tr:last-child td { border-bottom: none; }
+
+  .severity { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .sev-critical { background: rgba(252,129,129,0.2); color: #fc8181; }
+  .sev-important { background: rgba(246,173,85,0.2); color: #f6ad55; }
+  .sev-opt { background: rgba(104,211,145,0.2); color: #68d391; }
+
+  .finding-id { color: #4a5568; font-family: monospace; font-size: 11px; }
+  .finding-title { font-weight: 700; color: #f7fafc; font-size: 14px; margin-bottom: 6px; }
+  .finding-impact { color: #a0aec0; font-size: 13px; margin-bottom: 8px; line-height: 1.6; }
+
+  .steps { list-style: none; margin-top: 8px; }
+  .steps li { padding: 4px 0 4px 16px; font-size: 13px; color: #68d391; position: relative; line-height: 1.6; }
+  .steps li::before { content: "→"; position: absolute; left: 0; color: #4a5568; }
+
+  .transversal-item { background: #161b27; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; border-left: 3px solid #4a5568; }
+  .transversal-item.crit { border-left-color: #fc8181; }
+  .transversal-item.imp { border-left-color: #f6ad55; }
+  .transversal-title { font-weight: 700; margin-bottom: 8px; font-size: 15px; }
+  .transversal-desc { color: #a0aec0; font-size: 13px; line-height: 1.7; }
+
+  .checklist { list-style: none; }
+  .checklist li { padding: 16px 20px; border-bottom: 1px solid #1e2535; display: flex; gap: 14px; align-items: flex-start; }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #4a5568; flex-shrink: 0; margin-top: 3px; }
+  .check-content { flex: 1; }
+  .check-title { font-weight: 700; color: #f7fafc; margin-bottom: 4px; font-size: 14px; }
+  .check-meta { font-size: 12px; color: #718096; margin-bottom: 8px; }
+  .check-steps { list-style: none; }
+  .check-steps li { padding: 3px 0 3px 16px; font-size: 13px; color: #a0aec0; position: relative; line-height: 1.6; }
+  .check-steps li::before { content: "•"; position: absolute; left: 4px; color: #4a5568; }
+  .check-steps li strong { color: #63b3ed; }
+
+  .note-box { background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2); border-radius: 6px; padding: 10px 14px; margin-top: 8px; font-size: 12px; color: #90cdf4; }
+
+  .footer { text-align: center; padding: 40px; color: #4a5568; font-size: 12px; border-top: 1px solid #2d3748; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔍 Auditoría GHL — Omnexor</h1>
+  <div class="meta">Lead Solutions Architect Report &nbsp;·&nbsp; Marzo 2026 &nbsp;·&nbsp; 4 Workflows + 3 Bots analizados</div>
+  <div class="badges">
+    <span class="badge badge-red">🔴 8 Críticos</span>
+    <span class="badge badge-orange">🟠 10 Importantes</span>
+    <span class="badge badge-green">🟢 5 Optimizaciones</span>
+    <span class="badge badge-blue">📦 7 Elementos mapeados</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section-title">Resumen Ejecutivo</div>
+  <div class="summary-grid">
+    <div class="summary-card"><div class="num num-red">8</div><div class="label">Errores Críticos</div></div>
+    <div class="summary-card"><div class="num num-orange">10</div><div class="label">Importantes</div></div>
+    <div class="summary-card"><div class="num num-green">5</div><div class="label">Optimizaciones</div></div>
+    <div class="summary-card"><div class="num num-blue">7</div><div class="label">Elementos Analizados</div></div>
+  </div>
+
+  <div class="critical-banner">
+    <div class="title">🔴 C-01 · Loop infinito en Bot Luna — No condition met → Go To sin contador de iteraciones</div>
+    <div class="desc">Cuando el AI Splitter de presupuesto no reconoce la respuesta del lead, el flujo va a "No condition met" → #28 captura info → Go To de vuelta al splitter. Si el lead sigue respondiendo de forma ambigua, este ciclo se repite indefinidamente. No hay ningún mecanismo que lo detenga. El lead queda atrapado en el bot sin posibilidad de salir, y el canal queda bloqueado para esa conversación.</div>
+  </div>
+  <div class="critical-banner">
+    <div class="title">🔴 C-02 · Context Drift en 6 AI Captures secuenciales (Bot Luna #21–#27)</div>
+    <div class="desc">GHL Flow Builder V3 tiene un bug documentado: cuando hay múltiples nodos AI Capture encadenados, la IA lee el historial completo de la conversación e infiere respuestas que el lead no ha dado explícitamente. Puede saltarse preguntas enteras porque "cree" que ya tiene la respuesta. Sin prompts de aislamiento, los datos de cualificación (sector, desafío, facturación, presupuesto) pueden ser incorrectos. Resultado: tier erróneo → booking inútil → cierre fallido.</div>
+  </div>
+  <div class="critical-banner">
+    <div class="title">🔴 C-03 · bot_completado ausente en ramas terminales de Bot Luna</div>
+    <div class="desc">Las ramas "No cualificado" y "No sabe → No" terminan en FINAL o End Conversation sin añadir el tag bot_completado. Este tag es el único mecanismo que previene que Alex (bot de bienvenida) vuelva a activar Luna sobre un lead ya procesado. Sin él, un lead descartado puede entrar de nuevo en el flujo de cualificación.</div>
+  </div>
+  <div class="critical-banner">
+    <div class="title">🔴 C-04 · Mensajes libres enviados fuera de la ventana Meta de 24h — Fallos silenciosos</div>
+    <div class="desc">GHL no muestra error cuando un mensaje libre falla por la regla de 24h de Meta/WhatsApp Business: simplemente no se entrega. Los mensajes en riesgo son: (1) WF-1 Follow Up a 2h y 24h, (2) WF-3 "Confirmacion llamada", (3) WF No Show "primer mensaje". Si el lead lleva más de 24h sin responder, estos mensajes desaparecen sin dejar rastro.</div>
+  </div>
+  <div class="critical-banner">
+    <div class="title">🔴 C-05 · Doble creación/actualización de oportunidad: Flow Builder Luna + WF-2</div>
+    <div class="desc">Bot Luna tiene nodos "Crear o actualizar oportunidad" en las ramas de booking. WF-2 Enrutamiento también crea/actualiza oportunidad al detectar tags de tier. Ambos se ejecutan sobre el mismo lead. Esto provoca condiciones de carrera: el que ejecuta segundo sobreescribe al primero, y el stage final del pipeline depende de cuál llegó antes, no de la lógica de negocio.</div>
+  </div>
+
+  <div class="section-title">Matriz de Conflictos entre Elementos</div>
+  <table class="matrix-table">
+    <thead>
+      <tr><th>Elemento A</th><th>Elemento B</th><th>Tipo de conflicto</th><th>Riesgo</th></tr>
+    </thead>
+    <tbody>
+      <tr class="conflict-high">
+        <td>Bot Luna (Crear oportunidad en booking)</td>
+        <td>WF-2 Enrutamiento (Crear oportunidad)</td>
+        <td><span class="dot-red"></span>Doble escritura en pipeline — stage sobreescrito por el que ejecuta último</td>
+        <td><span class="severity sev-critical">CRÍTICO</span></td>
+      </tr>
+      <tr class="conflict-high">
+        <td>WF-3 Recordatorios (trigger: Confirmed)</td>
+        <td>WF-3 Recordatorios (reagendado)</td>
+        <td><span class="dot-red"></span>Al reagendar, el status vuelve a "Confirmed" → WF-3 se re-dispara → lead recibe todos los recordatorios de nuevo</td>
+        <td><span class="severity sev-critical">CRÍTICO</span></td>
+      </tr>
+      <tr class="conflict-med">
+        <td>WF-1 Activación (Bot califcar leads)</td>
+        <td>Bot Luna (sin bot_completado en algunas ramas)</td>
+        <td><span class="dot-orange"></span>Lead ya procesado puede re-entrar en WF-1 y ser enviado de nuevo al bot de cualificación</td>
+        <td><span class="severity sev-important">IMPORTANTE</span></td>
+      </tr>
+      <tr class="conflict-med">
+        <td>WF-2 (3 triggers tier separados)</td>
+        <td>WF-2 (mismo lead)</td>
+        <td><span class="dot-orange"></span>Si por edge case se asignan dos tier-tags, WF-2 ejecuta dos veces → doble actualización de oportunidad</td>
+        <td><span class="severity sev-important">IMPORTANTE</span></td>
+      </tr>
+      <tr class="conflict-med">
+        <td>Bot Omni General (Transfer Bot a Anna)</td>
+        <td>Anna (IA con prompt)</td>
+        <td><span class="dot-orange"></span>Transfer Bot tarda 30-60s en activar Anna. Sin mensaje puente, el lead queda en silencio y puede pensar que el bot falló</td>
+        <td><span class="severity sev-important">IMPORTANTE</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- WF-1 -->
+  <div class="section-title">WF-1 Activación</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-1 Activación</h3>
+        <div class="trigger">Trigger: Formulario enviado → Form is "Cualificación Pre-IA"</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">2 Críticos</span> <span class="badge badge-orange">2 Importantes</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Formulario Pre-IA</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Create Contact</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Crear oportunidad</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Template primer msg ✅</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-condition">Condition: replied?</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Contestó → Bot califcar leads</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-wait">No contestó → Wait 2h → Follow Up → Cond.</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">None → FINAL sin acción ⚠️</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">WF1-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">WhatsApp Follow Up tras >24h enviado como mensaje libre</div>
+              <div class="finding-impact">El primer mensaje usa template ✅ correcto. Pero el Follow Up a 2h y el de 24h se envían como mensajes libres. Si el lead lleva más de 24h sin escribir (lo cual es lo normal en un no-responde), WhatsApp Business bloquea silenciosamente el mensaje. El lead nunca lo recibe. El workflow continúa como si nada, creyendo que el mensaje fue entregado.</div>
+              <ul class="steps">
+                <li>Ir al nodo "WhatsApp Follow Up" del nivel 2h en WF-1.</li>
+                <li>Verificar si el tipo de nodo es "WhatsApp" libre o "Send WhatsApp Template".</li>
+                <li>Si es mensaje libre: crear un template en Meta Business Manager con el texto del follow up. Esperar aprobación (24-48h).</li>
+                <li>Una vez aprobado, reemplazar el nodo por "Send WhatsApp Template" seleccionando el template aprobado.</li>
+                <li>Repetir el mismo proceso para el Follow Up de 24h.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF1-02</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Rama "None" cierra en FINAL sin ninguna acción en los 3 niveles de condición</div>
+              <div class="finding-impact">Cada Condition tiene una rama "None" (When none of the conditions are met). En los 3 niveles del follow up, estas ramas van directamente a FINAL. Un lead que llega a None queda sin clasificar, sin tag identificativo, sin notificación al equipo. El closer no sabe que existe ese lead y nunca hará seguimiento manual.</div>
+              <ul class="steps">
+                <li>En cada una de las 3 ramas "None", añadir un nodo "Add Tag" con el valor <strong>lead_sin_clasificar</strong>.</li>
+                <li>Después del tag, añadir un nodo "Send Internal Notification" al assigned user del contacto con el mensaje: "Lead {contact.firstName} no clasificado en WF-1. Revisar manualmente."</li>
+                <li>Opcionalmente, añadir "Update Opportunity" para mover al lead a un stage de "Revisar" en el pipeline.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF1-03</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Bot califcar leads se activa en 3 puntos distintos sin filtro de re-entrada</div>
+              <div class="finding-impact">El bot de cualificación se activa en el nivel 1 (contestó rápido), nivel 2 (contestó a las 2h) y nivel 3 (contestó a las 24h). Si el lead responde tarde y por alguna razón ya fue cualificado previamente, podría entrar al bot de cualificación de nuevo.</div>
+              <ul class="steps">
+                <li>Antes de cada nodo "Bot califcar leads", añadir un nodo "Condition" que verifique: <strong>Tags does NOT include "bot_completado"</strong>.</li>
+                <li>Si la condición se cumple (no tiene bot_completado): activar el bot normalmente.</li>
+                <li>Si no se cumple (ya tiene bot_completado): enviar al lead a FINAL o a una rama de "ya cualificado".</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF1-04</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Tags "respondió rápido" / "respondió lento" sin uso documentado ni segmentación activa</div>
+              <div class="finding-impact">Se acumulan en los contactos sin que ningún workflow o segmentación los use activamente. Contaminan el perfil del contacto con datos que no aportan valor operativo.</div>
+              <ul class="steps">
+                <li>Revisar si algún workflow, smart list o campaña usa estos tags como filtro.</li>
+                <li>Si no se usan: eliminar los nodos "Add Tag" correspondientes del WF-1 para simplificar el flujo.</li>
+                <li>Si se quieren mantener para analytics: documentarlos en el CLAUDE.md y crear una smart list que los utilice.</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOT OMNI GENERAL -->
+  <div class="section-title">Bot Omni (General) — FAQ Router</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>Bot Omni General</h3>
+        <div class="trigger">Trigger: Chat Initiated · Bot ID: U8ZgeJuBbmuQCZb0UgWs · Función: Router FAQ + Transfer a Anna</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">1 Crítico</span> <span class="badge badge-orange">3 Importantes</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Chat Initiated</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">#1 AI Capture</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-condition">AI Splitter</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Agendar/cancelar → AI Msg → Transfer Bot (Anna)</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-action">Pregunta Omnexor → #2 Capturar → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">No condition met → #3 Capture → FINAL sin respuesta ⚠️</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">BOG-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Transfer Bot a Anna sin mensaje puente — silencio de 30-60s para el lead</div>
+              <div class="finding-impact">Transfer Bot tarda entre 30 y 60 segundos en activar a Anna. Durante ese tiempo, el lead no recibe ningún mensaje y puede pensar que el bot se ha roto o que nadie le atiende. No hay mecanismo de End Conversation en el bot Omni antes del transfer, por lo que si el lead escribe algo durante esa espera, puede que ningún bot responda.</div>
+              <ul class="steps">
+                <li>En la rama "Agendar/reagendar/cancelar", antes del nodo Transfer Bot, revisar el AI Message existente.</li>
+                <li>Asegurarse de que ese AI Message incluye una frase de transición clara: <em>"Ahora mismo te paso con Anna, que gestionará tu cita en un momento. Un segundo... ⏳"</em></li>
+                <li>El Transfer Bot ya actúa como cierre del bot Omni — no es necesario añadir End Conversation explícito, ya que al transferir el bot actual deja de escuchar.</li>
+                <li>Verificar en la configuración del Transfer Bot que apunta al Bot ID correcto de Anna.</li>
+              </ul>
+              <div class="note-box">⚠️ Nota GHL: No existe nodo "Stop Bot" en Flow Builder V3. El Transfer Bot gestiona el traspaso de forma nativa. El AI Message previo es el único mecanismo para gestionar la expectativa del lead durante el delay.</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">BOG-02</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Rama "No condition met" → #3 AI Capture → FINAL sin ninguna respuesta al lead</div>
+              <div class="finding-impact">Si el lead escribe algo que el AI Splitter no puede clasificar como "cita" ni como "pregunta sobre Omnexor", cae en esta rama. El nodo #3 AI Capture captura algo, pero el flujo termina en FINAL sin que el lead reciba ninguna respuesta. Experiencia de abandono total.</div>
+              <ul class="steps">
+                <li>Después del nodo #3 AI Capture, añadir un nodo "AI Message" con un mensaje de fallback genérico: <em>"Entendido. En breve un miembro del equipo de Omnexor revisará tu mensaje y te responderá. 😊"</em></li>
+                <li>Opcionalmente, añadir un nodo "Send Internal Notification" para alertar al equipo de que hay un lead con consulta no clasificada.</li>
+                <li>Si se quiere que Anna gestione también estos casos, añadir Transfer Bot a Anna después del AI Message.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">BOG-03</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Rama "Pregunta sobre Omnexor" — verificar si #2 incluye respuesta de IA</div>
+              <div class="finding-impact">El nodo #2 se llama "Capturar info". No está claro si solo captura la pregunta o también responde. Si solo captura y no responde, el lead pregunta sobre Omnexor y no recibe ninguna información.</div>
+              <ul class="steps">
+                <li>Abrir el nodo #2 y verificar si tiene configurado un "AI Response" o si es solo captura de campo.</li>
+                <li>Si es solo captura: añadir un nodo "AI Message" después con instrucciones para responder preguntas frecuentes sobre Omnexor (precio, servicios, proceso).</li>
+                <li>Si ya tiene AI Response configurado: asegurarse de que el knowledge base del bot tiene la información necesaria para responder correctamente.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">BOG-04</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Bot Omni General activo para cualquier "Chat Initiated" — sin filtro de tipo de lead</div>
+              <div class="finding-impact">El trigger es genérico. Un lead que ya fue cualificado y tiene bot_completado podría activar este bot de nuevo si inicia una nueva conversación.</div>
+              <ul class="steps">
+                <li>Revisar la configuración del trigger en la pestaña "Configuración" del bot.</li>
+                <li>Añadir filtro de condición al trigger: evaluar si tiene tags específicos que indiquen que debe activarse (ej: solo si tiene tag "omnexor_lead") o que no debe activarse (bot_completado).</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOT LUNA -->
+  <div class="section-title">Bot Luna (Lead) — Cualificación</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>Bot Luna (Lead)</h3>
+        <div class="trigger">Trigger: Chat Initiated · Bot ID: osP7IQgAJISVcOZCOU03 · Capturas: #21 → #27 → AI Splitter Tier → Booking</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">6 Críticos</span> <span class="badge badge-orange">4 Importantes</span> <span class="badge badge-green">3 Optimizaciones</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Chat Initiated</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-error">#21→#27 (6 AI Captures sin aislamiento) ⚠️</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-condition">AI Splitter Presupuesto</span><br style="flex-basis:100%">
+        <span class="flow-node">Enterprise → Tag → #29 decisor → Book Appt → Transfer Anna</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node">Mid/Small → Tag → #30/#31 → Book Appt → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">No cualificado → FINAL (sin bot_completado) ⚠️</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node">No sabe → Msg → Splitter → SI:#32→Book / NO:End Conv ⚠️</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">No condition met → #28 → Go To (loop infinito) ⚠️</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">LUN-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Context Drift en capturas #21–#27 (6 AI Captures secuenciales sin aislamiento)</div>
+              <div class="finding-impact">GHL Flow Builder V3 acumula el historial de la conversación en cada nodo AI Capture. A partir del 3er-4o nodo, la IA puede inferir respuestas del contexto anterior y saltar preguntas. Por ejemplo: si en #21 el lead menciona "somos una inmobiliaria con 10 agentes", en #24 la IA puede ya "saber" el tamaño de empresa y no hacer la pregunta de facturación correctamente. El dato guardado en el campo sería una inferencia, no una respuesta real.</div>
+              <ul class="steps">
+                <li>Abrir cada uno de los nodos #21, #23, #24, #25, #26 y #27 en el editor del bot.</li>
+                <li>En el campo de instrucciones/prompt de cada AI Capture, añadir al principio: <strong>"Haz SOLO esta pregunta específica. No uses información previa de la conversación para inferir o asumir la respuesta. Espera una respuesta explícita y directa del usuario antes de continuar."</strong></li>
+                <li>Guardar cada nodo y probar el bot con un lead de prueba, respondiendo de forma ambigua en las primeras preguntas para verificar que las siguientes capturas no infieren.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-02</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Loop infinito: No condition met → #28 → Go To sin contador de iteraciones</div>
+              <div class="finding-impact">Cuando el AI Splitter de presupuesto no puede clasificar la respuesta, va a "No condition met" → #28 AI Capture (solo info) → Go To de vuelta. Si el lead sigue respondiendo de forma no clasificable (ej: "depende", "no sé", "¿qué quieres decir?"), esto se repite sin límite. Además, hay un bug adicional: si el campo del nodo #28 ya tiene un valor de la iteración anterior, GHL puede saltar la captura en la segunda vuelta, causando que el lead quede completamente bloqueado.</div>
+              <ul class="steps">
+                <li>Crear tres custom fields nuevos en GHL: <strong>loop_counter_1</strong>, <strong>loop_counter_2</strong>, <strong>loop_counter_3</strong> (tipo Single Line).</li>
+                <li>En la rama "No condition met", antes del nodo #28, añadir un nodo "Condition" que compruebe: ¿tiene tag <strong>luna_loop_1</strong>? ¿tiene tag <strong>luna_loop_2</strong>?</li>
+                <li>Primera vez (sin tags loop): Add Tag <strong>luna_loop_1</strong> → #28 captura → Go To.</li>
+                <li>Segunda vez (tiene luna_loop_1 pero no luna_loop_2): Add Tag <strong>luna_loop_2</strong> → #28 captura diferente → Go To.</li>
+                <li>Tercera vez (tiene luna_loop_1 y luna_loop_2): enviar AI Message de cierre empático → Add Tag <strong>bot_completado</strong> → End Conversation.</li>
+                <li>Para evitar el bug de Go To + AI Capture con campo ya rellenado: usar un campo distinto en cada iteración del Go To (campo_loop_1, campo_loop_2) o limpiar el campo antes de cada vuelta con "Update Contact Field" seteando valor vacío.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-03</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">bot_completado ausente en rama "No cualificado" → FINAL directo</div>
+              <div class="finding-impact">La rama "No cualificado" del AI Splitter de tier va directamente a FINAL sin añadir ningún tag. Esto significa que el lead descartado no tiene el tag bot_completado. Si este lead vuelve a escribir o si WF-1 lo reintenta, Alex o el propio WF-1 puede volver a activar Bot Luna, sometiendo al lead a otra ronda de cualificación innecesaria.</div>
+              <ul class="steps">
+                <li>Localizar la rama "No cualificado" en el AI Splitter de Bot Luna.</li>
+                <li>Antes del nodo FINAL, insertar un nodo "Add Tag" con el valor <strong>bot_completado</strong>.</li>
+                <li>Opcionalmente, añadir también el tag <strong>no_cualificado</strong> para poder segmentar este grupo en el futuro.</li>
+                <li>Verificar que el Custom Message de despedida ya existe en esa rama. Si no, añadir un AI Message empático antes del tag.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-04</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">bot_completado ausente en rama "No sabe → No" → End Conversation</div>
+              <div class="finding-impact">El lead que responde "No" al splitter "¿Quiere seguir agendando?" recibe un Custom Message y End Conversation, pero sin bot_completado. Misma consecuencia que LUN-03: puede ser re-activado por Alex o por WF-1.</div>
+              <ul class="steps">
+                <li>Localizar la rama "No" del AI Splitter "¿Quiere seguir agendando?" dentro del flujo de "No sabe".</li>
+                <li>Antes del nodo End Conversation, insertar "Add Tag: bot_completado".</li>
+                <li>Verificar que el Custom Message de cierre tiene un tono correcto (no agresivo, dejar la puerta abierta).</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-05</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">"Crear oportunidad" dentro del Flow Builder — viola arquitectura GHL y genera doble escritura con WF-2</div>
+              <div class="finding-impact">GHL recomienda no ejecutar "Crear o actualizar oportunidad" dentro del Flow Builder porque el timing de ejecución no es determinista cuando hay múltiples nodos encadenados. Adicionalmente, WF-2 Enrutamiento también crea/actualiza la oportunidad al detectar el tag de tier. Resultado: dos actualizaciones sobre el mismo pipeline record, la segunda sobreescribe a la primera, y el stage final depende de cuál llegó antes, no de la lógica correcta.</div>
+              <ul class="steps">
+                <li>En Bot Luna, eliminar todos los nodos "Crear o actualizar oportunidad" de las ramas de booking (Enterprise, Mid, Small, No sabe).</li>
+                <li>En su lugar, cada rama de booking debe añadir un tag específico como puente: <strong>cita_agendada_enterprise</strong>, <strong>cita_agendada_mid</strong>, <strong>cita_agendada_small</strong>.</li>
+                <li>En WF-2 Enrutamiento, añadir estos tags como triggers adicionales (o añadir condiciones) para crear la oportunidad con el stage y datos correctos según el tier.</li>
+                <li>De esta forma, la lógica de pipeline queda centralizada en WF-2 y Bot Luna solo gestiona la conversación.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-06</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">AI Splitter de presupuesto puede clasificar mal respuestas numéricas variadas → leads cualificados caen en "No condition met"</div>
+              <div class="finding-impact">Respuestas como "unos mil euros", "sobre los 1500", "entre 2 y 3 mil al mes", "pues mira, depende pero podríamos llegar a 2000" son válidas pero el AI Splitter puede no reconocerlas si el prompt no incluye ejemplos de este tipo de frases. Estos leads caen en "No condition met" y entran en el loop problemático, cuando en realidad son Midmarket o Small.</div>
+              <ul class="steps">
+                <li>Abrir el nodo AI Splitter de presupuesto en Bot Luna.</li>
+                <li>En el prompt de cada rama, añadir ejemplos explícitos de frases que deben clasificarse ahí. Por ejemplo, para "Small": <em>"Incluye frases como 'unos 500 euros', 'entre 200 y 1000', 'podríamos poner 800 al mes', 'no mucho, quizás 300-400'."</em></li>
+                <li>Para "Midmarket": <em>"Incluye: 'sobre los 2000', 'entre 1500 y 3000', 'unos 2000 euros mensuales'."</em></li>
+                <li>Para "Nosabe": <em>"Incluye: 'no lo sé todavía', 'depende', 'no tengo claro el presupuesto', 'tendría que consultarlo'."</em></li>
+                <li>Probar con variantes de respuesta para verificar la clasificación correcta.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-07</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Transfer Bot a Anna (Enterprise) — delay de 30-60s sin gestión de expectativa</div>
+              <div class="finding-impact">En la rama Enterprise, después del Custom Message y "Crear oportunidad" (que se eliminará en LUN-05), hay un Transfer Bot. El lead enterprise es el más valioso y el que menos tolerancia tiene a los silencios. Un silencio de hasta 60 segundos en este punto puede generar desconfianza.</div>
+              <ul class="steps">
+                <li>Revisar el Custom Message que precede al Transfer Bot en la rama Enterprise.</li>
+                <li>Asegurarse de que ese mensaje incluye una frase que gestione el delay: <em>"Ahora mismo te conecto con nuestro equipo especializado para empresas como la tuya. En un momento estarán contigo... 🤝"</em></li>
+                <li>No añadir nodos Wait entre el Custom Message y el Transfer Bot — el mínimo en GHL es 1 minuto y mataría el feeling de continuidad. El AI Message es suficiente para gestionar la expectativa.</li>
+                <li>Verificar que el Bot ID en el Transfer Bot apunta exactamente a Anna.</li>
+              </ul>
+              <div class="note-box">⚠️ Nota GHL: Los Wait nodes tienen un mínimo de 1 minuto. Insertar un Wait antes del Transfer Bot alargaría innecesariamente el silencio en lugar de reducirlo. La solución es el mensaje de transición, no el Wait.</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-08</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">es_decisor no se guarda en custom field en capturas #29/#30/#31/#32</div>
+              <div class="finding-impact">Las capturas de "¿eres el decisor?" obtienen la respuesta del lead pero no hay evidencia de que se guarden en un custom field. El closer entra a la demo sin saber si hay más personas involucradas en la decisión de compra. Esto impacta directamente en la estrategia de cierre.</div>
+              <ul class="steps">
+                <li>En GHL, crear un custom field nuevo de tipo Single Line llamado <strong>es_decisor</strong> en la sección de Custom Fields del contacto.</li>
+                <li>En cada uno de los nodos #29, #30, #31 y #32, verificar la configuración del AI Capture y asegurarse de que el campo de destino apunta a <strong>es_decisor</strong>.</li>
+                <li>Si el AI Capture solo captura pero no hay campo asignado, añadir después un nodo "Update Contact Field" que guarde el valor capturado en el campo es_decisor.</li>
+                <li>En el CRM, el closer podrá ver este campo directamente en el perfil del contacto antes de la llamada.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-09</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Splitter "¿Quiere seguir agendando?" sin rama explícita para respuestas ambiguas</div>
+              <div class="finding-impact">El splitter tiene "Sí" y "No". Una respuesta como "quizás", "déjame pensarlo", "no estoy seguro" cae en "None" → FINAL. El lead queda sin bot_completado y sin gestión. En un punto tan crítico del funnel (el lead nosabe ya es una cualificación parcial), perder este lead por falta de fallback es costoso.</div>
+              <ul class="steps">
+                <li>Añadir una tercera rama al AI Splitter "¿Quiere seguir agendando?" llamada <strong>"Dudas / No sabe"</strong>.</li>
+                <li>En el prompt de esa rama, incluir: <em>"Respuestas ambiguas como 'quizás', 'no sé', 'déjame pensarlo', 'más tarde'."</em></li>
+                <li>En esa rama: enviar AI Message empático con una alternativa ("¿Te parece si te mando el calendario para que lo veas con calma?") + Add Tag bot_completado + End Conversation.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-10</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Ramas "Appointment Not Booked" sin CTA alternativo ni notificación</div>
+              <div class="finding-impact">Cuando el lead no consigue completar el booking (Appointment Not Booked), recibe un Custom Message pero no hay link alternativo de calendario ni notificación interna. El lead puede haber querido agendar pero tuvo un problema técnico, y queda sin seguimiento.</div>
+              <ul class="steps">
+                <li>En las ramas "Appointment Not Booked" de los tiers Mid, Small y No sabe, revisar el Custom Message.</li>
+                <li>Añadir en el mensaje un enlace directo al calendario: <em>"Aquí tienes el enlace por si prefieres elegir tú directamente el horario: [link]"</em></li>
+                <li>Añadir un nodo "Send Internal Notification" para alertar al closer: "Lead {firstName} de tier {tier} no pudo completar el booking. Contactar manualmente."</li>
+                <li>Añadir tag <strong>bot_completado</strong> también en estas ramas para prevenir re-activaciones.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-11</td>
+            <td><span class="severity sev-opt">OPTIMIZACIÓN</span></td>
+            <td>
+              <div class="finding-title">Mensajes post-booking idénticos para todos los tiers — oportunidad de personalización</div>
+              <div class="finding-impact">Un Enterprise que acaba de agendar merece un mensaje diferente a un Small. El Enterprise debería sentir que hay un equipo detrás preparándose para él. El Small puede recibir una confirmación más estándar.</div>
+              <ul class="steps">
+                <li>Enterprise: Custom Message tipo <em>"Perfecto {firstName}. He notificado a nuestro equipo de soluciones enterprise. Recibirás una confirmación y el equipo revisará tu caso antes de la llamada para aprovecharlo al máximo. 🎯"</em></li>
+                <li>Midmarket: <em>"Genial {firstName}. Nos vemos en la llamada. Mientras tanto, si tienes más contexto sobre tu empresa, no dudes en enviarlo por aquí. 💪"</em></li>
+                <li>Small: Mensaje de confirmación estándar con enlace de reprogramación por si necesita cambiar.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-12</td>
+            <td><span class="severity sev-opt">OPTIMIZACIÓN</span></td>
+            <td>
+              <div class="finding-title">Crear oportunidad después del booking — debería moverse a la asignación de tier</div>
+              <div class="finding-impact">Si el lead se cualifica (tier asignado) pero no llega a agendar, no hay oportunidad en el pipeline. El closer no sabe que existe un lead cualificado sin cita. Se pierde seguimiento de leads de alta calidad que simplemente no completaron el booking.</div>
+              <ul class="steps">
+                <li>Una vez implementado LUN-05 (eliminar oportunidad del Flow Builder), configurar WF-2 para que cree la oportunidad en cuanto se detecta el tag de tier, sin esperar al tag de cita_agendada.</li>
+                <li>El stage inicial sería "Cualificado sin cita".</li>
+                <li>Cuando se detecte el tag cita_agendada, WF-2 actualiza el stage a "Cita agendada".</li>
+                <li>Esto garantiza visibilidad completa del pipeline en todos los puntos del funnel.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">LUN-13</td>
+            <td><span class="severity sev-opt">OPTIMIZACIÓN</span></td>
+            <td>
+              <div class="finding-title">Custom Message en rama "No sabe" no personalizado con el desafío capturado</div>
+              <div class="finding-impact">Cuando el lead no sabe el presupuesto, el mensaje empático es genérico. Si en el nodo #24 se capturó el principal desafío, se podría usar ese dato para hacer el mensaje mucho más resonante.</div>
+              <ul class="steps">
+                <li>En el Custom Message de la rama "No sabe", personalizar usando el campo custom capturado. Por ejemplo: <em>"No te preocupes por el número exacto. Muchas empresas que se encontraban en la misma situación que tú ({{contact.principal_desafio}}) empezaron sin tener claro el presupuesto y lo definimos juntos en la llamada."</em></li>
+                <li>Verificar que el campo custom del desafío (#24) tiene el key correcto para usarlo en la variable del mensaje.</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WF-2 -->
+  <div class="section-title">WF-2 Enrutamiento</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-2 Enrutamiento</h3>
+        <div class="trigger">Trigger: Etiqueta añadida → tier_small / tier_midmarket / tier_enterprise (3 triggers separados)</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">1 Crítico</span> <span class="badge badge-orange">2 Importantes</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Tag tier_small / tier_mid / tier_enterprise</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-condition">Condition: Tags includes "cita_agendada"</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Branch → Crear/actualizar oportunidad → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">None → FINAL sin acción ⚠️</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">WF2-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Doble escritura en pipeline: Bot Luna + WF-2 ambos crean/actualizan oportunidad</div>
+              <div class="finding-impact">Actualmente Bot Luna tiene nodos "Crear o actualizar oportunidad" en sus ramas de booking. WF-2 también crea oportunidad al detectar el tag de tier. GHL ejecuta ambos de forma asíncrona. El que ejecuta segundo sobreescribe los datos del primero. El stage final del pipeline y los datos de la oportunidad quedan en un estado no determinista.</div>
+              <ul class="steps">
+                <li>Este punto se resuelve en coordinación con LUN-05: eliminar todos los nodos "Crear oportunidad" del Flow Builder de Luna.</li>
+                <li>WF-2 debe ser el único responsable de la gestión de pipeline.</li>
+                <li>Reestructurar WF-2 con dos fases: (1) Al detectar tag de tier → crear oportunidad en stage "Cualificado sin cita". (2) Al detectar tag cita_agendada → actualizar oportunidad a stage "Cita agendada".</li>
+                <li>Para diferenciar los tres tiers en el pipeline, WF-2 puede usar las condiciones de tags para asignar el stage y los campos correspondientes de cada tier.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF2-02</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Rama None → FINAL cuando hay tier asignado pero no hay cita agendada</div>
+              <div class="finding-impact">La condition actual solo actúa cuando el lead ya tiene el tag cita_agendada. Si el lead tiene tier pero no ha agendado (lo cual es frecuente), WF-2 no hace absolutamente nada. Ese lead cualificado no tiene oportunidad en el pipeline y el closer no lo ve.</div>
+              <ul class="steps">
+                <li>Reestructurar la Condition para que tenga dos ramas activas: "Tiene cita_agendada" y "No tiene cita_agendada" (en lugar de None).</li>
+                <li>Rama "No tiene cita_agendada": crear oportunidad en stage "Cualificado sin cita" con el tier correspondiente.</li>
+                <li>Rama "Tiene cita_agendada": crear/actualizar oportunidad en stage "Cita agendada".</li>
+                <li>Añadir tag <strong>oportunidad_creada</strong> al final de ambas ramas para prevenir dobles ejecuciones.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF2-03</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">3 triggers separados (uno por tier) sin protección contra doble ejecución</div>
+              <div class="finding-impact">Si por algún edge case (bug en el bot, testing, asignación manual) un lead recibe dos tags de tier consecutivos, WF-2 se ejecuta dos veces sobre el mismo contacto, creando o actualizando la oportunidad en conflicto.</div>
+              <ul class="steps">
+                <li>Añadir una condición de entrada en WF-2 al inicio del flujo: verificar que el contacto NO tiene el tag <strong>oportunidad_creada</strong>.</li>
+                <li>Si ya tiene ese tag: ir a FINAL sin ejecutar nada.</li>
+                <li>Si no tiene ese tag: ejecutar el flujo normalmente y al final añadir el tag oportunidad_creada.</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WF-3 -->
+  <div class="section-title">WF-3 Recordatorios (24h / 1h / 15min)</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-3 Recordatorios</h3>
+        <div class="trigger">Trigger: Estado de Cita → Appointment Status: Confirmed / Event Type: Normal</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">1 Crítico</span> <span class="badge badge-orange">1 Importante</span> <span class="badge badge-green">1 Optimización</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Appointment Confirmed</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Tag: Agendado IA</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Crear oportunidad: Booked Stage ✅</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-error">WhatsApp: Confirmacion llamada ⚠️</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait: 24h antes</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Template 24h ✅</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait: 1h antes</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Template 1h ✅</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait: 15min antes</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Template 15min ✅</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">WF3-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">"Confirmacion llamada" enviado inmediatamente tras booking puede ser mensaje libre fuera de ventana Meta</div>
+              <div class="finding-impact">Este mensaje se envía justo cuando el lead confirma la cita. Si el lead llegó al booking a través de un flow donde no escribió en los últimos 5 minutos (por ejemplo, si el booking fue a través de un enlace y no hubo respuesta directa), es posible que la ventana de 24h ya esté cerrada o próxima a cerrar. Como mensaje libre, GHL no garantiza la entrega y no muestra error. El lead puede no recibir la confirmación de su cita.</div>
+              <ul class="steps">
+                <li>Ir a los Templates de WhatsApp en GHL (Settings → WhatsApp → Templates).</li>
+                <li>Crear un template de confirmación de cita con variables: nombre del lead, fecha y hora de la cita, y cualquier instrucción previa a la llamada.</li>
+                <li>Someter el template a aprobación de Meta. El proceso toma normalmente 24-48h.</li>
+                <li>Una vez aprobado, reemplazar el nodo "WhatsApp: Confirmacion llamada" por "Send WhatsApp Template" seleccionando el template aprobado.</li>
+                <li>Mapear las variables del template con los campos del contacto en GHL (first_name, appointment_time, etc.).</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF3-02</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">Re-entrada al reagendar: trigger "Confirmed" se dispara de nuevo → recordatorios duplicados</div>
+              <div class="finding-impact">Cuando un lead reagenda su cita a través de Anna o manualmente, el status de la cita vuelve a "Confirmed". Esto re-dispara WF-3 desde el principio. El lead recibe otra confirmación + otro recordatorio 24h + otro 1h + otro 15min, duplicando todos los mensajes. Si tiene el tag Agendado IA de la primera vez, no hay protección contra la re-entrada.</div>
+              <ul class="steps">
+                <li>Al inicio de WF-3, añadir una Condition que verifique: ¿tiene el lead el tag <strong>agendado_ia</strong>?</li>
+                <li>Si tiene el tag (reagendado): ir a una rama de reagendado que envíe solo el mensaje de confirmación del nuevo horario, sin el ciclo completo de recordatorios. Añadir tag <strong>reagendado</strong> y continuar el ciclo de recordatorios desde el Wait 24h.</li>
+                <li>Si no tiene el tag (primera vez): ejecutar el flujo completo normalmente y añadir <strong>agendado_ia</strong> al final del nodo de confirmación.</li>
+                <li>Al cancelar la cita, asegurarse de que el WF de cancelación elimina el tag agendado_ia para que el ciclo pueda reiniciarse limpiamente si el lead reagenda.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">WF3-03</td>
+            <td><span class="severity sev-opt">OPTIMIZACIÓN</span></td>
+            <td>
+              <div class="finding-title">WF-3 no conecta con WF No Show — sin lógica post-cita integrada</div>
+              <div class="finding-impact">WF-3 termina en el recordatorio de 15 minutos pero no tiene lógica de seguimiento post-cita. Si el lead hace no-show, el WF No Show se activa por el trigger de status del appointment, pero no hay una conexión directa desde WF-3 para contextualizarlo.</div>
+              <ul class="steps">
+                <li>Después del recordatorio de 15 minutos, añadir un Wait hasta la hora de fin de la cita (ej: Wait 1h si la cita dura 1h).</li>
+                <li>Añadir una Condition que verifique el status del appointment: si sigue en "Confirmed" (nadie lo marcó como showed o completed), se dispara la lógica de no-show.</li>
+                <li>Esto no reemplaza al WF No Show existente — lo complementa dando contexto adicional.</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WF NO SHOW -->
+  <div class="section-title">WF No Show</div>
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF No Show</h3>
+        <div class="trigger">Trigger: Estado de Cita → Event Type: Normal / Appointment status: No show</div>
+      </div>
+      <div style="flex-shrink:0"><span class="badge badge-red">2 Críticos</span> <span class="badge badge-orange">1 Importante</span> <span class="badge badge-green">1 Optimización</span></div>
+    </div>
+    <div class="wf-card-body">
+      <div class="flow">
+        <span class="flow-node flow-node-trigger">Appointment No Show</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-error">WhatsApp: primer mensaje ⚠️</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-wait">Wait</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-condition">Condition: replied?</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Contestó → Update Bot + Status → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-wait">No contestó → Wait → Template 24h → Condition</span><span class="flow-arrow">→</span>
+        <span class="flow-node flow-node-action">Contestó → Update Bot → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-action">No contestó → Crear oportunidad + Add Tag → FINAL</span>
+        <span class="flow-arrow">|</span>
+        <span class="flow-node flow-node-error">None → FINAL sin notificación ⚠️</span>
+      </div>
+      <table class="findings-table">
+        <thead><tr><th style="width:70px">ID</th><th style="width:120px">Severidad</th><th>Problema · Impacto · Solución paso a paso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="finding-id">NS-01</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">"Primer mensaje" del WF No Show enviado como mensaje libre fuera de ventana de 24h</div>
+              <div class="finding-impact">El no-show ocurre en el momento de la cita programada. El lead no escribió nada en las últimas horas (solo recibió recordatorios). La ventana de 24h de Meta cuenta desde el último mensaje del lead, no desde el último mensaje enviado. Es muy probable que cuando se dispara el WF No Show, ya hayan pasado más de 24h desde que el lead escribió por última vez. Un mensaje libre en este contexto falla silenciosamente: GHL lo procesa, parece enviado, pero WhatsApp lo bloquea y el lead nunca lo ve.</div>
+              <ul class="steps">
+                <li>Ir a Templates de WhatsApp en GHL.</li>
+                <li>Crear un template específico para no-show con un tono apropiado. Ejemplo: <em>"Hola {nombre}, parece que se nos cruzaron los tiempos 😊 Quedamos pendientes de reagendar nuestra llamada. ¿Cuándo te vendría bien?"</em></li>
+                <li>Incluir el nombre del lead como variable para personalización.</li>
+                <li>Someter a aprobación Meta (24-48h).</li>
+                <li>Una vez aprobado, reemplazar el nodo "primer mensaje" por "Send WhatsApp Template" con el template aprobado.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">NS-02</td>
+            <td><span class="severity sev-critical">CRÍTICO</span></td>
+            <td>
+              <div class="finding-title">Rama None final → FINAL sin notificación al equipo ni acción sobre el contacto</div>
+              <div class="finding-impact">El lead que no responde ni al primer mensaje ni al template de 24h cae en una rama None que va directamente a FINAL. No hay tag, no hay notificación, no hay cambio de stage en el pipeline. El closer no sabe que este lead hizo no-show y no respondió a los dos intentos. El lead queda en un limbo operativo.</div>
+              <ul class="steps">
+                <li>En la rama None final del WF No Show, añadir un nodo "Add Tag" con el valor <strong>no_show_sin_respuesta</strong>.</li>
+                <li>Añadir un nodo "Send Internal Notification" al assigned user: <em>"Lead {firstName} hizo no-show y no respondió en 24h. Requiere contacto manual."</em></li>
+                <li>Añadir "Update Opportunity" para mover el stage a "No Show - Seguimiento manual" en el pipeline.</li>
+                <li>Opcionalente, añadir una tarea automática asignada al closer con fecha de vencimiento en 24h.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">NS-03</td>
+            <td><span class="severity sev-important">IMPORTANTE</span></td>
+            <td>
+              <div class="finding-title">"Update Conversation AI Bot and Status" — bot activado no identificado en las capturas</div>
+              <div class="finding-impact">Cuando el lead responde (rama Contestó), se activa un bot. No hay confirmación de qué bot es. Si por error apunta a Luna en lugar de Anna, el lead que hizo no-show entraría de nuevo en el flujo de cualificación completo, lo cual sería una experiencia muy negativa para alguien que ya fue cualificado y agendó.</div>
+              <ul class="steps">
+                <li>Abrir el nodo "Update Conversation AI Bot and Status" en las ramas Contestó del WF No Show.</li>
+                <li>Verificar que el Bot ID seleccionado corresponde exactamente a Anna (bot de reagendado con prompt).</li>
+                <li>Para confirmarlo: ir a Conversation AI → Ver todos los bots → copiar el ID de Anna y compararlo con el configurado en el nodo.</li>
+                <li>Documentar el Bot ID de Anna en el CLAUDE.md de Omnexor para referencia futura.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="finding-id">NS-04</td>
+            <td><span class="severity sev-opt">OPTIMIZACIÓN</span></td>
+            <td>
+              <div class="finding-title">Add Tag al final del WF No Show — verificar que previene re-entradas</div>
+              <div class="finding-impact">Las capturas muestran un "Add Tag" al final de la rama "No contestó" pero no es visible qué tag es. Si el tag no previene re-entradas, un cambio de status posterior podría volver a disparar el WF No Show sobre el mismo lead.</div>
+              <ul class="steps">
+                <li>Abrir el nodo "Add Tag" del WF No Show y verificar el valor del tag.</li>
+                <li>Si no incluye <strong>no_show_gestionado</strong>: cambiar o añadir ese tag.</li>
+                <li>Al inicio del WF No Show, añadir una Condition de entrada: verificar que el lead NO tiene el tag no_show_gestionado antes de ejecutar.</li>
+                <li>Esto previene que un mismo no-show procese el workflow dos veces si hay algún trigger duplicado.</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TRANSVERSAL -->
+  <div class="section-title">Problemas Transversales</div>
+
+  <div class="transversal-item crit">
+    <div class="transversal-title">🔴 Regla Meta 24h — Mensajes en riesgo de fallo silencioso</div>
+    <div class="transversal-desc">WhatsApp Business API bloquea mensajes libres cuando el lead lleva más de 24h sin escribir. GHL no muestra ningún error visible — el mensaje aparece como enviado pero nunca llega al lead. Los mensajes en riesgo identificados son: (1) WF-1 Follow Up a 2h y 24h, (2) WF-3 "Confirmacion llamada", (3) WF No Show "primer mensaje". Todos deben ser convertidos a templates Meta aprobados. El proceso de aprobación tarda 24-48h en Meta Business Manager.</div>
+  </div>
+  <div class="transversal-item crit">
+    <div class="transversal-title">🔴 bot_completado — El tag más crítico del sistema, ausente en 2 ramas terminales de Bot Luna</div>
+    <div class="transversal-desc">Toda la lógica de prevención de re-activación depende de este tag. Sin él en las ramas "No cualificado" y "No sabe → No", los leads pueden ser re-procesados. El impacto no es solo en experiencia: un lead enterprise descartado que recibe de nuevo el flujo de cualificación puede reaccionar negativamente y perder confianza en Omnexor.</div>
+  </div>
+  <div class="transversal-item imp">
+    <div class="transversal-title">🟠 Anna (IA con Prompt) — Bot de reagendado no auditado por falta de acceso al prompt</div>
+    <div class="transversal-desc">Anna es un bot de IA con prompt directo (no Flow Builder V3). Sin ver el prompt no es posible auditar: qué acciones puede ejecutar, cómo maneja el fallback si no puede agendar, si sus mensajes respetan la regla de 24h de Meta, si añade bot_completado al terminar, y qué pasa si el lead le hace preguntas fuera de su scope (cancelar definitivamente vs. reagendar). Se recomienda una segunda fase de auditoría específica para el prompt de Anna.</div>
+  </div>
+  <div class="transversal-item imp">
+    <div class="transversal-title">🟠 Nomenclatura de tags — Inconsistencias que dificultan la gestión y el debugging</div>
+    <div class="transversal-desc">Se detectan tres convenciones de nomenclatura mezcladas: snake_case ("tier_small"), palabras con espacios ("Agendado IA"), y texto con tildes ("respondió rápido"). Esto dificulta la creación de filtros, causa errores en condiciones donde las mayúsculas importan, y complica el debugging. Estandarizar todo a snake_case minúsculas sin tildes: tier_small, agendado_ia, respondio_rapido, bot_completado, no_cualificado.</div>
+  </div>
+  <div class="transversal-item imp">
+    <div class="transversal-title">🟠 Notificaciones internas — Ausentes en múltiples puntos de fallo críticos</div>
+    <div class="transversal-desc">Las ramas None, los leads no cualificados, los no-shows sin respuesta y los "Appointment Not Booked" no generan ninguna notificación al equipo humano. En un sistema con IA, el equipo opera completamente a ciegas cuando algo falla. Si el bot no puede gestionar un caso, nadie lo sabe hasta que el lead escribe directamente al número o el closer revisa el CRM manualmente.</div>
+  </div>
+
+  <!-- ACTION PLAN -->
+  <div class="section-title">Plan de Acción Priorizado — Checklist de Implementación</div>
+  <div class="wf-card">
+    <div class="wf-card-body" style="padding: 0">
+      <ul class="checklist">
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">1. Añadir bot_completado en ramas terminales de Bot Luna sin este tag</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Luna (LUN-03, LUN-04) · ~15 min</div>
+            <ul class="check-steps">
+              <li>Abrir Bot Luna en Flow Builder V3 → localizar rama "No cualificado" del AI Splitter de tier.</li>
+              <li>Antes del nodo FINAL, insertar <strong>Add Tag: bot_completado</strong>. Guardar.</li>
+              <li>Localizar rama "No sabe" → sub-rama "No" del splitter "¿Quiere seguir agendando?"</li>
+              <li>Antes del End Conversation, insertar <strong>Add Tag: bot_completado</strong>. Guardar.</li>
+              <li>Probar con un lead de prueba que responda con presupuesto bajo y verificar que recibe el tag.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">2. Implementar contador de iteraciones en loop "No condition met" de Bot Luna</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Luna (LUN-02, LUN-06) · ~45 min</div>
+            <ul class="check-steps">
+              <li>En GHL, ir a Custom Fields y crear un campo Single Line llamado <strong>luna_loop_count</strong>.</li>
+              <li>En la rama "No condition met" del AI Splitter, añadir antes del nodo #28 una Condition: ¿tiene tag luna_loop_1? ¿tiene luna_loop_2?</li>
+              <li>Primera pasada (sin tags): Add Tag luna_loop_1 → #28 → Go To (limpiar campo antes con Update Contact Field vacío).</li>
+              <li>Segunda pasada (tiene luna_loop_1): Add Tag luna_loop_2 → AI Message con otro enfoque de pregunta → Go To.</li>
+              <li>Tercera pasada (tiene luna_loop_1 y luna_loop_2): AI Message de cierre → Add Tag bot_completado → End Conversation.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">3. Añadir prompts de aislamiento contra Context Drift en capturas #21–#27</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Luna (LUN-01) · ~45 min</div>
+            <ul class="check-steps">
+              <li>Abrir nodo #21 (Validar negocio) → en el campo de instrucciones, añadir al inicio: <em>"Haz SOLO esta pregunta. No uses información previa de la conversación para inferir respuestas. Espera respuesta explícita."</em></li>
+              <li>Repetir el mismo texto de aislamiento en #23, #24, #25, #26 y #27.</li>
+              <li>Probar el bot respondiendo de forma evasiva en los primeros nodos (ej: "sí, lo que tú digas") para verificar que los siguientes nodos siguen haciendo sus preguntas.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">4. Convertir mensajes libres a templates Meta en WF-1, WF-3 y WF No Show</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · WF-1 + WF-3 + WF No Show (WF1-01, WF3-01, NS-01) · 1-2h + espera aprobación Meta</div>
+            <ul class="check-steps">
+              <li>Ir a GHL → Settings → WhatsApp → Templates → crear 3 nuevos templates.</li>
+              <li>Template 1 (Follow Up WF-1): recordatorio de que el lead llenó el formulario + CTA para responder.</li>
+              <li>Template 2 (Confirmacion llamada WF-3): confirmación de cita con fecha, hora y nombre del lead como variables.</li>
+              <li>Template 3 (No Show): mensaje empático de reagendado.</li>
+              <li>Someter los 3 a aprobación Meta. Esperar 24-48h.</li>
+              <li>Una vez aprobados, reemplazar los nodos de mensaje libre en los 3 workflows por "Send WhatsApp Template" seleccionando el template correspondiente.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">5. Eliminar "Crear oportunidad" del Flow Builder Luna y centralizar en WF-2</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Luna + WF-2 (LUN-05, WF2-01) · ~1h</div>
+            <ul class="check-steps">
+              <li>En Bot Luna, identificar todos los nodos "Crear o actualizar oportunidad" en las ramas Enterprise, Mid, Small y No sabe.</li>
+              <li>Reemplazarlos por nodos <strong>Add Tag</strong> con valores: cita_agendada_enterprise, cita_agendada_mid, cita_agendada_small según la rama.</li>
+              <li>En WF-2, añadir estos tags como triggers adicionales o condiciones para crear la oportunidad con el stage correcto.</li>
+              <li>Verificar que WF-2 también crea oportunidad en stage "Cualificado sin cita" al detectar tier sin cita (WF2-02).</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">6. Añadir mensaje puente en Bot Omni antes del Transfer Bot a Anna</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Omni General (BOG-01) · ~10 min</div>
+            <ul class="check-steps">
+              <li>Abrir Bot Omni General → rama "Agendar/reagendar/cancelar".</li>
+              <li>Revisar el AI Message que precede al Transfer Bot.</li>
+              <li>Asegurarse de que incluye: <em>"Ahora mismo te paso con Anna, que gestionará tu cita. Un momento... ⏳"</em></li>
+              <li>No añadir nodos Wait — el mínimo en GHL es 1 minuto y alargaría innecesariamente el silencio.</li>
+              <li>Verificar que el Bot ID del Transfer Bot es el de Anna.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">7. Añadir filtro anti-re-entrada en WF-3 para reagendados</div>
+            <div class="check-meta"><span class="severity sev-important">IMPORTANTE</span> · WF-3 (WF3-02) · ~20 min</div>
+            <ul class="check-steps">
+              <li>Al inicio de WF-3, antes del Add Tag "Agendado IA", añadir Condition: ¿tiene tag agendado_ia?</li>
+              <li>Si SÍ (reagendado): bifurcar a una rama que solo envíe la confirmación del nuevo horario + continuar desde el Wait 24h.</li>
+              <li>Si NO (primera vez): flujo normal completo + Add Tag agendado_ia al confirmar.</li>
+              <li>En el workflow de cancelación, asegurarse de que se elimina el tag agendado_ia para permitir que el ciclo se reinicie si reagenda.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">8. Guardar es_decisor en custom field en capturas #29/#30/#31/#32</div>
+            <div class="check-meta"><span class="severity sev-importante">IMPORTANTE</span> · Bot Luna (LUN-08) · ~20 min</div>
+            <ul class="check-steps">
+              <li>En GHL Custom Fields, crear un campo Single Line llamado <strong>es_decisor</strong>.</li>
+              <li>Abrir cada uno de los nodos #29, #30, #31 y #32 en Bot Luna.</li>
+              <li>En la configuración del AI Capture, asignar el campo de destino a <strong>es_decisor</strong>.</li>
+              <li>Verificar que el valor se guarda correctamente con un lead de prueba.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">9. Añadir notificaciones internas en puntos de fallo sin visibilidad</div>
+            <div class="check-meta"><span class="severity sev-important">IMPORTANTE</span> · WF-1 + WF-2 + WF No Show (WF1-02, NS-02, WF2-02) · ~30 min</div>
+            <ul class="check-steps">
+              <li>WF-1 ramas None: Add Tag "lead_sin_clasificar" + Send Internal Notification al assigned user.</li>
+              <li>WF-2 rama None: crear oportunidad en stage "Cualificado sin cita" (no solo notificación).</li>
+              <li>WF No Show rama None: Add Tag "no_show_sin_respuesta" + Internal Notification + actualizar stage pipeline.</li>
+              <li>Bot Luna "Appointment Not Booked": Add Tag bot_completado + Internal Notification + enlace calendario en el mensaje.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">10. Estandarizar nomenclatura de tags a snake_case minúsculas sin tildes</div>
+            <div class="check-meta"><span class="severity sev-important">IMPORTANTE</span> · Todos los elementos · ~1h</div>
+            <ul class="check-steps">
+              <li>Hacer inventario completo de todos los tags usados en bots y workflows.</li>
+              <li>Renombrar: "Agendado IA" → agendado_ia / "respondió rápido" → respondio_rapido / "Lead No calificado" → lead_no_calificado.</li>
+              <li>Actualizar todos los triggers, condiciones y Add Tag nodes en GHL para usar los nuevos nombres.</li>
+              <li>Actualizar también los filtros de Smart Lists si los hay.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">11. Auditar prompt de Anna (bot de reagendado) — Fase 2</div>
+            <div class="check-meta"><span class="severity sev-important">IMPORTANTE</span> · Anna · ~1h</div>
+            <ul class="check-steps">
+              <li>Compartir el prompt completo de Anna para análisis.</li>
+              <li>Verificar: ¿qué acciones puede ejecutar? ¿cómo maneja el fallback? ¿añade bot_completado al cerrar?</li>
+              <li>Verificar que los mensajes que Anna envía espontáneamente (fuera de respuesta inmediata) usan templates Meta aprobados.</li>
+              <li>Documentar el Bot ID de Anna en CLAUDE.md de Omnexor.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="check-box"></div>
+          <div class="check-content">
+            <div class="check-title">12. Añadir ejemplos de frases en AI Splitter de presupuesto para evitar fallos de clasificación</div>
+            <div class="check-meta"><span class="severity sev-critical">CRÍTICO</span> · Bot Luna (LUN-06) · ~20 min</div>
+            <ul class="check-steps">
+              <li>Abrir el nodo AI Splitter de presupuesto en Bot Luna.</li>
+              <li>En el prompt de cada rama, añadir 3-5 ejemplos de frases reales que deben clasificarse en esa rama.</li>
+              <li>Probar con respuestas variadas ("unos 2000", "entre 1500 y 3000", "no tengo claro") y verificar que caen en la rama correcta.</li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Auditoría GHL — Omnexor &nbsp;·&nbsp; Lead Solutions Architect &nbsp;·&nbsp; Marzo 2026<br>
+  8 Críticos · 10 Importantes · 5 Optimizaciones · 12 acciones en checklist
+</div>
+
+</body>
+</html>

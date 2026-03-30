@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Tags de Estado — Omnexor GHL</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f1117; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.7; }
+
+  .header { background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%); border-bottom: 1px solid #2d3748; padding: 32px 40px; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #f7fafc; margin-bottom: 4px; }
+  .header .meta { color: #718096; font-size: 13px; margin-bottom: 24px; }
+  .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+  .badge { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .badge-blue { background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+  .badge-purple { background: rgba(159,122,234,0.15); color: #b794f4; border: 1px solid rgba(159,122,234,0.3); }
+  .badge-green { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+  .badge-orange { background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 40px; }
+  .section-title { font-size: 18px; font-weight: 700; color: #f7fafc; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #2d3748; }
+  .section-title:first-child { margin-top: 0; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .summary-card { background: #1a1f2e; border-radius: 10px; padding: 20px; border: 1px solid #2d3748; text-align: center; }
+  .summary-card .num { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+  .summary-card .label { font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; }
+  .num-blue { color: #63b3ed; }
+  .num-purple { color: #b794f4; }
+  .num-green { color: #68d391; }
+  .num-total { color: #f7fafc; }
+
+  .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .principle-card { background: #1a1f2e; border-radius: 10px; padding: 20px; border: 1px solid #2d3748; }
+  .principle-card .p-icon { font-size: 24px; margin-bottom: 10px; }
+  .principle-card h4 { font-size: 14px; font-weight: 700; color: #f7fafc; margin-bottom: 8px; }
+  .principle-card p { font-size: 13px; color: #a0aec0; line-height: 1.6; }
+  .principle-card code { background: #2d3748; color: #b794f4; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+  .tag-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .tag-table th { background: #1a1f2e; color: #a0aec0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 14px; text-align: left; border: 1px solid #2d3748; }
+  .tag-table td { padding: 10px 14px; border: 1px solid #2d3748; vertical-align: top; line-height: 1.6; font-size: 13px; }
+  .tag-table tr:nth-child(even) td { background: #161b27; }
+  .tag-table tr:hover td { background: #1e2535; }
+
+  .tag-pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; font-family: 'Consolas', monospace; margin: 2px 2px; white-space: nowrap; }
+  .tag-pos { background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+  .tag-tier { background: rgba(159,122,234,0.15); color: #b794f4; border: 1px solid rgba(159,122,234,0.3); }
+  .tag-hist { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+  .tag-special { background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+  .tag-existing { background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.5); }
+
+  .wf-card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2d3748; margin-bottom: 24px; overflow: hidden; }
+  .wf-card-header { padding: 16px 24px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid #2d3748; gap: 16px; }
+  .wf-card-header h3 { font-size: 16px; font-weight: 700; color: #f7fafc; }
+  .wf-card-header .trigger { font-size: 12px; color: #718096; margin-top: 3px; }
+  .wf-card-body { padding: 20px 24px; }
+
+  .state-diagram { background: #0f1117; border: 1px solid #2d3748; border-radius: 10px; padding: 24px; margin-bottom: 24px; font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; color: #a0aec0; line-height: 1.8; overflow-x: auto; white-space: pre; }
+
+  .checklist { list-style: none; }
+  .checklist li { padding: 10px 0; border-bottom: 1px solid #1e2535; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #a0aec0; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li .check { width: 18px; height: 18px; border: 2px solid #2d3748; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+
+  .note-box { background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.25); border-left: 4px solid #63b3ed; border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 13px; color: #cbd5e0; }
+  .note-box strong { color: #63b3ed; }
+  .warn-box { background: rgba(246,173,85,0.08); border: 1px solid rgba(246,173,85,0.25); border-left: 4px solid #f6ad55; border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 13px; color: #cbd5e0; }
+  .warn-box strong { color: #f6ad55; }
+
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a0aec0; }
+
+  .dot-green { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #68d391; margin-right: 6px; }
+  .dot-blue { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #63b3ed; margin-right: 6px; }
+  .dot-orange { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f6ad55; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sistema de Tags de Estado — Omnexor GHL</h1>
+  <div class="meta">Versión 1.1 — 2026-03-12 · Máquina de estados para todos los workflows</div>
+  <div class="badges">
+    <span class="badge badge-blue">16 tags de posición</span>
+    <span class="badge badge-purple">5 tags de tier</span>
+    <span class="badge badge-green">11 tags de historial</span>
+    <span class="badge badge-orange">32 tags en total</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="num num-blue">16</div>
+      <div class="label">Tags de posición</div>
+    </div>
+    <div class="summary-card">
+      <div class="num num-purple">5</div>
+      <div class="label">Tags de tier</div>
+    </div>
+    <div class="summary-card">
+      <div class="num num-green">11</div>
+      <div class="label">Tags de historial</div>
+    </div>
+    <div class="summary-card">
+      <div class="num num-total">32</div>
+      <div class="label">Total sistema</div>
+    </div>
+  </div>
+
+  <!-- Leyenda -->
+  <div class="legend">
+    <div class="legend-item"><span class="tag-pill tag-pos">ejemplo</span> Tag de posición — uno activo a la vez, se borra al avanzar</div>
+    <div class="legend-item"><span class="tag-pill tag-tier">ejemplo</span> Tag de tier — permanente, asignado por Luna</div>
+    <div class="legend-item"><span class="tag-pill tag-hist">ejemplo</span> Tag de historial — permanente, registro acumulativo</div>
+    <div class="legend-item"><span class="tag-pill tag-existing">ejemplo</span> Tag ya existente en GHL — no crear de nuevo</div>
+  </div>
+
+  <!-- Principios -->
+  <div class="section-title">Principios del sistema</div>
+  <div class="principles-grid">
+    <div class="principle-card">
+      <div class="p-icon">🎯</div>
+      <h4>Un solo tag de posición activo</h4>
+      <p>En todo momento el contacto tiene exactamente <strong>UN</strong> tag de posición activo. Al avanzar de paso, se borra el anterior y se añade el nuevo.</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-icon">📚</div>
+      <h4>Historial permanente</h4>
+      <p>Los tags de historial y de tier nunca se borran. Se acumulan para registrar qué ocurrió con el lead.</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-icon">⚙️</div>
+      <h4>Orden universal en cada step</h4>
+      <p>1. Stop Bot (si aplica) → 2. Remove Tag anterior → 3. Add Tag nuevo → 4. Acción del negocio. Siempre en este orden.</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-icon">🚧</div>
+      <h4>bot_completado como barrera</h4>
+      <p>Se añade en <strong>TODAS</strong> las ramas terminales de Luna. Impide que Alex vuelva a activar Luna en leads ya procesados.</p>
+    </div>
+  </div>
+
+  <!-- Tags de posición -->
+  <div class="section-title">Tags de posición <span style="font-weight:400; color:#718096; font-size:14px;">(se borran al avanzar)</span></div>
+  <table class="tag-table">
+    <thead>
+      <tr><th>Tag</th><th>Workflow / Bot</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="tag-pill tag-pos">entrada_nuevo</span></td><td>Entrada</td><td>Lead acaba de entrar, sin bot activo todavía</td></tr>
+      <tr><td><span class="tag-pill tag-pos">alex_activo</span></td><td>Bot Alex</td><td>Alex está enviando la bienvenida</td></tr>
+      <tr><td><span class="tag-pill tag-pos">wf1_activando</span></td><td>WF-1</td><td>WF-1 procesando activación de Luna</td></tr>
+      <tr><td><span class="tag-pill tag-pos">luna_iniciada</span></td><td>Bot Luna</td><td>Luna asignada, esperando primer mensaje del lead</td></tr>
+      <tr><td><span class="tag-pill tag-pos">luna_cualificando</span></td><td>Bot Luna</td><td>Luna haciendo preguntas de cualificación activamente</td></tr>
+      <tr><td><span class="tag-pill tag-pos">luna_booking</span></td><td>Bot Luna</td><td>Luna en proceso de agendar cita (tier ya asignado)</td></tr>
+      <tr><td><span class="tag-pill tag-pos">luna_loop_1</span></td><td>Bot Luna</td><td>Primer reintento en loop "no condition met"</td></tr>
+      <tr><td><span class="tag-pill tag-pos">luna_loop_2</span></td><td>Bot Luna</td><td>Segundo reintento — el tercero cierra la conversación</td></tr>
+      <tr><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>WF-2</td><td>WF-2 evaluando tier para enrutar al pipeline correcto</td></tr>
+      <tr><td><span class="tag-pill tag-pos">wf2_enrutado</span></td><td>WF-2</td><td>WF-2 completó enrutamiento — esperando cita en calendario</td></tr>
+      <tr><td><span class="tag-pill tag-pos">recordatorio_24h</span></td><td>WF-3</td><td>Recordatorio 24h enviado, cita en horizonte</td></tr>
+      <tr><td><span class="tag-pill tag-pos">recordatorio_2h</span></td><td>WF-3</td><td>Recordatorio 2h enviado, cita inminente</td></tr>
+      <tr><td><span class="tag-pill tag-pos">cita_proxima</span></td><td>WF-3</td><td>Cita confirmada pendiente de realizarse</td></tr>
+      <tr><td><span class="tag-pill tag-pos">noshow_detectado</span></td><td>WF No Show</td><td>No show registrado, Anna pendiente de activar</td></tr>
+      <tr><td><span class="tag-pill tag-existing">anna_activa</span> <span style="color:#718096; font-size:11px;">ya existe</span></td><td>Bot Anna</td><td>Anna en conversación activa con el lead</td></tr>
+      <tr><td><span class="tag-pill tag-pos">anna_reagendando</span></td><td>Bot Anna</td><td>Anna ofreciendo nueva fecha para reagendar</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Tags de tier -->
+  <div class="section-title">Tags de tier <span style="font-weight:400; color:#718096; font-size:14px;">(permanentes — los asigna Luna)</span></div>
+  <table class="tag-table">
+    <thead>
+      <tr><th>Tag</th><th>Presupuesto</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="tag-pill tag-tier">tier_enterprise</span></td><td>5.000€+</td><td>Lead de alto valor — asignación a closer manual</td></tr>
+      <tr><td><span class="tag-pill tag-tier">tier_midmarket</span></td><td>1.500€ – 4.999€</td><td>Pipeline principal de conversión</td></tr>
+      <tr><td><span class="tag-pill tag-tier">tier_small</span></td><td>150€ – 1.499€</td><td>Enrutar a nurturing o pipeline small</td></tr>
+      <tr><td><span class="tag-pill tag-tier">tier_nocualificado</span></td><td>Menos de 150€</td><td>Descarte directo — no agendar cita</td></tr>
+      <tr><td><span class="tag-pill tag-tier">tier_nosabe</span></td><td>No sabe / ambiguo</td><td>Respuesta empática + booking opcional</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Tags de historial -->
+  <div class="section-title">Tags de historial <span style="font-weight:400; color:#718096; font-size:14px;">(permanentes — registro acumulativo)</span></div>
+  <table class="tag-table">
+    <thead>
+      <tr><th>Tag</th><th>Cuándo se añade</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="tag-pill tag-existing">bot_completado</span> <span style="color:#718096; font-size:11px;">ya existe</span></td><td>Todas las ramas terminales de Luna</td><td>Barrera anti-reactivación de Alex. No renombrar.</td></tr>
+      <tr><td><span class="tag-pill tag-existing">cita_agendada</span> <span style="color:#718096; font-size:11px;">ya existe</span></td><td>Booking completado en Luna</td><td>Se agendó cita al menos una vez</td></tr>
+      <tr><td><span class="tag-pill tag-existing">agendado_ia</span> <span style="color:#718096; font-size:11px;">ya existe</span></td><td>Confirmación de primera cita en WF-3</td><td>Marcador de primera cita — evita duplicar recordatorios en reagendados</td></tr>
+      <tr><td><span class="tag-pill tag-hist">luna_completada</span></td><td>Luna cierra con éxito</td><td>Luna completó cualificación correctamente</td></tr>
+      <tr><td><span class="tag-pill tag-hist">luna_descartada</span></td><td>No cualificado o loop agotado</td><td>Luna cerró sin cualificar</td></tr>
+      <tr><td><span class="tag-pill tag-hist">recordatorio_enviado</span></td><td>Primer recordatorio de WF-3</td><td>Se envió al menos un recordatorio pre-cita</td></tr>
+      <tr><td><span class="tag-pill tag-hist">noshow</span></td><td>Appointment status = No Show</td><td>El contacto no se presentó a una cita</td></tr>
+      <tr><td><span class="tag-pill tag-hist">reagendado</span></td><td>Anna consigue nueva cita</td><td>El contacto reagendó vía Anna</td></tr>
+      <tr><td><span class="tag-pill tag-hist">anna_descartada</span></td><td>Anna agota intentos sin éxito</td><td>Anna no logró reagendar — contacto cerrado</td></tr>
+      <tr><td><span class="tag-pill tag-hist">ganado</span></td><td>Appointment status = Showed</td><td>Cita realizada — lead convertido</td></tr>
+      <tr><td><span class="tag-pill tag-hist">nurturing</span></td><td>WF-2 rama Small o Nosabe</td><td>Contacto derivado a nurturing largo plazo</td></tr>
+      <tr><td><span class="tag-pill tag-hist">closer_asignado</span></td><td>WF-2 rama Enterprise</td><td>Closer asignado manualmente</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Mapa por workflow -->
+  <div class="section-title">Mapa de tags por workflow</div>
+
+  <!-- Bot Alex -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>Bot Alex — Bienvenida</h3>
+        <div class="trigger">Trigger: Contacto nuevo inbound (WhatsApp)</div>
+      </div>
+      <span class="badge badge-blue">Flow Builder V3</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso</th><th>Add Tag</th><th>Remove Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Contacto creado (WF trigger "Contact Created")</td><td><span class="tag-pill tag-pos">entrada_nuevo</span></td><td>—</td></tr>
+          <tr><td>Alex inicia conversación</td><td><span class="tag-pill tag-pos">alex_activo</span></td><td><span class="tag-pill tag-pos">entrada_nuevo</span></td></tr>
+          <tr><td>Alex finaliza — pasa a WF-1</td><td><span class="tag-pill tag-pos">wf1_activando</span></td><td><span class="tag-pill tag-pos">alex_activo</span></td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><strong>Nota:</strong> Alex <strong>NO</strong> añade <code>bot_completado</code> — ese tag es exclusivo de Luna.</div>
+    </div>
+  </div>
+
+  <!-- WF-1 -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-1 — Activación de Luna</h3>
+        <div class="trigger">Trigger: Tag añadido = <code>wf1_activando</code></div>
+      </div>
+      <span class="badge badge-orange">Workflow GHL</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso</th><th>Add Tag</th><th>Remove Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Branch: NO tiene <code>bot_completado</code> → activar Luna</td><td><span class="tag-pill tag-pos">luna_iniciada</span></td><td><span class="tag-pill tag-pos">wf1_activando</span></td></tr>
+          <tr><td>Branch: SÍ tiene <code>bot_completado</code> → ya cualificado</td><td>—</td><td><span class="tag-pill tag-pos">wf1_activando</span></td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box"><strong>Regla:</strong> Filtros del branch en <strong>OR</strong> (GHL pone AND por defecto — bug conocido).</div>
+    </div>
+  </div>
+
+  <!-- Bot Luna -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>Bot Luna — Cualificación</h3>
+        <div class="trigger">Trigger: Tag añadido = <code>luna_iniciada</code></div>
+      </div>
+      <span class="badge badge-blue">Flow Builder V3</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso en el Flow</th><th>Add Tag</th><th>Remove Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Luna empieza preguntas</td><td><span class="tag-pill tag-pos">luna_cualificando</span></td><td><span class="tag-pill tag-pos">luna_iniciada</span></td></tr>
+          <tr><td>AI Splitter → Enterprise</td><td><span class="tag-pill tag-tier">tier_enterprise</span> <span class="tag-pill tag-pos">luna_booking</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>AI Splitter → Midmarket</td><td><span class="tag-pill tag-tier">tier_midmarket</span> <span class="tag-pill tag-pos">luna_booking</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>AI Splitter → Small</td><td><span class="tag-pill tag-tier">tier_small</span> <span class="tag-pill tag-pos">luna_booking</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>AI Splitter → No cualificado <strong>(TERMINAL)</strong></td><td><span class="tag-pill tag-tier">tier_nocualificado</span> <span class="tag-pill tag-hist">luna_descartada</span> <span class="tag-pill tag-existing">bot_completado</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>AI Splitter → No sabe</td><td><span class="tag-pill tag-tier">tier_nosabe</span> <span class="tag-pill tag-pos">luna_booking</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>Booking completado <strong>(TERMINAL → WF-2)</strong></td><td><span class="tag-pill tag-pos">wf2_enrutando</span> <span class="tag-pill tag-hist">luna_completada</span> <span class="tag-pill tag-existing">cita_agendada</span> <span class="tag-pill tag-existing">bot_completado</span></td><td><span class="tag-pill tag-pos">luna_booking</span></td></tr>
+          <tr><td>No quiere booking <strong>(TERMINAL → WF-2)</strong></td><td><span class="tag-pill tag-pos">wf2_enrutando</span> <span class="tag-pill tag-hist">luna_completada</span> <span class="tag-pill tag-existing">bot_completado</span></td><td><span class="tag-pill tag-pos">luna_booking</span></td></tr>
+          <tr><td>Loop "no condition met" — 1er reintento</td><td><span class="tag-pill tag-pos">luna_loop_1</span></td><td><span class="tag-pill tag-pos">luna_cualificando</span></td></tr>
+          <tr><td>Loop "no condition met" — 2do reintento</td><td><span class="tag-pill tag-pos">luna_loop_2</span></td><td><span class="tag-pill tag-pos">luna_loop_1</span></td></tr>
+          <tr><td>Loop — 3er reintento → cierre <strong>(TERMINAL)</strong></td><td><span class="tag-pill tag-hist">luna_descartada</span> <span class="tag-pill tag-existing">bot_completado</span></td><td><span class="tag-pill tag-pos">luna_loop_2</span></td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box"><strong>Crítico:</strong> <code>bot_completado</code> debe estar en <strong>TODAS</strong> las ramas terminales sin excepción. No cualificado, no quiere booking, loop agotado, booking completado.</div>
+    </div>
+  </div>
+
+  <!-- WF-2 -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-2 — Enrutamiento post-cualificación</h3>
+        <div class="trigger">Trigger: Tag añadido = <code>wf2_enrutando</code></div>
+      </div>
+      <span class="badge badge-orange">Workflow GHL</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Branch</th><th>Add Tag</th><th>Remove Tag</th><th>Acción adicional</th></tr></thead>
+        <tbody>
+          <tr><td>Primera acción <strong>(SIEMPRE)</strong></td><td>—</td><td>—</td><td><strong>Stop Bot</strong> — obligatorio como primera acción</td></tr>
+          <tr><td>Tier Enterprise</td><td><span class="tag-pill tag-hist">closer_asignado</span></td><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>Crear oportunidad pipeline Enterprise + notificar closer</td></tr>
+          <tr><td>Tier Midmarket</td><td><span class="tag-pill tag-pos">wf2_enrutado</span></td><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>Crear oportunidad pipeline Midmarket → WF-3</td></tr>
+          <tr><td>Tier Small</td><td><span class="tag-pill tag-hist">nurturing</span></td><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>Crear oportunidad pipeline Small + secuencia nurturing</td></tr>
+          <tr><td>Tier Nosabe</td><td><span class="tag-pill tag-hist">nurturing</span></td><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>Seguimiento empático</td></tr>
+          <tr><td>No cualificado</td><td>—</td><td><span class="tag-pill tag-pos">wf2_enrutando</span></td><td>Cerrar oportunidad como "Perdido"</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><strong>Recordatorio:</strong> Crear la oportunidad aquí en WF-2, <strong>no</strong> dentro del Flow Builder de Luna. Filtros de tier en <strong>OR</strong>.</div>
+    </div>
+  </div>
+
+  <!-- WF-3 -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF-3 — Recordatorios pre-cita</h3>
+        <div class="trigger">Trigger: Appointment Created / Confirmed en calendario</div>
+      </div>
+      <span class="badge badge-orange">Workflow GHL</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso</th><th>Add Tag</th><th>Remove Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Cita detectada — inicio WF-3</td><td><span class="tag-pill tag-pos">recordatorio_24h</span></td><td><span class="tag-pill tag-pos">wf2_enrutado</span> (o tag activo actual)</td></tr>
+          <tr><td>Wait hasta 24h antes de cita</td><td>—</td><td>—</td></tr>
+          <tr><td>Enviar recordatorio 24h (template Meta)</td><td><span class="tag-pill tag-hist">recordatorio_enviado</span></td><td>—</td></tr>
+          <tr><td>Avanzar a recordatorio 2h</td><td><span class="tag-pill tag-pos">recordatorio_2h</span></td><td><span class="tag-pill tag-pos">recordatorio_24h</span></td></tr>
+          <tr><td>Wait hasta 2h antes de cita</td><td>—</td><td>—</td></tr>
+          <tr><td>Enviar recordatorio 2h (template Meta)</td><td>—</td><td>—</td></tr>
+          <tr><td>Cita inminente</td><td><span class="tag-pill tag-pos">cita_proxima</span></td><td><span class="tag-pill tag-pos">recordatorio_2h</span></td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><strong>Nota sobre <code>agendado_ia</code>:</strong> Al inicio de WF-3, verificar si el contacto ya tiene <code>agendado_ia</code>. Si lo tiene → es un reagendado, enviar solo confirmación de nuevo horario y saltar al ciclo de recordatorios. Si no lo tiene → flujo completo + añadir <code>agendado_ia</code> al confirmar la primera cita.</div>
+      <div class="warn-box"><strong>Crítico:</strong> Mensajes después de Wait de 24h+ <strong>siempre template Meta aprobado</strong>. Los mensajes libres fallan silenciosamente en GHL.</div>
+    </div>
+  </div>
+
+  <!-- WF No Show + Anna -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF No Show — Bot Anna</h3>
+        <div class="trigger">Trigger: Appointment status cambia a "No Show"</div>
+      </div>
+      <span class="badge badge-orange">Workflow GHL</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso</th><th>Add Tag</th><th>Remove Tag</th><th>Acción adicional</th></tr></thead>
+        <tbody>
+          <tr><td>No show detectado</td><td><span class="tag-pill tag-pos">noshow_detectado</span> <span class="tag-pill tag-hist">noshow</span></td><td><span class="tag-pill tag-pos">cita_proxima</span></td><td>Actualizar oportunidad en pipeline</td></tr>
+          <tr><td>Wait 1–2h (margen por tardanza)</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Activar Anna</td><td><span class="tag-pill tag-existing">anna_activa</span></td><td><span class="tag-pill tag-pos">noshow_detectado</span></td><td>Asignar bot Anna + template Meta de reagendado</td></tr>
+          <tr><td>Anna ofreciendo nueva fecha</td><td><span class="tag-pill tag-pos">anna_reagendando</span></td><td><span class="tag-pill tag-existing">anna_activa</span></td><td>—</td></tr>
+          <tr><td>Acepta reagendar <strong>(TERMINAL → vuelve a WF-3)</strong></td><td><span class="tag-pill tag-hist">reagendado</span> <span class="tag-pill tag-pos">recordatorio_24h</span></td><td><span class="tag-pill tag-pos">anna_reagendando</span></td><td>Nueva cita creada → WF-3 reinicia</td></tr>
+          <tr><td>Rechaza o no responde <strong>(TERMINAL)</strong></td><td><span class="tag-pill tag-hist">anna_descartada</span></td><td><span class="tag-pill tag-pos">anna_reagendando</span></td><td>Cerrar oportunidad como "Perdido"</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><strong>Nota:</strong> El tag <code>noshow</code> queda registrado permanentemente aunque el lead reagende. El Wait de 1–2h da margen por si llegó tarde y el sistema ya marcó no show.</div>
+    </div>
+  </div>
+
+  <!-- WF Ganado -->
+  <div class="wf-card">
+    <div class="wf-card-header">
+      <div>
+        <h3>WF Ganado — Cita realizada</h3>
+        <div class="trigger">Trigger: Appointment status cambia a "Showed"</div>
+      </div>
+      <span class="badge badge-green">Cierre positivo</span>
+    </div>
+    <div class="wf-card-body">
+      <table class="tag-table">
+        <thead><tr><th>Paso</th><th>Add Tag</th><th>Remove Tag</th></tr></thead>
+        <tbody>
+          <tr><td>Cita realizada → marcar como ganado</td><td><span class="tag-pill tag-hist">ganado</span></td><td><span class="tag-pill tag-pos">cita_proxima</span></td></tr>
+          <tr><td>Actualizar oportunidad a "Ganado"</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Estados finales -->
+  <div class="section-title">Estados finales — combinaciones de tags</div>
+  <table class="tag-table">
+    <thead><tr><th>Situación</th><th>Tags de historial presentes</th><th>Tag de posición activo</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="dot-green"></span>Ganado (cita realizada)</td>
+        <td><span class="tag-pill tag-hist">ganado</span> <span class="tag-pill tag-existing">cita_agendada</span> <span class="tag-pill tag-hist">luna_completada</span></td>
+        <td><em style="color:#718096">ninguno</em></td>
+      </tr>
+      <tr>
+        <td><span class="dot-orange"></span>No show sin reagendar</td>
+        <td><span class="tag-pill tag-hist">noshow</span> <span class="tag-pill tag-hist">anna_descartada</span></td>
+        <td><em style="color:#718096">ninguno</em></td>
+      </tr>
+      <tr>
+        <td><span class="dot-blue"></span>Reagendado (esperando cita)</td>
+        <td><span class="tag-pill tag-hist">noshow</span> <span class="tag-pill tag-hist">reagendado</span></td>
+        <td><span class="tag-pill tag-pos">recordatorio_24h</span></td>
+      </tr>
+      <tr>
+        <td>No cualificado</td>
+        <td><span class="tag-pill tag-hist">luna_descartada</span> <span class="tag-pill tag-tier">tier_nocualificado</span> <span class="tag-pill tag-existing">bot_completado</span></td>
+        <td><em style="color:#718096">ninguno</em></td>
+      </tr>
+      <tr>
+        <td>Loop agotado</td>
+        <td><span class="tag-pill tag-hist">luna_descartada</span> <span class="tag-pill tag-existing">bot_completado</span> + tier si fue asignado</td>
+        <td><em style="color:#718096">ninguno</em></td>
+      </tr>
+      <tr>
+        <td>Nurturing largo plazo</td>
+        <td><span class="tag-pill tag-hist">nurturing</span> + tier</td>
+        <td><em style="color:#718096">ninguno</em></td>
+      </tr>
+      <tr>
+        <td>Enterprise — closer asignado</td>
+        <td><span class="tag-pill tag-hist">closer_asignado</span> <span class="tag-pill tag-tier">tier_enterprise</span></td>
+        <td><em style="color:#718096">ninguno (gestión manual)</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Diagrama -->
+  <div class="section-title">Diagrama de flujo de estados</div>
+  <div class="state-diagram">[Contacto nuevo]
+       │
+       ▼
+entrada_nuevo
+       │
+       ▼ (Alex inicia)
+alex_activo
+       │
+       ▼ (Alex termina)
+wf1_activando
+       │
+       ├─ ya tiene bot_completado ──────────────────────── FIN (no hacer nada)
+       │
+       ▼ (Luna asignada)
+luna_iniciada → luna_cualificando
+       │
+       ├─ No cualificado ──── tier_nocualificado + luna_descartada + bot_completado ── FIN
+       │
+       ├─ tier asignado ───── tier_[X] (permanente)
+       │         │
+       │         ▼
+       │   luna_booking
+       │         │
+       │         ├─ Booking OK  ──── wf2_enrutando + luna_completada + cita_agendada + bot_completado
+       │         └─ No booking  ──── wf2_enrutando + luna_completada + bot_completado
+       │
+       ├─ loop_1 ──► loop_2 ──► luna_descartada + bot_completado ── FIN
+       │
+       ▼ (WF-2 enruta)
+wf2_enrutando
+       │
+       ├─ Enterprise ─── closer_asignado ──────────────── FIN / seguimiento manual
+       ├─ Midmarket  ─── wf2_enrutado ─────────────────── WF-3 ▼
+       ├─ Small      ─── nurturing ─────────────────────── nurturing / WF-3 ▼
+       ├─ Nosabe     ─── nurturing ─────────────────────── seguimiento
+       └─ No cualif. ──────────────────────────────────── FIN
+                │
+                ▼ (WF-3 — hay cita)
+       recordatorio_24h ──► recordatorio_2h ──► cita_proxima
+                │
+                ├─ Showed ──── ganado ─────────────────── FIN ✓
+                │
+                └─ No Show ─── noshow_detectado + noshow
+                                      │
+                                      ▼ (Anna)
+                               anna_activa ──► anna_reagendando
+                                      │
+                                      ├─ Reagenda ─── reagendado ──► vuelve a WF-3
+                                      └─ Rechaza  ─── anna_descartada ─── FIN</div>
+
+  <!-- Checklist -->
+  <div class="section-title">Checklist de implementación</div>
+  <div class="wf-card">
+    <div class="wf-card-body">
+      <ul class="checklist">
+        <li><div class="check"></div>Crear los tags nuevos en GHL (Settings → Tags) — los marcados en naranja ya existen</li>
+        <li><div class="check"></div>Verificar que TODAS las ramas terminales de Luna añaden <code>bot_completado</code></li>
+        <li><div class="check"></div>WF-2 tiene <strong>Stop Bot</strong> como primera acción obligatoria</li>
+        <li><div class="check"></div>Filtros de tier en WF-2 usan <strong>OR</strong> (GHL pone AND por defecto)</li>
+        <li><div class="check"></div>Mensajes post-Wait de 24h+ usan template Meta aprobado (nunca mensaje libre)</li>
+        <li><div class="check"></div>WF-3 tiene condición al inicio: si tiene <code>agendado_ia</code> → rama reagendado (sin ciclo completo)</li>
+        <li><div class="check"></div>WF No Show: Wait de 1–2h antes de activar Anna</li>
+        <li><div class="check"></div>Probar con contacto de test: recorrer todo el funnel paso a paso</li>
+        <li><div class="check"></div>Verificar que en cada paso solo hay UN tag de posición activo</li>
+        <li><div class="check"></div>Verificar que los tags de historial y tier no se borran en ningún paso</li>
+        <li><div class="check"></div>WF Ganado configurado con trigger Appointment status = "Showed"</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

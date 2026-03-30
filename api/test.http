@@ -1,0 +1,21 @@
+### Test 1 — Primer mensaje
+POST http://localhost:5678/webhook-test/luna-test
+Content-Type: application/json
+
+{
+  "message": "Hola, me interesa vuestro servicio",
+  "firstName": "Carlos"
+}
+
+### Test 2 — Continuar conversación (con historial)
+POST http://localhost:5678/webhook-test/luna-test
+Content-Type: application/json
+
+{
+  "message": "Tengo una agencia de marketing",
+  "firstName": "Carlos",
+  "historial": [
+    { "role": "assistant", "content": "¡Hola Carlos! Encantada de conocerte. Para poder ayudarte mejor, ¿a qué se dedica tu empresa o negocio?" },
+    { "role": "user", "content": "Hola, me interesa vuestro servicio" }
+  ]
+}

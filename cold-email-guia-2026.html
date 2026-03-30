@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cold Email 2026 — Guía por Sector | Omnexor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  :root{
+    --bg:#f1f5f9;
+    --white:#fff;
+    --dark:#0f172a;
+    --blue:#2563eb;
+    --blue-light:#eff6ff;
+    --blue-mid:#bfdbfe;
+    --green:#10b981;
+    --green-light:#ecfdf5;
+    --green-mid:#bbf7d0;
+    --red:#dc2626;
+    --red-light:#fef2f2;
+    --red-mid:#fecaca;
+    --orange:#f59e0b;
+    --orange-light:#fffbeb;
+    --purple:#7c3aed;
+    --slate:#64748b;
+    --border:#e2e8f0;
+  }
+
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--dark);
+    line-height:1.6;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper{max-width:1000px;margin:0 auto;padding:48px 24px 100px;}
+
+  /* ── HERO ── */
+  .hero{
+    background:linear-gradient(160deg,#060a14 0%,#0a1628 45%,#1e3a8a 100%);
+    border-radius:20px;
+    padding:52px 60px;
+    color:#fff;
+    margin-bottom:40px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';position:absolute;top:-80px;right:-80px;
+    width:300px;height:300px;
+    background:radial-gradient(circle,rgba(37,99,235,.2),transparent 70%);
+    border-radius:50%;
+  }
+  .hero::after{
+    content:'';position:absolute;bottom:-60px;left:30%;
+    width:200px;height:200px;
+    background:radial-gradient(circle,rgba(16,185,129,.1),transparent 70%);
+    border-radius:50%;
+  }
+  .hero-eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+    border-radius:100px;padding:7px 18px;
+    font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:rgba(255,255,255,.6);margin-bottom:28px;
+  }
+  .hero-eyebrow span{width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block;}
+  .hero h1{
+    font-size:42px;font-weight:900;letter-spacing:-.03em;line-height:1.1;
+    margin-bottom:16px;position:relative;z-index:1;
+  }
+  .hero h1 em{font-style:normal;color:#60a5fa;}
+  .hero-sub{
+    font-size:16px;color:rgba(255,255,255,.6);max-width:600px;
+    line-height:1.65;margin-bottom:36px;position:relative;z-index:1;
+  }
+  .hero-stats{
+    display:flex;gap:40px;position:relative;z-index:1;
+    padding-top:28px;border-top:1px solid rgba(255,255,255,.08);
+  }
+  .hero-stat-val{font-size:28px;font-weight:800;color:#fff;line-height:1;}
+  .hero-stat-val .accent{color:#10b981;}
+  .hero-stat-lbl{font-size:11px;color:rgba(255,255,255,.45);font-weight:500;margin-top:4px;}
+
+  /* ── INDEX ── */
+  .toc{
+    background:var(--white);border-radius:14px;border:1px solid var(--border);
+    padding:28px 32px;margin-bottom:40px;
+  }
+  .toc-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:16px;}
+  .toc-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .toc-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;border-radius:8px;
+    background:var(--bg);border:1px solid var(--border);
+    text-decoration:none;color:var(--dark);
+    font-size:13px;font-weight:500;
+    transition:background .15s;
+  }
+  .toc-item:hover{background:#e2e8f0;}
+  .toc-num{
+    width:24px;height:24px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+  }
+
+  /* ── SECTION ── */
+  .section{margin-bottom:60px;}
+  .section-header{
+    border-radius:16px;padding:32px 40px;margin-bottom:24px;color:#fff;
+    position:relative;overflow:hidden;
+  }
+  .section-header::after{
+    content:'';position:absolute;top:-40px;right:-40px;
+    width:160px;height:160px;
+    background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);
+    border-radius:50%;
+  }
+  .sh-1{background:linear-gradient(135deg,#0f4c75,#1b6ca8);}
+  .sh-2{background:linear-gradient(135deg,#0a3d2e,#1a6b4a);}
+  .sh-3{background:linear-gradient(135deg,#4a1942,#7b2d8b);}
+  .sh-4{background:linear-gradient(135deg,#7c2d12,#c2410c);}
+  .sh-0{background:linear-gradient(135deg,#1e1b4b,#3730a3);}
+
+  .section-num{
+    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(255,255,255,.5);margin-bottom:8px;
+  }
+  .section-header h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+  .section-header p{font-size:14px;color:rgba(255,255,255,.65);max-width:500px;line-height:1.6;}
+  .section-tags{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
+  .stag{
+    font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+    color:rgba(255,255,255,.8);
+  }
+
+  /* ── PAIN BOX ── */
+  .pain-box{
+    background:var(--red-light);border:1px solid var(--red-mid);
+    border-radius:12px;padding:20px 24px;margin-bottom:20px;
+  }
+  .pain-box-title{
+    font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .pain-box ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
+  .pain-box li{
+    font-size:13.5px;color:#7f1d1d;
+    display:flex;align-items:flex-start;gap:8px;
+  }
+  .pain-box li::before{content:'→';color:var(--red);font-weight:700;flex-shrink:0;}
+
+  /* ── INSIGHT BOX ── */
+  .insight-box{
+    background:var(--blue-light);border:1px solid var(--blue-mid);
+    border-radius:12px;padding:18px 24px;margin-bottom:24px;
+    font-size:13.5px;color:#1e3a8a;line-height:1.6;
+  }
+  .insight-box strong{font-weight:700;}
+
+  /* ── EMAIL CARD ── */
+  .email-card{
+    background:var(--white);border-radius:12px;border:1px solid var(--border);
+    overflow:hidden;margin-bottom:16px;
+  }
+  .ec-header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 24px;background:#f8fafc;border-bottom:1px solid var(--border);
+  }
+  .ec-step{display:flex;align-items:center;gap:12px;}
+  .ec-badge{
+    width:30px;height:30px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+  }
+  .ec-badge.b1{background:linear-gradient(135deg,#2563eb,#1d4ed8);}
+  .ec-badge.b2{background:linear-gradient(135deg,#7c3aed,#6d28d9);}
+  .ec-badge.b3{background:linear-gradient(135deg,#0891b2,#0e7490);}
+  .ec-badge.b4{background:linear-gradient(135deg,#059669,#047857);}
+  .ec-title{font-size:14px;font-weight:600;color:var(--dark);}
+  .ec-day{
+    font-size:11px;font-weight:600;padding:4px 12px;
+    border-radius:100px;background:#e2e8f0;color:var(--slate);
+  }
+  .ec-subjects{
+    padding:14px 24px;border-bottom:1px solid #f1f5f9;background:#fafbfc;
+  }
+  .ec-subjects-label{
+    font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:#94a3b8;margin-bottom:8px;
+  }
+  .ec-subjects-list{display:flex;flex-wrap:wrap;gap:8px;}
+  .ec-subject{
+    font-size:12px;font-weight:500;padding:5px 12px;
+    border-radius:8px;background:var(--blue-light);
+    border:1px solid var(--blue-mid);color:#1e3a8a;
+  }
+  .ec-body{padding:20px 24px;border-bottom:1px solid #f1f5f9;}
+  .ec-body p{font-size:13.5px;color:#334155;line-height:1.7;margin-bottom:6px;}
+  .var{color:var(--purple);font-weight:500;}
+  .ec-why{
+    padding:14px 24px;background:var(--green-light);
+    display:flex;align-items:flex-start;gap:10px;
+  }
+  .ec-why-icon{
+    width:20px;height:20px;background:var(--green);color:#fff;
+    border-radius:6px;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;
+  }
+  .ec-why-text{font-size:12.5px;color:#065f46;line-height:1.55;}
+  .ec-why-text strong{font-weight:600;}
+
+  /* ── TIPS GRID ── */
+  .tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+  .tip-card{
+    background:var(--white);border:1px solid var(--border);
+    border-radius:10px;padding:16px 18px;
+  }
+  .tip-icon{font-size:20px;margin-bottom:8px;}
+  .tip-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+  .tip-body{font-size:12px;color:var(--slate);line-height:1.55;}
+
+  /* ── CONFIG TABLE ── */
+  .config-table-wrap{
+    background:var(--white);border-radius:12px;border:1px solid var(--border);
+    overflow:hidden;margin-bottom:8px;
+  }
+  table{width:100%;border-collapse:collapse;}
+  th{
+    font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:#94a3b8;padding:10px 20px;background:#f8fafc;
+    border-bottom:1px solid var(--border);text-align:left;
+  }
+  td{padding:11px 20px;font-size:13px;color:#475569;border-bottom:1px solid #f8fafc;}
+  tr:last-child td{border-bottom:none;}
+  td:first-child{font-weight:600;color:var(--dark);}
+  td.green{color:var(--green);font-weight:700;}
+  td.red{color:var(--red);font-weight:700;}
+  td.blue{color:var(--blue);font-weight:700;}
+
+  /* ── DEAD/ALIVE BOX ── */
+  .da-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .da-card{border-radius:12px;padding:20px 24px;}
+  .da-dead{background:var(--red-light);border:1px solid var(--red-mid);}
+  .da-alive{background:var(--green-light);border:1px solid var(--green-mid);}
+  .da-title{
+    font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    margin-bottom:12px;display:flex;align-items:center;gap:6px;
+  }
+  .da-dead .da-title{color:var(--red);}
+  .da-alive .da-title{color:#065f46;}
+  .da-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
+  .da-list li{font-size:13px;display:flex;align-items:flex-start;gap:8px;line-height:1.4;}
+  .da-dead .da-list li{color:#7f1d1d;}
+  .da-alive .da-list li{color:#064e3b;}
+  .da-dead .da-list li::before{content:'✗';color:var(--red);font-weight:700;flex-shrink:0;}
+  .da-alive .da-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+
+  /* ── BENCHMARK ── */
+  .benchmark-strip{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--border);border-radius:12px;overflow:hidden;
+    margin-bottom:24px;
+  }
+  .bm-cell{
+    background:var(--white);padding:20px 16px;text-align:center;
+  }
+  .bm-val{font-size:28px;font-weight:800;color:var(--dark);line-height:1;}
+  .bm-val.g{color:var(--green);}
+  .bm-val.b{color:var(--blue);}
+  .bm-val.r{color:var(--red);}
+  .bm-val.o{color:var(--orange);}
+  .bm-lbl{font-size:11px;color:var(--slate);font-weight:500;margin-top:6px;line-height:1.3;}
+
+  /* ── DIVIDER ── */
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:32px 0;}
+
+  /* ── FOOTER ── */
+  .doc-footer{
+    text-align:center;padding-top:40px;
+    font-size:12px;color:#94a3b8;border-top:1px solid var(--border);
+  }
+  .footer-brand{font-weight:700;color:var(--dark);font-size:15px;}
+  .footer-brand .dot{color:var(--blue);}
+
+  /* ── Responsive ── */
+  @media(max-width:700px){
+    .toc-list,.da-grid,.tips-grid{grid-template-columns:1fr;}
+    .hero{padding:36px 28px;}
+    .hero h1{font-size:30px;}
+    .section-header{padding:28px 28px;}
+    .hero-stats{flex-direction:column;gap:20px;}
+    .benchmark-strip{grid-template-columns:1fr 1fr;}
+  }
+
+  /* ── NAV ── */
+  .page-nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(15,23,42,.97);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:0 24px;
+  }
+  .page-nav-inner{
+    max-width:1000px;margin:0 auto;
+    display:flex;align-items:center;gap:4px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .page-nav-inner::-webkit-scrollbar{display:none;}
+  .nav-brand{
+    font-size:14px;font-weight:700;color:#fff;
+    padding:16px 20px 16px 0;
+    border-right:1px solid rgba(255,255,255,.1);
+    margin-right:8px;white-space:nowrap;flex-shrink:0;
+  }
+  .nav-brand .dot{color:#2563eb;}
+  .nav-btn{
+    display:flex;align-items:center;gap:7px;
+    padding:14px 16px;
+    font-size:12.5px;font-weight:600;
+    color:rgba(255,255,255,.45);
+    border:none;background:none;cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all .18s;white-space:nowrap;flex-shrink:0;
+    letter-spacing:.01em;
+  }
+  .nav-btn:hover{color:rgba(255,255,255,.8);}
+  .nav-btn.active{color:#fff;border-bottom-color:#2563eb;}
+  .nav-btn .nb{
+    width:18px;height:18px;border-radius:5px;
+    font-size:10px;font-weight:700;color:#fff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+
+  /* ── PAGE VISIBILITY ── */
+  .page-section{display:none;}
+  .page-section.active{display:block;}
+
+</style>
+</head>
+<body>
+
+<nav class="page-nav">
+  <div class="page-nav-inner">
+    <div class="nav-brand">omnexor<span class="dot">.</span></div>
+    <button class="nav-btn active" onclick="showPage('intro')" data-page="intro">
+      <div class="nb" style="background:#3730a3;">0</div> Fundamentos 2026
+    </button>
+    <button class="nav-btn" onclick="showPage('clinicas')" data-page="clinicas">
+      <div class="nb" style="background:#1b6ca8;">1</div> Clínicas dentales
+    </button>
+    <button class="nav-btn" onclick="showPage('inmobiliarias')" data-page="inmobiliarias">
+      <div class="nb" style="background:#1a6b4a;">2</div> Inmobiliarias
+    </button>
+    <button class="nav-btn" onclick="showPage('reformas')" data-page="reformas">
+      <div class="nb" style="background:#7b2d8b;">3</div> Reformas
+    </button>
+    <button class="nav-btn" onclick="showPage('estetica')" data-page="estetica">
+      <div class="nb" style="background:#c2410c;">4</div> Estética
+    </button>
+    <button class="nav-btn" onclick="showPage('config')" data-page="config">
+      <div class="nb" style="background:#0f172a;border:1px solid rgba(255,255,255,.2);">⚙</div> Config
+    </button>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+<div class="page-section active" data-page="intro">
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <div class="hero-eyebrow"><span></span> Investigación actualizada — Marzo 2026</div>
+  <h1>Cold Email 2026<br><em>Lo que funciona ahora</em></h1>
+  <p class="hero-sub">Guía práctica basada en benchmarks reales y análisis de miles de campañas activas. Secuencias listas para usar por sector: clínicas dentales, inmobiliarias, reformas y centros de estética.</p>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val">3.43<span class="accent">%</span></div>
+      <div class="hero-stat-lbl">Reply rate medio global 2026<br>(top performers: 10–25%)</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">50–125</div>
+      <div class="hero-stat-lbl">Palabras óptimas por email<br>(50% más replies que emails largos)</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">30<span class="accent">%</span></div>
+      <div class="hero-stat-lbl">Tasa de éxito de CTAs tipo<br>"¿te interesa saber más?"</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">287<span class="accent">%</span></div>
+      <div class="hero-stat-lbl">Boost con multichannel<br>email + LinkedIn + llamada</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ÍNDICE ══════════════ -->
+<div class="toc">
+  <div class="toc-title">Contenido de este documento</div>
+  <div class="toc-list">
+    <a href="#fundamentos" class="toc-item">
+      <div class="toc-num" style="background:#3730a3;">0</div>
+      Fundamentos 2026 — Qué ha cambiado
+    </a>
+    <a href="#clinicas" class="toc-item">
+      <div class="toc-num" style="background:#1b6ca8;">1</div>
+      Clínicas dentales
+    </a>
+    <a href="#inmobiliarias" class="toc-item">
+      <div class="toc-num" style="background:#1a6b4a;">2</div>
+      Inmobiliarias
+    </a>
+    <a href="#reformas" class="toc-item">
+      <div class="toc-num" style="background:#7b2d8b;">3</div>
+      Empresas de reformas
+    </a>
+    <a href="#estetica" class="toc-item">
+      <div class="toc-num" style="background:#c2410c;">4</div>
+      Centros de estética / peluquerías
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════ SECCIÓN 0: FUNDAMENTOS ══════════════ -->
+<div class="section" id="fundamentos">
+  <div class="section-header sh-0">
+    <div class="section-num">Sección 0</div>
+    <h2>Fundamentos 2026 — Qué ha cambiado</h2>
+    <p>Lo que funcionaba en 2022–2023 está muerto. Esto es lo que dicen los datos ahora mismo.</p>
+    <div class="section-tags">
+      <span class="stag">Investigación</span>
+      <span class="stag">Benchmarks</span>
+      <span class="stag">Principios universales</span>
+    </div>
+  </div>
+
+  <div class="da-grid">
+    <div class="da-card da-dead">
+      <div class="da-title">💀 Muerto en 2026</div>
+      <ul class="da-list">
+        <li>Opener de "curiosidad" — fingir que no estás vendiendo</li>
+        <li>"Prometo que este es mi último mensaje"</li>
+        <li>Emails de más de 150 palabras</li>
+        <li>3 preguntas en un mismo email</li>
+        <li>Subject lines en MAYÚSCULAS o con exclamaciones</li>
+        <li>Personalización básica (solo nombre + empresa)</li>
+        <li>Pitch completo en el primer email</li>
+        <li>Pedir llamada de 30 min en el segundo contacto</li>
+      </ul>
+    </div>
+    <div class="da-card da-alive">
+      <div class="da-title">✅ Lo que funciona ahora</div>
+      <ul class="da-list">
+        <li>Emails de 50–80 palabras. Un punto, un CTA</li>
+        <li>CTAs de baja fricción: "¿es esto relevante para vosotros?"</li>
+        <li>Personalización real: ciudad, dato específico, contexto de negocio</li>
+        <li>Subject lines en minúscula, conversacionales, bajo 7 palabras</li>
+        <li>Número concreto en el cuerpo (€, %, horas)</li>
+        <li>Ángulo diferente en cada step (no repetir el mismo punto)</li>
+        <li>Video personalizado (Loom) — 3–5x más replies</li>
+        <li>Multichannel: email + LinkedIn coordinados</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="benchmark-strip">
+    <div class="bm-cell">
+      <div class="bm-val b">7</div>
+      <div class="bm-lbl">Palabras máx.<br>en subject line</div>
+    </div>
+    <div class="bm-cell">
+      <div class="bm-val g">8–12</div>
+      <div class="bm-lbl">Touchpoints totales<br>por prospecto</div>
+    </div>
+    <div class="bm-cell">
+      <div class="bm-val o">13:00</div>
+      <div class="bm-lbl">Hora óptima de envío<br>(hora del receptor)</div>
+    </div>
+    <div class="bm-cell">
+      <div class="bm-val g">42%</div>
+      <div class="bm-lbl">Replies vienen de<br>follow-ups (no Email 1)</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <strong>El principio clave de 2026:</strong> los filtros de spam ahora miden señales de engagement (replies, clics, tiempo de lectura). Si tus emails no generan interacción, tu dominio se penaliza aunque pases los filtros técnicos. La relevancia <em>es</em> la deliverability.
+  </div>
+
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-icon">🎯</div>
+      <div class="tip-title">Intención antes que volumen</div>
+      <div class="tip-body">Los mejores resultados de 2026 vienen de prospectos con señales de compra activa — no del blast masivo. Mejor 50 emails muy relevantes que 500 genéricos.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🎥</div>
+      <div class="tip-title">Video en email = ventaja competitiva</div>
+      <div class="tip-body">Un thumbnail de Loom personalizado con el nombre de la empresa en pantalla genera 3–5x más replies que texto solo. En España casi nadie lo hace aún — ventana de oportunidad.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🔄</div>
+      <div class="tip-title">CTA progresivo</div>
+      <div class="tip-body">Email 1: sí/no. Email 2: pedir un recurso. Email 3: nuevo ángulo. Email 4: breakup con valor. Nunca pidas la llamada antes del Email 3.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">📊</div>
+      <div class="tip-title">A/B testing prioritario</div>
+      <div class="tip-body">Prueba subject lines primero (mayor impacto en open rate), luego CTA (mayor impacto en reply rate). Nunca cambies más de una variable a la vez.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="page-section" data-page="clinicas">
+<!-- ══════════════ SECCIÓN 1: CLÍNICAS DENTALES ══════════════ -->
+<div class="section" id="clinicas">
+  <div class="section-header sh-1">
+    <div class="section-num">Sección 1</div>
+    <h2>Clínicas Dentales</h2>
+    <p>Pain principal: no-shows y tiempo perdido en confirmaciones manuales. ROI del sistema claramente medible.</p>
+    <div class="section-tags">
+      <span class="stag">10–15 citas/día</span>
+      <span class="stag">No-shows 15–30%</span>
+      <span class="stag">Decisor: director/gerente</span>
+    </div>
+  </div>
+
+  <div class="pain-box">
+    <div class="pain-box-title">⚡ Dolores que resuenan</div>
+    <ul>
+      <li>Huecos vacíos de último minuto que nadie puede rellenar</li>
+      <li>Recepción pierde 45–90 min/día llamando para confirmar citas</li>
+      <li>Pacientes que no se presentan sin avisar — 120–200€ por hueco perdido</li>
+      <li>Sin sistema de reagendado automático cuando cancela alguien</li>
+      <li>Base de datos de pacientes inactivos que nadie reactiva</li>
+    </ul>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b1">1</div><div class="ec-title">Primer contacto — número real + ciudad</div></div>
+      <div class="ec-day">Día 0</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">pregunta rápida, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">las citas perdidas de <span class="var">{{companyName}}</span></div>
+        <div class="ec-subject"><span class="var">{{companyName}}</span> — una cosa que vi</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p>Hola <span class="var">{{firstName}}</span>,</p>
+      <p>Trabajo con clínicas dentales en España automatizando la recuperación de pacientes que no se presentan.</p>
+      <p>Una clínica en <span class="var">{{city}}</span> recuperó 14 huecos muertos el primer mes — sin que recepción tuviera que llamar a nadie.</p>
+      <p>¿Es la gestión de no-shows algo que estáis mirando ahora mismo en <span class="var">{{companyName}}</span>, o ya lo tenéis resuelto?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> personalización real (ciudad), número específico (14 huecos), pregunta binaria fácil de responder, 55 palabras, cero pitch.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b2">2</div><div class="ec-title">Follow-up — revelar el sistema, CTA suave</div></div>
+      <div class="ec-day">Día 3</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asunto (reply thread)</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">re: pregunta rápida, <span class="var">{{firstName}}</span></div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>, por si se perdió entre los demás correos.</p>
+      <p>Para darte contexto: montamos un sistema que manda recordatorios por WhatsApp y reagenda automáticamente cuando el paciente no confirma. Sin apps nuevas, sin cambiar vuestro sistema actual.</p>
+      <p>En clínicas con 8–15 citas al día, el ahorro medio es de 2.200€/mes en huecos recuperados.</p>
+      <p>Si tiene sentido para <span class="var">{{companyName}}</span>, ¿te parece bien que te mande un resumen de cómo funciona? (un PDF de 2 páginas, sin llamada)</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> CTA de baja fricción — pide un PDF, no una llamada. Cifra concreta (2.200€/mes). No impone nada al prospecto.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b3">3</div><div class="ec-title">Ángulo nuevo — tiempo del equipo</div></div>
+      <div class="ec-day">Día 7</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">el coste oculto de <span class="var">{{companyName}}</span></div>
+        <div class="ec-subject">¿cuánto tiempo pierde recepción al día?</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>Dato que vemos en clínicas antes de trabajar con ellas:</p>
+      <p>Recepción dedica 45–90 min al día a confirmar citas, perseguir no-shows y reasignar huecos a mano. Eso son 30+ horas al mes de trabajo que se puede automatizar al 90%.</p>
+      <p>¿Os suena esto en <span class="var">{{companyName}}</span>, o ya lo tenéis optimizado?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> ángulo completamente diferente al Email 1 (tiempo del equipo, no dinero). Captura a quien ignoró los anteriores porque le toca este pain específico.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b4">4</div><div class="ec-title">Breakup con valor — dejar puerta abierta</div></div>
+      <div class="ec-day">Día 12</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">último mensaje, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">te dejo esto por si acaso</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>No voy a insistir más — entiendo que el timing no siempre es el correcto.</p>
+      <p>Te dejo esto por si te es útil: hemos documentado los 5 errores más comunes en gestión de citas en clínicas dentales. Sin pitch, solo el documento. ¿Lo quieres?</p>
+      <p>Y si el tema vuelve a estar sobre la mesa, aquí estaré.</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> no mendiga, aporta valor real (PDF lead magnet), deja la puerta abierta con dignidad. Los que responden aquí son leads muy calientes.</div></div>
+  </div>
+</div>
+
+</div>
+<div class="page-section" data-page="inmobiliarias">
+<!-- ══════════════ SECCIÓN 2: INMOBILIARIAS ══════════════ -->
+<div class="section" id="inmobiliarias">
+  <div class="section-header sh-2">
+    <div class="section-num">Sección 2</div>
+    <h2>Inmobiliarias</h2>
+    <p>Pain principal: leads entrantes que se pierden, seguimiento manual de compradores/vendedores, sin sistema de nurturing.</p>
+    <div class="section-tags">
+      <span class="stag">5–50 agentes</span>
+      <span class="stag">Ticket medio alto</span>
+      <span class="stag">Decisor: director comercial / gerente</span>
+    </div>
+  </div>
+
+  <div class="pain-box">
+    <div class="pain-box-title">⚡ Dolores que resuenan</div>
+    <ul>
+      <li>Leads por portales (Idealista, Fotocasa) que no se contactan en los primeros 5 minutos — se enfrían</li>
+      <li>Seguimiento de compradores y vendedores completamente manual — depende del agente</li>
+      <li>Sin pipeline visual — no se sabe en qué fase está cada cliente</li>
+      <li>Propietarios que piden valoración y luego no vuelven a dar señales de vida</li>
+      <li>No-shows en visitas — el piso queda reservado y luego el cliente no aparece</li>
+    </ul>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b1">1</div><div class="ec-title">Primer contacto — velocidad de contacto</div></div>
+      <div class="ec-day">Día 0</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">los leads de <span class="var">{{companyName}}</span></div>
+        <div class="ec-subject">pregunta sobre vuestros portales, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject"><span class="var">{{companyName}}</span> — ¿cuánto tardáis en contactar un lead?</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p>Hola <span class="var">{{firstName}}</span>,</p>
+      <p>Trabajo con agencias inmobiliarias en España automatizando el primer contacto con leads de portales.</p>
+      <p>Las agencias que contactan en los primeros 5 minutos convierten hasta 9 veces más que las que esperan una hora. Con el sistema que montamos, ese contacto ocurre de forma automática — 24/7, por WhatsApp.</p>
+      <p>¿Es la velocidad de respuesta a leads algo que estáis intentando mejorar en <span class="var">{{companyName}}</span>?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> dato de impacto (9x conversión), pain inmediato reconocible, pregunta directa sobre su situación actual.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b2">2</div><div class="ec-title">Follow-up — pipeline + nurturing automático</div></div>
+      <div class="ec-day">Día 3</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asunto (reply thread)</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">re: los leads de <span class="var">{{companyName}}</span></div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>, por si se perdió.</p>
+      <p>Además del primer contacto automático, montamos un pipeline completo donde cada lead avanza de fase solo: primer contacto → visita agendada → seguimiento post-visita → cierre. Sin que ningún agente tenga que acordarse de hacer nada manualmente.</p>
+      <p>Una agencia en <span class="var">{{city}}</span> redujo el tiempo medio de cierre un 35% en los primeros 60 días.</p>
+      <p>¿Te parece bien que te mande cómo lo montamos exactamente? (sin llamada, solo un esquema)</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> amplía el pain más allá del primer contacto. Dato específico (35% reducción cierre). CTA suave: esquema, no llamada.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b3">3</div><div class="ec-title">Ángulo nuevo — los agentes y la dependencia humana</div></div>
+      <div class="ec-day">Día 8</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">¿qué pasa en <span class="var">{{companyName}}</span> cuando un agente se va?</div>
+        <div class="ec-subject">el problema de depender de las personas</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>Algo que vemos mucho en agencias: cuando un agente bueno se va, se lleva los leads y el histórico de conversaciones. No hay sistema, solo hay personas.</p>
+      <p>El pipeline que montamos vive en la plataforma, no en la cabeza de nadie. Cualquier agente puede ver en qué punto está cada cliente en cualquier momento.</p>
+      <p>¿Es eso algo que os afecta en <span class="var">{{companyName}}</span>?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> toca un pain emocional diferente — la vulnerabilidad de depender de personas clave. Muy reconocible en agencias medianas.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b4">4</div><div class="ec-title">Breakup — dejar valor</div></div>
+      <div class="ec-day">Día 14</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">último mensaje, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">te dejo esto antes de irme</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>No insisto más. Pero antes de cerrar el hilo, te dejo algo útil: hemos documentado cómo las agencias que sí tienen sistema automático gestionan el mismo volumen de leads con la mitad de agentes.</p>
+      <p>¿Lo quieres? Sin compromiso.</p>
+      <p>Y cuando sea el momento en <span class="var">{{companyName}}</span>, aquí estaremos.</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> cierre limpio, recurso de valor real, frase final que no presiona. Los leads que responden aquí son los más cualificados.</div></div>
+  </div>
+</div>
+
+</div>
+<div class="page-section" data-page="reformas">
+<!-- ══════════════ SECCIÓN 3: REFORMAS ══════════════ -->
+<div class="section" id="reformas">
+  <div class="section-header sh-3">
+    <div class="section-num">Sección 3</div>
+    <h2>Empresas de Reformas</h2>
+    <p>Pain principal: presupuestos enviados que nunca responden, seguimiento manual de proyectos, pérdida de leads por falta de rapidez.</p>
+    <div class="section-tags">
+      <span class="stag">2–20 trabajadores</span>
+      <span class="stag">Ciclo largo de venta</span>
+      <span class="stag">Decisor: propietario / gerente</span>
+    </div>
+  </div>
+
+  <div class="pain-box">
+    <div class="pain-box-title">⚡ Dolores que resuenan</div>
+    <ul>
+      <li>Presupuestos enviados que se quedan sin respuesta — sin seguimiento sistemático</li>
+      <li>El cliente pide presupuesto, desaparece y al mes llama a la competencia</li>
+      <li>Sin recordatorio automático: el encargado se olvida de hacer seguimiento</li>
+      <li>Temporada alta = caos; temporada baja = sin leads activos</li>
+      <li>Clientes antiguos que podrían generar trabajo nuevo pero nadie los contacta</li>
+    </ul>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b1">1</div><div class="ec-title">Primer contacto — presupuestos perdidos</div></div>
+      <div class="ec-day">Día 0</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">los presupuestos de <span class="var">{{companyName}}</span></div>
+        <div class="ec-subject">pregunta sobre seguimiento, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">¿cuántos presupuestos se os pierden al mes?</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p>Hola <span class="var">{{firstName}}</span>,</p>
+      <p>Trabajo con empresas de reformas en <span class="var">{{city}}</span> automatizando el seguimiento de presupuestos.</p>
+      <p>El patrón que más vemos: el cliente pide presupuesto, no responde, y a las 3 semanas contrata a otra empresa. No porque la oferta fuera peor — sino porque llegaron primero.</p>
+      <p>¿Os está pasando eso en <span class="var">{{companyName}}</span> o ya tenéis el seguimiento bajo control?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> cuenta una historia reconocible (el cliente que se pierde), no acusa — describe. Pregunta binaria simple. Personalización por ciudad.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b2">2</div><div class="ec-title">Follow-up — qué hace el sistema exactamente</div></div>
+      <div class="ec-day">Día 4</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asunto (reply thread)</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">re: los presupuestos de <span class="var">{{companyName}}</span></div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>, por si no viste el anterior.</p>
+      <p>Lo que montamos: cuando enviáis un presupuesto, el sistema manda automáticamente recordatorios por WhatsApp al cliente a los 2 días, a los 5 y a los 10. Si responde, para. Si no, el encargado recibe una alerta para llamar.</p>
+      <p>Una empresa de reformas en Madrid cerró 3 proyectos extra en el primer mes solo con esto.</p>
+      <p>¿Te lo explico en un par de minutos por escrito? Sin llamada.</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> explica el sistema de forma concreta y visual. Resultado específico (3 proyectos extra). CTA: explicación por escrito, no llamada.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b3">3</div><div class="ec-title">Ángulo nuevo — clientes dormidos</div></div>
+      <div class="ec-day">Día 9</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">¿cuántos clientes antiguos tiene <span class="var">{{companyName}}</span>?</div>
+        <div class="ec-subject">la mina de oro que ya tenéis</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>Cosa que pocas empresas de reformas hacen: contactar a clientes que ya les han contratado una vez.</p>
+      <p>Alguien que reformó la cocina hace 3 años puede necesitar el baño ahora. O conoce a alguien que lo necesita. Pero si nadie le escribe, no lo recuerda.</p>
+      <p>¿Tenéis algún proceso para reactivar esos clientes en <span class="var">{{companyName}}</span>, o está todo enfocado en captar nuevos?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> ángulo completamente diferente (reactivación vs captación). Fácil de visualizar para el propietario. Abre conversación sobre base de datos existente.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b4">4</div><div class="ec-title">Breakup — dejar valor</div></div>
+      <div class="ec-day">Día 15</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">último mensaje, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">antes de cerrar el hilo</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>Lo dejo aquí. Si no es el momento, perfecto.</p>
+      <p>Solo te dejo esto: hemos documentado cómo las empresas de reformas que automatizan el seguimiento cierran de media un 40% más de presupuestos sin contratar a nadie nuevo. Sin compromiso, solo por si te es útil. ¿Lo quieres?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> brevísimo, sin presión, con cifra de impacto (40% más cierres) y lead magnet como gancho de baja fricción.</div></div>
+  </div>
+</div>
+
+</div>
+<div class="page-section" data-page="estetica">
+<!-- ══════════════ SECCIÓN 4: ESTÉTICA ══════════════ -->
+<div class="section" id="estetica">
+  <div class="section-header sh-4">
+    <div class="section-num">Sección 4</div>
+    <h2>Centros de Estética / Peluquerías</h2>
+    <p>Vertical emergente — pocas agencias van a ellos todavía. Pain similar a clínicas: no-shows, clientes inactivos, reservas manuales.</p>
+    <div class="section-tags">
+      <span class="stag">1–5 profesionales</span>
+      <span class="stag">Alta rotación de clientes</span>
+      <span class="stag">Decisor: propietario directo</span>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <strong>Por qué este sector:</strong> Competencia baja en outreach. El propietario suele ser el mismo que atiende — cualquier automatización que ahorre tiempo impacta directamente en su vida. El pain de no-shows es idéntico al dental pero casi nadie les está hablando de soluciones. <strong>Ventana de oportunidad real.</strong>
+  </div>
+
+  <div class="pain-box">
+    <div class="pain-box-title">⚡ Dolores que resuenan</div>
+    <ul>
+      <li>Clientes que reservan y no se presentan — hueco perdido sin posibilidad de rellenarlo</li>
+      <li>Reservas por Instagram DM o WhatsApp manual — sin agenda centralizada</li>
+      <li>Clientes que no vuelven porque "se olvidaron" — nadie les recuerda</li>
+      <li>Temporada de bodas / eventos: no se aprovecha para captar citas por adelantado</li>
+      <li>Sin reseñas automáticas — la competencia tiene más visibilidad en Google</li>
+    </ul>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b1">1</div><div class="ec-title">Primer contacto — no-shows y tiempo perdido</div></div>
+      <div class="ec-day">Día 0</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">pregunta rápida, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">los huecos vacíos de <span class="var">{{companyName}}</span></div>
+        <div class="ec-subject"><span class="var">{{companyName}}</span> — ¿cómo gestionáis las cancelaciones?</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p>Hola <span class="var">{{firstName}}</span>,</p>
+      <p>Trabajo con centros de estética y peluquerías en España automatizando recordatorios y reservas por WhatsApp.</p>
+      <p>El patrón más común: la clienta reserva, no recibe recordatorio, se olvida. El hueco queda vacío y ya es tarde para rellenarlo.</p>
+      <p>Un centro en <span class="var">{{city}}</span> redujo sus no-shows un 70% en 3 semanas solo con recordatorios automáticos por WhatsApp.</p>
+      <p>¿Es algo que os está costando en <span class="var">{{companyName}}</span>?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> cuenta el problema sin preguntar (ellos saben que existe), añade resultado concreto (70% reducción), pregunta final de confirmación. Lenguaje muy cercano al propietario.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b2">2</div><div class="ec-title">Follow-up — reactivación de clientes inactivos</div></div>
+      <div class="ec-day">Día 3</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asunto (reply thread)</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">re: pregunta rápida, <span class="var">{{firstName}}</span></div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>, por si no viste el anterior.</p>
+      <p>Además de los recordatorios, lo segundo que más impacto tiene: reactivar clientas que llevan 2–3 meses sin venir. Un mensaje automático tipo "Hola Ana, hace tiempo que no te vemos por aquí — ¿quieres reservar esta semana?" genera entre un 15 y un 25% de respuestas.</p>
+      <p>Sin apps nuevas. Solo WhatsApp, que ya usan.</p>
+      <p>¿Te mando cómo funciona exactamente?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> segundo pain diferente (reactivación), ejemplo de mensaje real incluido, dato de respuesta (15–25%), sin fricción.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b3">3</div><div class="ec-title">Ángulo nuevo — reseñas de Google</div></div>
+      <div class="ec-day">Día 8</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">¿cuántas reseñas tiene <span class="var">{{companyName}}</span> en Google?</div>
+        <div class="ec-subject">la competencia os está ganando en esto</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>Una cosa que hacemos que la mayoría no espera: después de cada cita, el sistema manda un WhatsApp automático para pedir reseña en Google.</p>
+      <p>Clientas satisfechas casi siempre dejan reseña si se lo pones fácil. La mayoría de centros no lo hacen porque nadie se acuerda de pedirlo.</p>
+      <p>¿Tenéis algún proceso para esto en <span class="var">{{companyName}}</span>, o va todo a mano?</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> tercer ángulo completamente distinto (visibilidad local), muy concreto, fácil de imaginar, y toca el ego competitivo del propietario.</div></div>
+  </div>
+
+  <div class="email-card">
+    <div class="ec-header">
+      <div class="ec-step"><div class="ec-badge b4">4</div><div class="ec-title">Breakup — dejar valor</div></div>
+      <div class="ec-day">Día 14</div>
+    </div>
+    <div class="ec-subjects">
+      <div class="ec-subjects-label">Asuntos A/B</div>
+      <div class="ec-subjects-list">
+        <div class="ec-subject">último mensaje, <span class="var">{{firstName}}</span></div>
+        <div class="ec-subject">te dejo esto antes de irme</div>
+      </div>
+    </div>
+    <div class="ec-body">
+      <p><span class="var">{{firstName}}</span>,</p>
+      <p>No insisto más.</p>
+      <p>Solo te dejo esto por si algún día es útil: hemos documentado cómo los centros que automatizan recordatorios + reactivación + reseñas llenan agenda sin pagar publicidad. Sin pitch, solo el documento. ¿Lo quieres?</p>
+      <p>Cuando sea el momento, aquí estaré.</p>
+      <p><span class="var">{{senderName}}</span></p>
+    </div>
+    <div class="ec-why"><div class="ec-why-icon">✓</div><div class="ec-why-text"><strong>Por qué funciona:</strong> resume las 3 propuestas de valor en una frase, lead magnet como gancho, cierre sin presión.</div></div>
+  </div>
+</div>
+
+</div>
+<div class="page-section" data-page="config">
+<!-- ══════════════ CONFIG INSTANTLY ══════════════ -->
+<div class="section">
+  <div class="section-header" style="background:linear-gradient(135deg,#1e293b,#334155);">
+    <div class="section-num">Configuración</div>
+    <h2>Setup Instantly — Válido para todos los sectores</h2>
+    <p>Parámetros recomendados basados en benchmarks 2026.</p>
+  </div>
+
+  <div class="config-table-wrap">
+    <table>
+      <thead>
+        <tr><th>Parámetro</th><th>Configuración</th><th>Por qué</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cadencia</td><td class="blue">Días 0 / 3 / 7-9 / 12-15</td><td>Da tiempo a leer sin perder momentum</td></tr>
+        <tr><td>Hora de envío</td><td class="blue">9:00–10:30h (Mar–Jue)</td><td>Mayor open rate en horario laboral temprano</td></tr>
+        <tr><td>Emails/día por dominio</td><td class="green">Máx. 40</td><td>Protege reputación del dominio secundario</td></tr>
+        <tr><td>Stop on reply</td><td class="green">✓ Activado siempre</td><td>Evita enviar más emails a quien ya respondió</td></tr>
+        <tr><td>Stop on click</td><td class="green">✓ Activado</td><td>Si abrió el PDF ya es un lead caliente — actuar</td></tr>
+        <tr><td>Tracking apertura</td><td class="green">✓ Activado</td><td>Para medir open rate y testar subjects</td></tr>
+        <tr><td>Tracking clics</td><td class="blue">Opcional</td><td>Desactivar si baja deliverability (pixel sospechoso)</td></tr>
+        <tr><td>Reply thread</td><td class="green">✓ Step 2 siempre en reply</td><td>Da sensación de conversación real</td></tr>
+        <tr><td>Tests A/B</td><td class="blue">2 variants de subject en Step 1</td><td>Mayor impacto en open rate con mínimo esfuerzo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="config-table-wrap" style="margin-top:16px;">
+    <table>
+      <thead>
+        <tr><th>Métrica</th><th>Mínimo aceptable</th><th>Objetivo</th><th>Top performers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Open rate</td><td class="red">25%</td><td class="blue">35–45%</td><td class="green">50%+</td></tr>
+        <tr><td>Reply rate</td><td class="red">1%</td><td class="blue">3–6%</td><td class="green">10–15%</td></tr>
+        <tr><td>Interesados reales</td><td class="red">0.5%</td><td class="blue">1–3%</td><td class="green">5%+</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <div class="footer-brand">omnexor<span class="dot">.</span></div>
+  <div style="margin-top:8px;">Guía interna — Cold Email 2026 · Marzo 2026</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+function showPage(page) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const section = document.querySelector('.page-section[data-page="' + page + '"]');
+  const btn = document.querySelector('.nav-btn[data-page="' + page + '"]');
+  if(section) section.classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>

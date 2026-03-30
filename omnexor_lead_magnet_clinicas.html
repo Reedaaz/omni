@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 Errores en la Gestión de Citas — Clínicas Dentales 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  @page{
+    size:A4;
+    margin:0;
+  }
+
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:#fff;
+    color:#1a1a2e;
+    line-height:1.6;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  /* ——— PAGE 1 ——— */
+  .page{
+    width:210mm;
+    min-height:297mm;
+    margin:0 auto;
+    padding:0;
+    position:relative;
+    overflow:hidden;
+    page-break-after:always;
+  }
+
+  /* Cover / Hero */
+  .cover{
+    background:linear-gradient(165deg,#060a14 0%,#0a1628 40%,#1e3a8a 100%);
+    color:#fff;
+    padding:60px 56px 48px;
+    min-height:297mm;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .cover::before{
+    content:'';
+    position:absolute;
+    top:-120px;right:-120px;
+    width:400px;height:400px;
+    background:radial-gradient(circle,rgba(37,99,235,.15),transparent 70%);
+    border-radius:50%;
+  }
+
+  .cover::after{
+    content:'';
+    position:absolute;
+    bottom:-80px;left:-80px;
+    width:300px;height:300px;
+    background:radial-gradient(circle,rgba(16,185,129,.1),transparent 70%);
+    border-radius:50%;
+  }
+
+  .cover-top{position:relative;z-index:1;}
+
+  .cover-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:100px;
+    padding:8px 20px;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.7);
+    margin-bottom:40px;
+  }
+
+  .cover-badge span{
+    width:6px;height:6px;
+    background:#10b981;
+    border-radius:50%;
+    display:inline-block;
+  }
+
+  .cover h1{
+    font-size:42px;
+    font-weight:800;
+    line-height:1.1;
+    margin-bottom:20px;
+    letter-spacing:-.02em;
+  }
+
+  .cover h1 em{
+    font-style:normal;
+    color:#60a5fa;
+  }
+
+  .cover-sub{
+    font-size:17px;
+    font-weight:400;
+    color:rgba(255,255,255,.65);
+    max-width:420px;
+    line-height:1.6;
+    margin-bottom:48px;
+  }
+
+  .cover-stats{
+    display:flex;
+    gap:40px;
+    margin-bottom:48px;
+  }
+
+  .cover-stat{
+    border-left:2px solid rgba(255,255,255,.15);
+    padding-left:20px;
+  }
+
+  .cover-stat-number{
+    font-size:36px;
+    font-weight:800;
+    color:#fff;
+    line-height:1;
+    margin-bottom:4px;
+  }
+
+  .cover-stat-number .accent{color:#10b981;}
+
+  .cover-stat-label{
+    font-size:12px;
+    color:rgba(255,255,255,.5);
+    font-weight:500;
+    letter-spacing:.02em;
+  }
+
+  .cover-errors-preview{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:0;
+  }
+
+  .cover-error-pill{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:10px;
+    padding:14px 18px;
+  }
+
+  .cover-error-num{
+    width:28px;height:28px;
+    background:rgba(239,68,68,.15);
+    color:#f87171;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:700;
+    flex-shrink:0;
+  }
+
+  .cover-error-text{
+    font-size:12px;
+    font-weight:500;
+    color:rgba(255,255,255,.7);
+    line-height:1.35;
+  }
+
+  .cover-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    position:relative;
+    z-index:1;
+    padding-top:40px;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+
+  .cover-brand{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+
+  .cover-brand .dot{color:#2563eb;}
+
+  .cover-meta{
+    font-size:11px;
+    color:rgba(255,255,255,.35);
+    text-align:right;
+    line-height:1.6;
+  }
+
+  /* ——— PAGE 2: Intro + Errors 1-3 ——— */
+  .content-page{
+    padding:48px 56px;
+    min-height:297mm;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .intro-block{
+    background:linear-gradient(135deg,#f0f7ff,#f8fafc);
+    border-radius:12px;
+    padding:28px 32px;
+    margin-bottom:36px;
+    border-left:3px solid #2563eb;
+  }
+
+  .intro-block p{
+    font-size:14px;
+    color:#475569;
+    line-height:1.7;
+  }
+
+  .intro-block strong{color:#1e3a8a;}
+
+  .error-section{
+    margin-bottom:32px;
+    page-break-inside:avoid;
+  }
+
+  .error-header{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:14px;
+  }
+
+  .error-number{
+    width:40px;height:40px;
+    background:linear-gradient(135deg,#fee2e2,#fecaca);
+    color:#dc2626;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:800;
+    flex-shrink:0;
+  }
+
+  .error-title{
+    font-size:18px;
+    font-weight:700;
+    color:#1a1a2e;
+    line-height:1.3;
+    padding-top:6px;
+  }
+
+  .error-body{
+    padding-left:56px;
+  }
+
+  .error-body p{
+    font-size:13.5px;
+    color:#475569;
+    line-height:1.65;
+    margin-bottom:12px;
+  }
+
+  .error-stat-box{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    padding:8px 16px;
+    margin-bottom:12px;
+  }
+
+  .error-stat-box .num{
+    font-size:20px;
+    font-weight:800;
+    color:#dc2626;
+  }
+
+  .error-stat-box .txt{
+    font-size:12px;
+    color:#991b1b;
+    font-weight:500;
+  }
+
+  .fix-box{
+    background:linear-gradient(135deg,#ecfdf5,#f0fdf4);
+    border:1px solid #bbf7d0;
+    border-radius:8px;
+    padding:14px 18px;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  .fix-icon{
+    width:22px;height:22px;
+    background:#10b981;
+    color:#fff;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:700;
+    flex-shrink:0;
+    margin-top:1px;
+  }
+
+  .fix-text{
+    font-size:12.5px;
+    color:#065f46;
+    line-height:1.55;
+    font-weight:500;
+  }
+
+  .page-divider{
+    width:100%;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#e2e8f0,transparent);
+    margin:8px 0 32px;
+  }
+
+  /* ——— PAGE 3: Errors 4-5 + Conclusion ——— */
+  .conclusion-block{
+    background:linear-gradient(165deg,#060a14,#0a1628 60%,#1e3a8a 100%);
+    color:#fff;
+    border-radius:16px;
+    padding:36px 40px;
+    margin-top:auto;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .conclusion-block::before{
+    content:'';
+    position:absolute;
+    top:-40px;right:-40px;
+    width:180px;height:180px;
+    background:radial-gradient(circle,rgba(37,99,235,.2),transparent 70%);
+    border-radius:50%;
+  }
+
+  .conclusion-block h3{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:16px;
+    position:relative;
+    z-index:1;
+  }
+
+  .conclusion-block h3 em{
+    font-style:normal;
+    color:#60a5fa;
+  }
+
+  .conclusion-block p{
+    font-size:14px;
+    color:rgba(255,255,255,.7);
+    line-height:1.65;
+    margin-bottom:16px;
+    position:relative;
+    z-index:1;
+    max-width:90%;
+  }
+
+  .conclusion-results{
+    display:flex;
+    gap:32px;
+    margin-top:24px;
+    position:relative;
+    z-index:1;
+  }
+
+  .conclusion-result{
+    border-left:2px solid rgba(16,185,129,.4);
+    padding-left:16px;
+  }
+
+  .conclusion-result .val{
+    font-size:28px;
+    font-weight:800;
+    color:#10b981;
+    line-height:1;
+    margin-bottom:4px;
+  }
+
+  .conclusion-result .lbl{
+    font-size:11px;
+    color:rgba(255,255,255,.5);
+    font-weight:500;
+  }
+
+  .conclusion-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:28px;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,.08);
+    position:relative;
+    z-index:1;
+  }
+
+  .conclusion-cta{
+    font-size:13px;
+    color:rgba(255,255,255,.5);
+    font-weight:400;
+  }
+
+  .conclusion-cta strong{
+    color:#fff;
+    font-weight:600;
+  }
+
+  .conclusion-brand{
+    font-size:18px;
+    font-weight:700;
+    color:#fff;
+  }
+
+  .conclusion-brand .dot{color:#2563eb;}
+
+  /* Page number */
+  .page-num{
+    text-align:center;
+    font-size:10px;
+    color:#94a3b8;
+    padding-top:24px;
+    margin-top:auto;
+  }
+
+  /* Print optimization */
+  @media print{
+    body{background:#fff;}
+    .page{margin:0;box-shadow:none;page-break-after:always;}
+    .cover{min-height:100vh;}
+    .content-page{min-height:100vh;}
+  }
+
+  /* Screen mode: center and add shadow */
+  @media screen{
+    body{background:#e2e8f0;padding:40px 0;}
+    .page{box-shadow:0 4px 40px rgba(0,0,0,.12);border-radius:4px;margin-bottom:40px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PAGE 1: COVER ═══════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-top">
+      <div class="cover-badge"><span></span> Informe Sector Dental — España 2026</div>
+
+      <h1>5 errores que cuestan<br>más de <em>3.000€/mes</em><br>a tu clínica dental</h1>
+
+      <p class="cover-sub">Y cómo los están resolviendo las clínicas que ya han dejado de perder pacientes, tiempo y dinero en 2026.</p>
+
+      <div class="cover-stats">
+        <div class="cover-stat">
+          <div class="cover-stat-number">15–30<span class="accent">%</span></div>
+          <div class="cover-stat-label">Tasa media de no-shows<br>en clínicas sin sistema</div>
+        </div>
+        <div class="cover-stat">
+          <div class="cover-stat-number">2.800<span class="accent">€</span></div>
+          <div class="cover-stat-label">Ingreso medio perdido<br>por mes en huecos vacíos</div>
+        </div>
+        <div class="cover-stat">
+          <div class="cover-stat-number">42<span class="accent">h</span></div>
+          <div class="cover-stat-label">Horas al mes de recepción<br>en gestión manual de citas</div>
+        </div>
+      </div>
+
+      <div class="cover-errors-preview">
+        <div class="cover-error-pill">
+          <div class="cover-error-num">1</div>
+          <div class="cover-error-text">Confirmar citas manualmente</div>
+        </div>
+        <div class="cover-error-pill">
+          <div class="cover-error-num">2</div>
+          <div class="cover-error-text">Reagendar a mano los no-shows</div>
+        </div>
+        <div class="cover-error-pill">
+          <div class="cover-error-num">3</div>
+          <div class="cover-error-text">Usar solo email o SMS para recordar</div>
+        </div>
+        <div class="cover-error-pill">
+          <div class="cover-error-num">4</div>
+          <div class="cover-error-text">No medir el coste real de citas perdidas</div>
+        </div>
+        <div class="cover-error-pill" style="grid-column:1/3;">
+          <div class="cover-error-num">5</div>
+          <div class="cover-error-text">No tener sistema de reactivación de pacientes inactivos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div class="cover-brand">omnexor<span class="dot">.</span></div>
+      <div class="cover-meta">Documento interno — Sector dental<br>Marzo 2026 — v1.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE 2: INTRO + ERRORES 1-3 ═══════════ -->
+<div class="page content-page">
+
+  <div class="intro-block">
+    <p>Este documento resume los <strong>5 patrones más comunes</strong> que vemos en clínicas dentales de entre 5 y 20 profesionales en España. No es un pitch — es un diagnóstico real basado en lo que encontramos una y otra vez. Si te ves reflejado en 2 o más puntos, probablemente estás dejando dinero sobre la mesa cada mes.</p>
+  </div>
+
+  <!-- ERROR 1 -->
+  <div class="error-section">
+    <div class="error-header">
+      <div class="error-number">1</div>
+      <div class="error-title">Confirmar citas a mano (teléfono o SMS)</div>
+    </div>
+    <div class="error-body">
+      <p>La recepción llama uno a uno a los pacientes del día siguiente. Cada llamada dura entre 1 y 3 minutos, asumiendo que descuelgan (que no lo hacen en el 60% de los casos). Con 12 citas al día, eso son 25–40 minutos diarios solo en confirmaciones — sin contar las rellamadas.</p>
+      <div class="error-stat-box">
+        <div class="num">60%</div>
+        <div class="txt">de las llamadas de confirmación<br>no se contestan a la primera</div>
+      </div>
+      <div class="fix-box">
+        <div class="fix-icon">&#10003;</div>
+        <div class="fix-text"><strong>Qué hacen las clínicas que lo resuelven:</strong> Confirmación automática por WhatsApp 24h antes. El paciente responde "Sí" o "No" tocando un botón. Sin llamadas, sin esperas. Tasa de confirmación &gt;85%.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-divider"></div>
+
+  <!-- ERROR 2 -->
+  <div class="error-section">
+    <div class="error-header">
+      <div class="error-number">2</div>
+      <div class="error-title">No reagendar automáticamente cuando alguien no viene</div>
+    </div>
+    <div class="error-body">
+      <p>El paciente no se presenta. El hueco queda vacío. Recepción lo descubre el mismo día — a veces cuando ya es tarde para rellenarlo. El hueco muerto no genera ingresos, pero sí ha ocupado un espacio en agenda que otro paciente podría haber usado.</p>
+      <div class="error-stat-box">
+        <div class="num">120–200€</div>
+        <div class="txt">ingreso medio perdido por<br>cada cita que no se presenta</div>
+      </div>
+      <div class="fix-box">
+        <div class="fix-icon">&#10003;</div>
+        <div class="fix-text"><strong>Qué hacen las clínicas que lo resuelven:</strong> Cuando el paciente no confirma o cancela, el sistema ofrece reagendar automáticamente en otro horario. Si no responde, se activa una lista de espera automática que rellena el hueco con otro paciente.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-divider"></div>
+
+  <!-- ERROR 3 -->
+  <div class="error-section">
+    <div class="error-header">
+      <div class="error-number">3</div>
+      <div class="error-title">Recordatorios solo por email (o sin recordatorio)</div>
+    </div>
+    <div class="error-body">
+      <p>Muchas clínicas envían un email automático como recordatorio de cita. El problema: la tasa de apertura media de email en salud es inferior al 20%. El paciente ni lo ve. Algunas clínicas directamente no envían ningún recordatorio — asumen que el paciente "se acordará".</p>
+      <div class="error-stat-box">
+        <div class="num">&lt;20%</div>
+        <div class="txt">tasa de apertura media de emails<br>de recordatorio en sector salud</div>
+      </div>
+      <div class="fix-box">
+        <div class="fix-icon">&#10003;</div>
+        <div class="fix-text"><strong>Qué hacen las clínicas que lo resuelven:</strong> WhatsApp tiene &gt;90% de tasa de apertura. Un recordatorio por WhatsApp con botón de confirmación es el estándar en 2026. No apps, no logins — un mensaje directo al móvil del paciente.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-num">2 / 3</div>
+</div>
+
+<!-- ═══════════ PAGE 3: ERRORES 4-5 + CONCLUSIÓN ═══════════ -->
+<div class="page content-page">
+
+  <!-- ERROR 4 -->
+  <div class="error-section">
+    <div class="error-header">
+      <div class="error-number">4</div>
+      <div class="error-title">No medir el coste real de las citas perdidas al mes</div>
+    </div>
+    <div class="error-body">
+      <p>Pregunta a cualquier director de clínica cuánto pierde al mes en no-shows y la mayoría no sabe la cifra exacta. Saben que "pierden alguna cita", pero no han hecho el cálculo. Sin esa cifra, el problema parece menor de lo que es — y no se priorizan soluciones.</p>
+      <p><strong>El cálculo es simple:</strong></p>
+      <p style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:13px;font-family:'Courier New',monospace;color:#334155;margin-bottom:14px;">
+        Ticket medio × citas no presentadas/mes = pérdida mensual<br>
+        <strong style="color:#dc2626;">Ejemplo: 150€ × 18 no-shows = 2.700€/mes perdidos</strong>
+      </p>
+      <div class="fix-box">
+        <div class="fix-icon">&#10003;</div>
+        <div class="fix-text"><strong>Qué hacen las clínicas que lo resuelven:</strong> Miden el no-show rate semanalmente. Tienen un dashboard donde ven: citas agendadas, confirmadas, canceladas, y no presentadas. Cuando ves la cifra cada lunes, la urgencia de resolverlo es real.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-divider"></div>
+
+  <!-- ERROR 5 -->
+  <div class="error-section">
+    <div class="error-header">
+      <div class="error-number">5</div>
+      <div class="error-title">No tener sistema de reactivación para pacientes inactivos</div>
+    </div>
+    <div class="error-body">
+      <p>El paciente vino hace 8 meses a una limpieza. No ha vuelto. No ha recibido ningún mensaje. En la base de datos de la clínica hay cientos o miles de pacientes así — personas que ya te conocen, ya confían en ti, pero simplemente se les olvidó pedir cita.</p>
+      <div class="error-stat-box">
+        <div class="num">5–7x</div>
+        <div class="txt">más barato reactivar un paciente<br>existente que captar uno nuevo</div>
+      </div>
+      <div class="fix-box">
+        <div class="fix-icon">&#10003;</div>
+        <div class="fix-text"><strong>Qué hacen las clínicas que lo resuelven:</strong> Mensajes automáticos a pacientes que llevan +90 días sin visita. "Hola María, vimos que tu última revisión fue hace 6 meses. ¿Te reservamos hueco esta semana?" — Por WhatsApp, personalizado, con enlace directo para agendar.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-block">
+    <h3>Si te has visto reflejado<br>en <em>2 o más errores</em>...</h3>
+    <p>No es culpa tuya — es que la mayoría de clínicas en España siguen gestionando las citas como hace 10 años. Pero las que están empezando a automatizar estos procesos ya están viendo resultados como estos:</p>
+
+    <div class="conclusion-results">
+      <div class="conclusion-result">
+        <div class="val">-70%</div>
+        <div class="lbl">Reducción en<br>no-shows</div>
+      </div>
+      <div class="conclusion-result">
+        <div class="val">14</div>
+        <div class="lbl">Huecos recuperados<br>al mes de media</div>
+      </div>
+      <div class="conclusion-result">
+        <div class="val">30h</div>
+        <div class="lbl">Liberadas para<br>recepción al mes</div>
+      </div>
+      <div class="conclusion-result">
+        <div class="val">+2.200€</div>
+        <div class="lbl">Ingresos recuperados<br>de media por mes</div>
+      </div>
+    </div>
+
+    <div class="conclusion-footer">
+      <div class="conclusion-cta"><strong>¿Quieres saber cómo aplicar esto en tu clínica?</strong><br>Responde a este correo y te lo explicamos en 5 minutos.</div>
+      <div class="conclusion-brand">omnexor<span class="dot">.</span></div>
+    </div>
+  </div>
+
+  <div class="page-num">3 / 3</div>
+</div>
+
+</body>
+</html>
